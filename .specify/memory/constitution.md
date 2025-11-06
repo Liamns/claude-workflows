@@ -234,7 +234,6 @@ Prioritize integration tests over unit tests.
 - 프로토타입 코드 (명시적으로 "prototype" 표시)
 - 일회성 마이그레이션 스크립트
 - 외부 API 특정 어댑터 코드
-
 ## Amendment Procedure
 
 **Process:**

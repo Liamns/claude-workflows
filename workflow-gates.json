@@ -13,10 +13,14 @@
         "아키텍처 변경"
       ],
       "process": [
-        "/speckit.specify",
-        "/speckit.plan",
-        "/speckit.tasks",
-        "/speckit.implement"
+        "/start (프로젝트 첫 실행 시)",
+        "/major [feature-name] (통합 워크플로)",
+        "또는 단계별:",
+        "/major-specify [feature-name]",
+        "/major-clarify [feature-number]",
+        "/major-plan [feature-number]",
+        "/major-tasks [feature-number]",
+        "/major-implement [feature-number] (선택)"
       ],
       "gates": {
         "pre-implementation": {
@@ -134,8 +138,10 @@
         "UI 개선"
       ],
       "process": [
-        "Sub-agent 직접 호출",
-        "Skill 활용"
+        "/minor [feature-number-or-description]",
+        "또는:",
+        "Sub-agent 직접 호출 (quick-fixer, fsd-architect)",
+        "Skill 활용 (bug-fix-pattern, fsd-component-creation)"
       ],
       "gates": {
         "pre-implementation": {
@@ -213,6 +219,8 @@
         "설정 변경"
       ],
       "process": [
+        "/micro [description]",
+        "또는:",
         "직접 수정 (AI 최소 개입)"
       ],
       "gates": {

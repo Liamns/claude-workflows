@@ -20,11 +20,41 @@ rm -rf /tmp/claude-workflows
 
 ### 사용법
 
-설치 후 Claude Code에서 자동으로 워크플로가 활성화됩니다:
+설치 후 Claude Code에서 워크플로 명령어를 사용할 수 있습니다:
 
-- **Major 워크플로**: `/speckit.specify` → `/speckit.plan` → `/speckit.tasks` → `/speckit.implement`
-- **Minor 워크플로**: Sub-agent 직접 호출 또는 Skill 활용
-- **Micro 워크플로**: 직접 수정 (AI 최소 개입)
+#### 프로젝트 초기 설정
+```bash
+/start    # .specify/ 디렉토리 및 Constitution 생성
+```
+
+#### Major 워크플로 (신규 기능)
+```bash
+# 통합 워크플로 (권장)
+/major user-authentication
+
+# 또는 단계별 실행
+/major-specify user-authentication  # 1. Specification 생성
+/major-clarify 001                  # 2. 질문을 통한 명확화 (선택)
+/major-plan 001                     # 3. Implementation Plan 수립
+/major-tasks 001                    # 4. Task Breakdown 생성
+/major-implement 001                # 5. 자동 구현 (선택)
+```
+
+#### Minor 워크플로 (기능 개선/버그 수정)
+```bash
+/minor 001                          # 기존 feature 업데이트
+/minor fix-login-validation         # 새 작업
+```
+
+#### Micro 워크플로 (빠른 수정)
+```bash
+/micro 로그인 버튼 텍스트 오타 수정
+/micro console.log 제거
+```
+
+#### Sub-agents & Skills
+- **Sub-agents**: 컨텍스트 격리된 전문 에이전트
+- **Skills**: 자동으로 상황에 맞게 실행되는 패턴
 
 ## 📋 워크플로 분류
 
@@ -88,7 +118,23 @@ rm -rf /tmp/claude-workflows
 
 ```
 .claude/
-├── agents/              # Sub-agents (7개)
+├── commands/                    # Slash Commands
+│   ├── start.md                 # 프로젝트 초기화
+│   ├── major.md                 # 통합 Major 워크플로
+│   ├── major-specify.md         # Step 1: Specification
+│   ├── major-clarify.md         # Step 2: Clarification
+│   ├── major-plan.md            # Step 3: Plan
+│   ├── major-tasks.md           # Step 4: Tasks
+│   ├── major-implement.md       # Step 5: Implementation
+│   ├── minor.md                 # Minor 워크플로
+│   └── micro.md                 # Micro 워크플로
+│
+├── templates/                   # 문서 템플릿
+│   ├── spec-template.md
+│   ├── plan-template.md
+│   └── tasks-template.md
+│
+├── agents/                      # Sub-agents (7개)
 │   ├── quick-fixer.md
 │   ├── changelog-writer.md
 │   ├── fsd-architect.md
@@ -97,24 +143,73 @@ rm -rf /tmp/claude-workflows
 │   ├── mobile-specialist.md
 │   └── code-reviewer.md
 │
-├── skills/              # Skills (7개)
-│   ├── bug-fix-pattern/
-│   ├── daily-changelog-notion/
-│   ├── fsd-component-creation/
-│   ├── api-integration/
-│   ├── form-validation/
-│   ├── platform-detection/
-│   └── mobile-build/
-│
-└── workflow-gates.json  # Quality Gates 설정
+└── skills/                      # Skills (7개)
+    ├── bug-fix-pattern/
+    ├── daily-changelog-notion/
+    ├── fsd-component-creation/
+    ├── api-integration/
+    ├── form-validation/
+    ├── platform-detection/
+    └── mobile-build/
+
+.specify/                        # Spec-Kit 구조
+├── memory/
+│   └── constitution.md          # 프로젝트 거버넌스
+├── templates/
+│   ├── spec-template.md
+│   ├── plan-template.md
+│   └── tasks-template.md
+├── scripts/bash/
+│   ├── common.sh
+│   ├── create-new-feature.sh
+│   └── check-prerequisites.sh
+├── steering/                    # 선택사항
+│   ├── product.md
+│   ├── tech.md
+│   └── structure.md
+└── specs/                       # Feature별 저장소
+    └── 001-feature-name/
+        ├── spec.md
+        ├── plan.md
+        ├── tasks.md
+        ├── research.md
+        ├── data-model.md
+        ├── contracts/
+        └── checklists/
+
+workflow-gates.json              # Quality Gates 설정
 ```
 
 ## 🎯 핵심 원칙
 
-1. **워크플로 분류**: 작업 규모에 따라 Major/Minor/Micro로 분류하여 과도한 프로세스 방지
-2. **컨텍스트 격리**: Sub-agents를 통한 독립적 컨텍스트 윈도우로 토큰 효율성 극대화
-3. **점진적 공개**: 메인 문서는 500줄 이하로 유지, 세부사항은 참조 파일로 분리
-4. **병렬 실행**: 여러 Sub-agents 동시 실행으로 응답 속도 개선
+1. **Specification-Driven Development**: spec.md를 실행 가능한 1차 아티팩트로 사용
+2. **워크플로 분류**: 작업 규모에 따라 Major/Minor/Micro로 분류하여 과도한 프로세스 방지
+3. **컨텍스트 격리**: Sub-agents를 통한 독립적 컨텍스트 윈도우로 토큰 효율성 극대화
+4. **Constitution-Based Governance**: 프로젝트별 불변 원칙 정의 (9개 Article)
+5. **점진적 공개**: 메인 문서는 500줄 이하로 유지, 세부사항은 참조 파일로 분리
+6. **병렬 실행**: [P] 표시된 Task 동시 실행으로 응답 속도 개선
+7. **Test-First**: 테스트 작성 후 구현 (TDD)
+
+## 📚 추가 문서
+
+### Specification 구조
+- **spec.md**: WHAT/WHY만 포함 (HOW 제외), User Scenarios 중심
+- **plan.md**: 기술적 구현 계획, Constitution Check, Phase 0+1
+- **tasks.md**: 실행 가능한 Task breakdown, Test-First 순서
+
+### Constitution (거버넌스)
+- **Article I**: Library-First (외부 라이브러리 우선)
+- **Article III**: Test-First (TDD 적용)
+- **Article VII**: Simplicity (≤3 projects initially)
+- **Article VIII**: Anti-Abstraction (과도한 추상화 금지)
+- **Article IX**: Integration-First Testing
+
+### Task Format
+```
+[T001] [P?] [Story?] Description /absolute/path/to/file
+```
+- `[P]`: 병렬화 가능
+- `[Story]`: User Story ID (US1, US2...)
 
 ## 🔧 커스터마이징
 
@@ -194,8 +289,12 @@ MIT License - 자유롭게 사용, 수정, 배포 가능합니다.
 ## 📖 상세 문서
 
 - [Notion Workflow 문서](https://www.notion.so/2a21e422ebe480c59138f5ca33cbf007)
-- Constitution: `.claude/constitution.md`
+- Constitution Template: `.specify/memory/constitution.md`
+- Spec Template: `.specify/templates/spec-template.md`
+- Plan Template: `.specify/templates/plan-template.md`
+- Tasks Template: `.specify/templates/tasks-template.md`
 - Workflow Gates: `workflow-gates.json`
+- Slash Commands: `.claude/commands/*.md`
 
 ## 🙋‍♂️ 지원
 

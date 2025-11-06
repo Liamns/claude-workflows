@@ -1,52 +1,82 @@
-# Claude Code Workflows
+# 🤖 Claude Workflows
 
-배차킹 프로젝트의 개발 효율성, 품질, 토큰 최적화를 위한 재사용 가능한 Claude Code 워크플로 시스템입니다.
+[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](https://github.com/Liamns/claude-workflows)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-purple.svg)](https://claude.ai/code)
 
-## 🚀 빠른 시작
+> Smart workflows for Claude Code - Auto-triage, smart commits, and PR reviews
 
-### 설치
+Claude Code를 통한 개발 효율성 극대화를 위한 스마트 워크플로우 시스템
+
+## 🚀 Quick Start
+
+### 1분 설치
 
 ```bash
-# 프로젝트 디렉토리에서 실행
+# 현재 프로젝트에 설치
 curl -fsSL https://raw.githubusercontent.com/Liamns/claude-workflows/main/install.sh | bash
 
-# 또는 수동 설치
-git clone https://github.com/Liamns/claude-workflows.git /tmp/claude-workflows
-cp -r /tmp/claude-workflows/agents .claude/
-cp -r /tmp/claude-workflows/skills .claude/
-cp /tmp/claude-workflows/workflow-gates.json .claude/
-rm -rf /tmp/claude-workflows
+# 또는 직접 클론
+git clone https://github.com/Liamns/claude-workflows
+cd claude-workflows
+./install.sh /path/to/your/project
 ```
 
-### 사용법
+### 첫 명령어
 
-설치 후 Claude Code에서 워크플로 명령어를 사용할 수 있습니다:
+```bash
+# AI가 작업 복잡도를 자동 분석하여 최적 워크플로우 선택
+/triage "타입 에러 수정"
+→ Minor 워크플로우 자동 선택 (75% 토큰 절약)
+```
 
-#### 프로젝트 초기 설정
+## ✨ 새로운 기능 (v2.0.0)
+
+### 🎯 `/triage` - 자동 워크플로우 선택
+작업 설명을 입력하면 AI가 자동으로 Major/Minor/Micro 중 최적 워크플로우 선택
+- **토큰 절약**: 잘못된 워크플로우 선택으로 인한 낭비 방지
+- **스마트 분석**: 복잡도 점수 기반 자동 분류
+- **추가 질문**: 애매한 경우 구체적 정보 요청
+
+### 📝 `/commit` - 스마트 커밋
+Git 변경사항을 분석하여 Conventional Commits 형식으로 자동 커밋
+- **자동 타입 판단**: feat/fix/refactor 등 정확한 분류
+- **Breaking Changes 감지**: 호환성 영향 자동 탐지
+- **선택적 검증**: 타입체크, 린트, 테스트 실행 옵션
+
+### 🔍 `/pr-review` - PR 자동 리뷰
+GitHub PR을 자동으로 분석하고 코드 리뷰 수행
+- **보안 검사**: XSS, SQL Injection 등 취약점 검사
+- **성능 분석**: 메모리 누수, 불필요한 리렌더링 감지
+- **아키텍처 검증**: FSD 규칙 준수 확인
+- **터미널 출력**: GitHub 댓글 없이 로컬에서 결과 확인
+
+## 📊 워크플로우 사용법
+
+### 프로젝트 초기 설정
 ```bash
 /start    # .specify/ 디렉토리 및 Constitution 생성
 ```
 
-#### Major 워크플로 (신규 기능)
+### Major 워크플로 (신규 기능)
 ```bash
-# 통합 워크플로 (권장)
+# 자동 선택 (권장)
+/triage "사용자 인증 기능 추가"
+
+# 또는 직접 실행
 /major user-authentication
-
-# 또는 단계별 실행
-/major-specify user-authentication  # 1. Specification 생성
-/major-clarify 001                  # 2. 질문을 통한 명확화 (선택)
-/major-plan 001                     # 3. Implementation Plan 수립
-/major-tasks 001                    # 4. Task Breakdown 생성
-/major-implement 001                # 5. 자동 구현 (선택)
 ```
 
-#### Minor 워크플로 (기능 개선/버그 수정)
+### Minor 워크플로 (버그 수정/개선)
 ```bash
-/minor 001                          # 기존 feature 업데이트
-/minor fix-login-validation         # 새 작업
+# 자동 선택
+/triage "로그인 폼 검증 버그"
+
+# 또는 직접 실행
+/minor fix-login-validation
 ```
 
-#### Micro 워크플로 (빠른 수정)
+### Micro 워크플로 (빠른 수정)
 ```bash
 /micro 로그인 버튼 텍스트 오타 수정
 /micro console.log 제거

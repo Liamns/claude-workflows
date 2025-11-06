@@ -1,7 +1,7 @@
 ---
 name: code-reviewer
 description: 코드 품질, 보안, 성능을 자동으로 검토합니다. PR 생성 시 자동 실행되며, XSS/SQL injection 검사, 성능 최적화, 베스트 프랙티스 제안을 제공합니다.
-tools: Bash(git diff*), Read, Grep
+tools: Bash(git diff*), Read, Grep, Bash(gh pr*), Bash(gh issue*), Bash(gh api*)
 model: opus
 ---
 

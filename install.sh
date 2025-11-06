@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Claude Code Workflows Installer
-# Version: 1.0.0
+# Version: 2.0.0
 
 set -e
 
@@ -21,7 +21,7 @@ TEMP_DIR=$(mktemp -d)
 print_header() {
     echo -e "${BLUE}╔════════════════════════════════════════╗${NC}"
     echo -e "${BLUE}║   Claude Code Workflows Installer     ║${NC}"
-    echo -e "${BLUE}║   Version 1.0.0                        ║${NC}"
+    echo -e "${BLUE}║   Version 2.0.0                        ║${NC}"
     echo -e "${BLUE}╚════════════════════════════════════════╝${NC}"
     echo ""
 }
@@ -65,11 +65,6 @@ install_workflows() {
         exit 1
     fi
 
-    # Create .claude directory if it doesn't exist
-    print_info "Creating .claude directory..."
-    mkdir -p "$TARGET_DIR/.claude"
-    print_success ".claude directory ready"
-
     # Clone repository to temp directory
     print_info "Downloading workflows from GitHub..."
     if git clone --quiet "$REPO_URL" "$TEMP_DIR" 2>/dev/null; then
@@ -78,6 +73,39 @@ install_workflows() {
         print_error "Failed to download from GitHub"
         print_info "Please check your internet connection or repository URL"
         exit 1
+    fi
+
+    # Create .claude directory structure
+    print_info "Creating .claude directory structure..."
+    mkdir -p "$TARGET_DIR/.claude/commands"
+    mkdir -p "$TARGET_DIR/.claude/templates"
+    print_success ".claude directory ready"
+
+    # Copy slash commands
+    if [ -d "$TEMP_DIR/.claude/commands" ]; then
+        print_info "Installing Slash Commands (9개)..."
+        cp -r "$TEMP_DIR/.claude/commands/"* "$TARGET_DIR/.claude/commands/" 2>/dev/null || true
+        print_success "Slash Commands installed (start, major, minor, micro 등)"
+    else
+        print_warning ".claude/commands/ directory not found in repository"
+    fi
+
+    # Copy templates
+    if [ -d "$TEMP_DIR/.claude/templates" ]; then
+        print_info "Installing Templates..."
+        cp -r "$TEMP_DIR/.claude/templates/"* "$TARGET_DIR/.claude/templates/" 2>/dev/null || true
+        print_success "Templates installed"
+    else
+        print_warning ".claude/templates/ directory not found in repository"
+    fi
+
+    # Copy workflow-gates.json
+    if [ -f "$TEMP_DIR/workflow-gates.json" ]; then
+        print_info "Installing workflow-gates.json..."
+        cp "$TEMP_DIR/workflow-gates.json" "$TARGET_DIR/.claude/"
+        print_success "workflow-gates.json installed"
+    else
+        print_warning "workflow-gates.json not found in repository"
     fi
 
     # Copy agents
@@ -98,13 +126,25 @@ install_workflows() {
         print_warning "skills/ directory not found in repository"
     fi
 
-    # Copy workflow-gates.json
-    if [ -f "$TEMP_DIR/workflow-gates.json" ]; then
-        print_info "Installing workflow-gates.json..."
-        cp "$TEMP_DIR/workflow-gates.json" "$TARGET_DIR/.claude/"
-        print_success "workflow-gates.json installed"
-    else
-        print_warning "workflow-gates.json not found in repository"
+    # Create .specify directory structure (optional, created by /start command)
+    print_info "Creating .specify directory structure..."
+    mkdir -p "$TARGET_DIR/.specify/memory"
+    mkdir -p "$TARGET_DIR/.specify/templates"
+    mkdir -p "$TARGET_DIR/.specify/scripts/bash"
+    mkdir -p "$TARGET_DIR/.specify/steering"
+    mkdir -p "$TARGET_DIR/.specify/specs"
+
+    # Copy .specify templates
+    if [ -d "$TEMP_DIR/.specify/templates" ]; then
+        print_info "Installing .specify templates..."
+        cp -r "$TEMP_DIR/.specify/templates/"* "$TARGET_DIR/.specify/templates/" 2>/dev/null || true
+        print_success ".specify templates installed"
+    fi
+
+    # Copy constitution template
+    if [ -f "$TEMP_DIR/.specify/memory/constitution.md" ]; then
+        cp "$TEMP_DIR/.specify/memory/constitution.md" "$TARGET_DIR/.specify/memory/"
+        print_success "Constitution template installed"
     fi
 
     echo ""
@@ -116,9 +156,18 @@ install_workflows() {
     echo -e "${GREEN}Installed Components:${NC}"
     echo ""
     echo "📁 $TARGET_DIR/.claude/"
+    echo "   ├── commands/        (9 Slash Commands)"
+    echo "   ├── templates/       (문서 템플릿)"
     echo "   ├── agents/          (7 Sub-agents)"
     echo "   ├── skills/          (7 Skills)"
     echo "   └── workflow-gates.json"
+    echo ""
+    echo "📁 $TARGET_DIR/.specify/"
+    echo "   ├── memory/          (constitution.md)"
+    echo "   ├── templates/       (spec, plan, tasks)"
+    echo "   ├── scripts/bash/"
+    echo "   ├── steering/"
+    echo "   └── specs/"
     echo ""
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
@@ -126,13 +175,24 @@ install_workflows() {
     # Print next steps
     echo -e "${GREEN}Next Steps:${NC}"
     echo ""
-    echo "1. 워크플로가 활성화되었습니다!"
-    echo "2. Claude Code에서 다음 명령어를 사용할 수 있습니다:"
-    echo "   - Major 워크플로: /speckit.specify"
-    echo "   - Sub-agents: quick-fixer, fsd-architect, test-guardian 등"
-    echo "   - Skills: 자동으로 상황에 맞게 실행됩니다"
+    echo "1. 프로젝트 초기 설정:"
+    echo "   /start              # Constitution 생성 및 .specify/ 구조 완성"
     echo ""
-    echo "3. 자세한 사용법은 README.md를 참고하세요:"
+    echo "2. 워크플로 명령어:"
+    echo "   /major [feature-name]        # 신규 기능 (통합 워크플로)"
+    echo "   /minor [feature-or-issue]    # 버그 수정, 기능 개선"
+    echo "   /micro [description]         # 빠른 수정"
+    echo ""
+    echo "3. 단계별 실행 (Major):"
+    echo "   /major-specify [feature-name]"
+    echo "   /major-clarify [feature-number]"
+    echo "   /major-plan [feature-number]"
+    echo "   /major-tasks [feature-number]"
+    echo "   /major-implement [feature-number]"
+    echo ""
+    echo "4. Sub-agents 및 Skills는 자동으로 활성화됩니다"
+    echo ""
+    echo "5. 자세한 사용법:"
     echo "   ${REPO_URL}#readme"
     echo ""
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"

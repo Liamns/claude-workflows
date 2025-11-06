@@ -428,6 +428,6 @@ export function DispatchForm({ userId }: Props) {
 ## 통합
 
 이 Skill은 다음과 함께 사용됩니다:
-- **fsd-architect** Sub-agent: 생성 후 아키텍처 규칙 재검증
-- **test-guardian** Sub-agent: Major 워크플로우에서 테스트 파일 함께 생성
-- **api-designer** Sub-agent: API 관련 Feature 생성 시 API 계약 먼저 설계
+- **fsd-architect** agent: 생성 후 아키텍처 규칙 재검증
+- **test-guardian** agent: Major 워크플로우에서 테스트 파일 함께 생성
+- **api-designer** agent: API 관련 Feature 생성 시 API 계약 먼저 설계

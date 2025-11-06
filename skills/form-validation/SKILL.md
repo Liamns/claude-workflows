@@ -353,4 +353,4 @@ features/dispatch/ui/DispatchForm.tsx
 이 Skill은 다음과 함께 사용됩니다:
 - **api-integration** Skill: API 호출 전 Zod 검증
 - **fsd-component-creation** Skill: Feature 컴포넌트에 폼 추가
-- **test-guardian** Sub-agent: 폼 검증 테스트 작성
+- **test-guardian** agent: 폼 검증 테스트 작성

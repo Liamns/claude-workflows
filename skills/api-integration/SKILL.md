@@ -352,6 +352,6 @@ POST /api/dispatch
 ## 통합
 
 이 Skill은 다음과 함께 사용됩니다:
-- **api-designer** Sub-agent: API 계약 먼저 설계
+- **api-designer** agent: API 계약 먼저 설계
 - **form-validation** Skill: React Hook Form과 통합
-- **test-guardian** Sub-agent: API 호출 테스트 작성
+- **test-guardian** agent: API 호출 테스트 작성

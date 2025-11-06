@@ -119,9 +119,9 @@ install_workflows() {
 
     # Copy skills
     if [ -d "$TEMP_DIR/skills" ]; then
-        print_info "Installing Skills (8개)..."
+        print_info "Installing Skills (10개)..."
         cp -r "$TEMP_DIR/skills" "$TARGET_DIR/.claude/"
-        print_success "Skills installed (commit-guard, bug-fix-pattern, api-integration 등)"
+        print_success "Skills installed (reusability-enforcer, reusability-metrics, api-integration 등)"
     else
         print_warning "skills/ directory not found in repository"
     fi
@@ -168,7 +168,7 @@ install_workflows() {
     echo "   ├── commands/        (12 Slash Commands)"
     echo "   ├── templates/       (문서 템플릿)"
     echo "   ├── agents/          (8 Sub-agents)"
-    echo "   ├── skills/          (8 Skills)"
+    echo "   ├── skills/          (10 Skills)"
     echo "   ├── docs/            (가이드 문서)"
     echo "   └── workflow-gates.json"
     echo ""
@@ -188,8 +188,8 @@ install_workflows() {
     echo "1. 프로젝트 초기 설정:"
     echo "   /start              # Constitution 생성 및 .specify/ 구조 완성"
     echo ""
-    echo "2. 자동 워크플로 선택 (🆕):"
-    echo "   /triage [작업 설명]         # AI가 최적 워크플로 자동 선택"
+    echo "2. 자동 워크플로 선택 (🆕 재사용성 검사 포함):"
+    echo "   /triage [작업 설명]         # AI가 최적 워크플로 자동 선택 + 재사용 모듈 검색"
     echo ""
     echo "3. 워크플로 명령어:"
     echo "   /major [feature-name]        # 신규 기능 (통합 워크플로)"

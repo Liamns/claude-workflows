@@ -56,6 +56,17 @@
           }
         },
         "during-implementation": {
+          "reusability-check": {
+            "enabled": true,
+            "required": true,
+            "description": "재사용성 검사 및 패턴 일관성",
+            "skill": "reusability-enforcer",
+            "criteria": [
+              "기존 패턴 검색 완료",
+              "패턴 일관성 확보",
+              "중복 코드 5% 이하"
+            ]
+          },
           "fsd-architecture": {
             "enabled": true,
             "required": true,
@@ -90,6 +101,17 @@
           }
         },
         "post-implementation": {
+          "reusability-metrics": {
+            "enabled": true,
+            "required": false,
+            "description": "재사용성 메트릭 측정",
+            "skill": "reusability-metrics",
+            "criteria": [
+              "재사용률 60% 이상",
+              "중복 코드 5% 이하",
+              "shared 컴포넌트 활용"
+            ]
+          },
           "code-review": {
             "enabled": true,
             "required": true,
@@ -156,6 +178,16 @@
           }
         },
         "during-implementation": {
+          "reusability-check": {
+            "enabled": true,
+            "required": false,
+            "description": "재사용 패턴 검색",
+            "skill": "reusability-enforcer",
+            "criteria": [
+              "기존 패턴 활용",
+              "일관성 유지"
+            ]
+          },
           "minimal-change": {
             "enabled": true,
             "required": true,

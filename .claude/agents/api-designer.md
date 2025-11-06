@@ -1,6 +1,6 @@
 ---
 name: api-designer
-description: Major 워크플로우 전용. API 계약을 설계하고 httpClient 통합을 담당합니다. 에러 처리, 토큰 관리, React Query 패턴을 제공합니다.
+description: Major 워크플로우 전용. API 계약을 설계하고 기존 API 통합 패턴을 따라 구현합니다. 에러 처리, 토큰 관리, 데이터 페칭 패턴을 일관성 있게 적용합니다.
 tools: Read, Grep, Write, WebFetch(domain:*)
 model: sonnet
 ---
@@ -72,17 +72,19 @@ export interface DispatchError {
 }
 ```
 
-### Step 2: API 함수 작성
+### Step 2: API 함수 작성 (기존 패턴 따르기)
 
 ```typescript
 // features/dispatch/api/createDispatch.ts
-import { httpClient } from '@/app/api/httpClient';
+// 프로젝트의 기존 API 클라이언트 패턴을 그대로 사용
+import { apiClient } from '@/shared/api'; // 기존 패턴에 맞춰 import
 import type { CreateDispatchRequest, CreateDispatchResponse } from './types';
 
 export async function createDispatch(
   data: CreateDispatchRequest
 ): Promise<CreateDispatchResponse> {
-  const response = await httpClient.post<CreateDispatchResponse>(
+  // 기존 프로젝트의 API 호출 패턴을 그대로 따름
+  const response = await apiClient.post<CreateDispatchResponse>(
     '/api/dispatch',
     data
   );
@@ -90,11 +92,12 @@ export async function createDispatch(
 }
 ```
 
-### Step 3: React Query 훅 작성
+### Step 3: 데이터 페칭 훅 작성 (기존 패턴 따르기)
 
 ```typescript
 // features/dispatch/api/useCreateDispatch.ts
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+// 프로젝트에서 사용 중인 데이터 페칭 라이브러리/패턴 그대로 사용
+import { useDataMutation } from '@/shared/hooks'; // 기존 패턴
 import { createDispatch } from './createDispatch';
 import type { CreateDispatchRequest } from './types';
 
@@ -135,48 +138,47 @@ export function useDispatchForm() {
 }
 ```
 
-## httpClient 통합
+## API 클라이언트 통합 (기존 패턴 활용)
 
 ### 자동 처리 기능
 
-프로젝트의 `httpClient`는 다음을 자동 처리합니다:
+프로젝트의 기존 API 클라이언트가 처리하는 기능들을 확인하고 활용:
 
-1. **토큰 첨부**: 모든 요청에 `Authorization` 헤더 자동 추가
-2. **401 처리**: 토큰 만료 시 자동 갱신 및 재시도
-3. **에러 구조화**: 백엔드 에러를 일관된 형식으로 변환
+1. **인증 처리**: 기존 토큰/세션 관리 방식 그대로 사용
+2. **에러 처리**: 기존 에러 핸들링 패턴 그대로 적용
+3. **응답 변환**: 기존 데이터 변환 방식 그대로 따름
 
 ### 에러 처리 패턴
 
 ```typescript
 // features/dispatch/api/useCreateDispatch.ts
 export function useCreateDispatch() {
-  return useMutation({
+  // 프로젝트의 기존 에러 처리 패턴을 그대로 따름
+  return useDataMutation({
     mutationFn: createDispatch,
-    onError: (error: AxiosError<DispatchError>) => {
-      // httpClient가 이미 401을 처리했으므로
-      // 여기서는 비즈니스 에러만 처리
+    onError: (error: ApiError) => {
+      // 기존 프로젝트의 에러 처리 패턴 적용
+      // 인증 에러는 이미 상위 레벨에서 처리됨
 
-      if (error.response?.status === 400) {
-        // 검증 에러
-        const field = error.response.data.field;
-        const message = error.response.data.message;
-        // UI에 필드별 에러 표시
-      } else if (error.response?.status === 403) {
-        // 권한 에러
-        // 권한 없음 UI 표시
-      } else if (error.response?.status === 422) {
-        // 처리 불가 에러
-        // 에러 메시지 표시
+      if (error.status === 400) {
+        // 검증 에러 - 기존 패턴대로 처리
+        handleValidationError(error);
+      } else if (error.status === 403) {
+        // 권한 에러 - 기존 패턴대로 처리
+        handlePermissionError(error);
+      } else if (error.status === 422) {
+        // 처리 불가 에러 - 기존 패턴대로 처리
+        handleProcessingError(error);
       } else {
-        // 기타 서버 에러
-        // 일반 에러 메시지 표시
+        // 기타 에러 - 기존 패턴대로 처리
+        handleGenericError(error);
       }
     },
   });
 }
 ```
 
-## React Query 최적화
+## 데이터 페칭 최적화 (기존 패턴 활용)
 
 ### 1. 캐싱 전략
 

@@ -13,7 +13,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-REPO_URL="https://github.com/yourusername/claude-workflows"
+REPO_URL="https://github.com/Liamns/claude-workflows"
 TARGET_DIR="${1:-.}"
 TEMP_DIR=$(mktemp -d)
 
@@ -147,7 +147,7 @@ usage() {
     echo "  $0 /path/to/project   # Install to specific directory"
     echo ""
     echo "Or use with curl:"
-    echo "  curl -fsSL https://raw.githubusercontent.com/yourusername/claude-workflows/main/install.sh | bash"
+    echo "  curl -fsSL https://raw.githubusercontent.com/Liamns/claude-workflows/main/install.sh | bash"
 }
 
 # Parse arguments

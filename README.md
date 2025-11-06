@@ -8,10 +8,10 @@
 
 ```bash
 # 프로젝트 디렉토리에서 실행
-curl -fsSL https://raw.githubusercontent.com/yourusername/claude-workflows/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Liamns/claude-workflows/main/install.sh | bash
 
 # 또는 수동 설치
-git clone https://github.com/yourusername/claude-workflows.git /tmp/claude-workflows
+git clone https://github.com/Liamns/claude-workflows.git /tmp/claude-workflows
 cp -r /tmp/claude-workflows/agents .claude/
 cp -r /tmp/claude-workflows/skills .claude/
 cp /tmp/claude-workflows/workflow-gates.json .claude/
@@ -199,5 +199,5 @@ MIT License - 자유롭게 사용, 수정, 배포 가능합니다.
 
 ## 🙋‍♂️ 지원
 
-- Issues: https://github.com/yourusername/claude-workflows/issues
-- Discussions: https://github.com/yourusername/claude-workflows/discussions
+- Issues: https://github.com/Liamns/claude-workflows/issues
+- Discussions: https://github.com/Liamns/claude-workflows/discussions

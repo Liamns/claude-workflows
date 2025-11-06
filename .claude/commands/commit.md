@@ -203,6 +203,10 @@ default_type: feat
 auto_scope: true
 emoji: false  # 이모지 사용 여부
 
+# 커밋 메세지 설정
+commit:
+  add_claude_footer: false # "Generated with Claude Code" 푸터 제거
+
 # 검증 기본값
 verification:
   default: quick  # full, quick, skip

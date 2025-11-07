@@ -1,7 +1,12 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Architecture patterns registry for multi-architecture support",
+  "implementationStatus": {
+    "implemented": ["fsd", "atomic", "clean", "hexagonal", "ddd", "layered"],
+    "planned": ["mvc", "micro-frontend", "serverless", "monorepo", "jamstack", "microservices", "mvvm", "clean-mobile"],
+    "comingSoon": "2024 Q1"
+  },
   "architectures": {
     "frontend": {
       "fsd": {
@@ -26,7 +31,8 @@
         "aliases": ["model-view-controller", "mvp", "mvvm"],
         "compatibility": ["angular", "vue", "react"],
         "configPath": "architectures/frontend/mvc/config.json",
-        "enabled": true
+        "enabled": false,
+        "status": "planned"
       },
       "micro-frontend": {
         "name": "Micro Frontend",
@@ -34,7 +40,8 @@
         "aliases": ["micro-frontends", "module-federation"],
         "compatibility": ["react", "vue", "angular"],
         "configPath": "architectures/frontend/micro-frontend/config.json",
-        "enabled": true
+        "enabled": false,
+        "status": "planned"
       }
     },
     "backend": {
@@ -76,7 +83,8 @@
         "aliases": ["faas", "lambda"],
         "compatibility": ["node", "python", "go", "java"],
         "configPath": "architectures/backend/serverless/config.json",
-        "enabled": true
+        "enabled": false,
+        "status": "planned"
       }
     },
     "fullstack": {
@@ -86,7 +94,8 @@
         "aliases": ["mono-repo", "nx", "turborepo"],
         "compatibility": ["nx", "turborepo", "lerna", "rush"],
         "configPath": "architectures/fullstack/monorepo/config.json",
-        "enabled": true
+        "enabled": false,
+        "status": "planned"
       },
       "jamstack": {
         "name": "JAMstack",
@@ -94,7 +103,8 @@
         "aliases": ["jam"],
         "compatibility": ["gatsby", "next", "nuxt", "11ty"],
         "configPath": "architectures/fullstack/jamstack/config.json",
-        "enabled": true
+        "enabled": false,
+        "status": "planned"
       },
       "microservices": {
         "name": "Microservices",
@@ -102,7 +112,8 @@
         "aliases": ["micro-services"],
         "compatibility": ["docker", "kubernetes", "all"],
         "configPath": "architectures/fullstack/microservices/config.json",
-        "enabled": true
+        "enabled": false,
+        "status": "planned"
       }
     },
     "mobile": {
@@ -112,7 +123,8 @@
         "aliases": ["mobile-mvvm"],
         "compatibility": ["react-native", "flutter", "ionic"],
         "configPath": "architectures/mobile/mvvm/config.json",
-        "enabled": true
+        "enabled": false,
+        "status": "planned"
       },
       "clean-mobile": {
         "name": "Clean Architecture Mobile",
@@ -120,7 +132,8 @@
         "aliases": ["mobile-clean"],
         "compatibility": ["react-native", "flutter", "ionic"],
         "configPath": "architectures/mobile/clean/config.json",
-        "enabled": true
+        "enabled": false,
+        "status": "planned"
       }
     }
   },

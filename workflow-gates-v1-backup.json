@@ -1,0 +1,445 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "description": "워크플로우별 품질 게이트 설정",
+  "workflows": {
+    "major": {
+      "name": "Major (Spec-Kit)",
+      "description": "신규 기능 추가, 아키텍처 변경, API 엔드포인트 추가",
+      "triggers": [
+        "2일 이상 소요 예상",
+        "3개 이상 새 파일 생성",
+        "API 엔드포인트 추가",
+        "아키텍처 변경"
+      ],
+      "process": [
+        "/start (프로젝트 첫 실행 시)",
+        "/major [feature-name] (통합 워크플로)",
+        "또는 단계별:",
+        "/major-specify [feature-name]",
+        "/major-clarify [feature-number]",
+        "/major-plan [feature-number]",
+        "/major-tasks [feature-number]",
+        "/major-implement [feature-number] (선택)"
+      ],
+      "gates": {
+        "pre-implementation": {
+          "spec-quality": {
+            "enabled": true,
+            "required": true,
+            "description": "spec.md 품질 검증",
+            "criteria": [
+              "목표 명확성",
+              "성공 기준 정의",
+              "기술 스택 명시"
+            ]
+          },
+          "test-plan": {
+            "enabled": true,
+            "required": true,
+            "description": "테스트 계획 수립",
+            "criteria": [
+              "단위 테스트 계획",
+              "통합 테스트 계획",
+              "커버리지 목표 80%+"
+            ]
+          },
+          "api-contract": {
+            "enabled": true,
+            "required": false,
+            "description": "API 계약 정의 (API 관련 시만)",
+            "criteria": [
+              "Request/Response 타입",
+              "에러 응답 형식",
+              "MSW 핸들러"
+            ]
+          }
+        },
+        "during-implementation": {
+          "reusability-check": {
+            "enabled": true,
+            "required": true,
+            "description": "재사용성 검사 및 패턴 일관성",
+            "skill": "reusability-enforcer",
+            "criteria": [
+              "기존 패턴 검색 완료",
+              "패턴 일관성 확보",
+              "중복 코드 5% 이하"
+            ]
+          },
+          "fsd-architecture": {
+            "enabled": true,
+            "required": true,
+            "description": "FSD 아키텍처 준수",
+            "agent": "fsd-architect",
+            "criteria": [
+              "Entity 순수성",
+              "Features Props 규칙",
+              "의존성 방향"
+            ]
+          },
+          "test-first": {
+            "enabled": true,
+            "required": true,
+            "description": "테스트 우선 개발",
+            "agent": "test-guardian",
+            "criteria": [
+              "구현 전 테스트 작성",
+              "테스트 통과 확인",
+              "커버리지 80%+ 달성"
+            ]
+          },
+          "type-safety": {
+            "enabled": true,
+            "required": true,
+            "description": "타입 안전성",
+            "command": "yarn type-check",
+            "criteria": [
+              "TypeScript strict 모드",
+              "타입 에러 없음"
+            ]
+          }
+        },
+        "post-implementation": {
+          "reusability-metrics": {
+            "enabled": true,
+            "required": false,
+            "description": "재사용성 메트릭 측정",
+            "skill": "reusability-metrics",
+            "criteria": [
+              "재사용률 60% 이상",
+              "중복 코드 5% 이하",
+              "shared 컴포넌트 활용"
+            ]
+          },
+          "code-review": {
+            "enabled": true,
+            "required": true,
+            "description": "자동 코드 리뷰",
+            "agent": "code-reviewer",
+            "criteria": [
+              "보안 취약점 없음",
+              "성능 이슈 없음",
+              "베스트 프랙티스 준수"
+            ]
+          },
+          "all-tests-pass": {
+            "enabled": true,
+            "required": true,
+            "description": "전체 테스트 통과",
+            "commands": [
+              "yarn test",
+              "yarn test:critical"
+            ],
+            "criteria": [
+              "모든 테스트 통과",
+              "커버리지 80%+"
+            ]
+          },
+          "build-success": {
+            "enabled": true,
+            "required": true,
+            "description": "빌드 성공",
+            "command": "yarn build:dev",
+            "criteria": [
+              "빌드 에러 없음",
+              "번들 크기 확인"
+            ]
+          }
+        }
+      },
+      "estimated_token_savings": "60%",
+      "quality_level": "highest"
+    },
+    "minor": {
+      "name": "Minor (Lightweight)",
+      "description": "버그 픽스, 기존 기능 개선, UI 스타일 변경",
+      "triggers": [
+        "1일 이하 소요",
+        "로직 수정",
+        "UI 개선"
+      ],
+      "process": [
+        "/minor [feature-number-or-description]",
+        "또는:",
+        "Sub-agent 직접 호출 (quick-fixer, fsd-architect)",
+        "Skill 활용 (bug-fix-pattern, fsd-component-creation)"
+      ],
+      "gates": {
+        "pre-implementation": {
+          "issue-identification": {
+            "enabled": true,
+            "required": true,
+            "description": "문제 식별",
+            "criteria": [
+              "재현 가능한 버그 설명",
+              "영향 범위 파악"
+            ]
+          }
+        },
+        "during-implementation": {
+          "reusability-check": {
+            "enabled": true,
+            "required": false,
+            "description": "재사용 패턴 검색",
+            "skill": "reusability-enforcer",
+            "criteria": [
+              "기존 패턴 활용",
+              "일관성 유지"
+            ]
+          },
+          "minimal-change": {
+            "enabled": true,
+            "required": true,
+            "description": "최소 변경 원칙",
+            "agent": "quick-fixer",
+            "criteria": [
+              "변경 범위 최소화",
+              "Side effect 검증"
+            ]
+          },
+          "fsd-architecture": {
+            "enabled": true,
+            "required": true,
+            "description": "FSD 규칙 준수",
+            "agent": "fsd-architect",
+            "criteria": [
+              "레이어 규칙 위반 없음"
+            ]
+          },
+          "type-check": {
+            "enabled": true,
+            "required": true,
+            "description": "타입 체크",
+            "command": "yarn type-check",
+            "criteria": [
+              "타입 에러 없음"
+            ]
+          }
+        },
+        "post-implementation": {
+          "related-tests": {
+            "enabled": true,
+            "required": true,
+            "description": "관련 테스트 통과",
+            "command": "yarn test [affected]",
+            "criteria": [
+              "수정된 파일 관련 테스트 통과"
+            ]
+          },
+          "regression-check": {
+            "enabled": true,
+            "required": false,
+            "description": "회귀 테스트 (선택)",
+            "command": "yarn test:critical",
+            "criteria": [
+              "Critical path 테스트 통과"
+            ]
+          }
+        }
+      },
+      "estimated_token_savings": "75%",
+      "quality_level": "high"
+    },
+    "micro": {
+      "name": "Micro (Quick Fix)",
+      "description": "타이포 수정, 주석, 로그 제거, 설정 파일",
+      "triggers": [
+        "30분 이하 소요",
+        "문서 수정",
+        "주석 추가/제거",
+        "설정 변경"
+      ],
+      "process": [
+        "/micro [description]",
+        "또는:",
+        "직접 수정 (AI 최소 개입)"
+      ],
+      "gates": {
+        "post-implementation": {
+          "syntax-check": {
+            "enabled": true,
+            "required": true,
+            "description": "문법 체크",
+            "command": "yarn lint",
+            "criteria": [
+              "Lint 에러 없음"
+            ]
+          },
+          "build-verify": {
+            "enabled": false,
+            "required": false,
+            "description": "빌드 검증 (선택)",
+            "command": "yarn build:dev",
+            "criteria": [
+              "빌드 성공"
+            ]
+          }
+        }
+      },
+      "estimated_token_savings": "85%",
+      "quality_level": "standard"
+    }
+  },
+  "review": {
+    "name": "Code Review",
+    "description": "종합적인 코드 리뷰 - 파일, 디렉토리, git diff 분석",
+    "triggers": [
+      "코드 리뷰 요청",
+      "커밋 전 검증",
+      "PR 외부 리뷰"
+    ],
+    "process": [
+      "/review [target] - 기본 리뷰",
+      "/review [target] --adv - 심층 분석",
+      "/review --staged - 스테이징 변경사항",
+      "/review --diff main...HEAD - 브랜치 차이"
+    ],
+    "model_selection": {
+      "complexity_threshold": {
+        "haiku": [0, 5],
+        "sonnet": [6, 11],
+        "opus": [12, null]
+      },
+      "auto_upgrade_triggers": [
+        "security_issues",
+        "breaking_changes",
+        "architecture_violations"
+      ]
+    },
+    "context7": {
+      "activation_threshold": 10,
+      "token_budget": 3000,
+      "advanced_mode_always": true
+    },
+    "agents": {
+      "core": {
+        "code-reviewer": {
+          "enabled": true,
+          "focus": ["security", "performance", "quality"],
+          "model": "opus_with_fallback"
+        },
+        "architect": {
+          "enabled": true,
+          "mode": "validate",
+          "detect_breaking": true
+        },
+        "security-scanner": {
+          "enabled": "conditional",
+          "trigger": "security_issues_detected",
+          "deep_scan": true
+        }
+      },
+      "advanced": {
+        "impact-analyzer": {
+          "enabled": "with_adv_flag",
+          "use_context7": true,
+          "max_depth": 5
+        }
+      }
+    },
+    "skills": {
+      "reusability-enforcer": {
+        "enabled": true,
+        "enforce_article_x": true,
+        "target_reuse_rate": 60,
+        "max_duplication": 5
+      },
+      "test-coverage-analyzer": {
+        "enabled": "conditional",
+        "trigger": "test_files_changed",
+        "target_coverage": 80
+      },
+      "code-metrics-collector": {
+        "enabled": true,
+        "collect": ["complexity", "duplication", "volume"]
+      },
+      "dependency-tracer": {
+        "enabled": "with_adv_flag",
+        "detect_circular": true,
+        "analyze_bundle": true
+      }
+    },
+    "output_formats": {
+      "summary": {
+        "default": true,
+        "length": "1_page"
+      },
+      "detailed": {
+        "flag": "--format detailed",
+        "length": "3-5_pages"
+      },
+      "json": {
+        "flag": "--format json",
+        "use_case": "CI/CD"
+      }
+    },
+    "constitution_integration": {
+      "enabled": true,
+      "check_articles": ["I", "III", "X"],
+      "fallback": "generic_best_practices"
+    },
+    "recommendations": {
+      "LGTM": {
+        "criteria": ["no_critical", "no_high", "warnings < 5"]
+      },
+      "NEEDS_WORK": {
+        "criteria": ["high_issues > 0", "warnings > 5"]
+      },
+      "BLOCKED": {
+        "criteria": ["critical_issues > 0", "security_vulnerabilities"]
+      }
+    },
+    "estimated_review_time": {
+      "basic": "30-45s",
+      "standard": "60-90s",
+      "advanced": "2-3m"
+    }
+  },
+  "common_gates": {
+    "git": {
+      "commit_message": {
+        "enabled": true,
+        "format": "conventional",
+        "examples": [
+          "feat: 운송 신청 기능 추가",
+          "fix: 차량번호 검증 오류 수정",
+          "docs: README 업데이트",
+          "style: 코드 포맷팅",
+          "refactor: useDispatch 훅 분리",
+          "test: 운송 신청 테스트 추가"
+        ]
+      },
+      "branch_naming": {
+        "enabled": true,
+        "patterns": [
+          "feature/*",
+          "fix/*",
+          "refactor/*",
+          "docs/*"
+        ]
+      }
+    },
+    "documentation": {
+      "changelog": {
+        "enabled": true,
+        "required_for": ["major"],
+        "agent": "changelog-writer"
+      },
+      "notion_update": {
+        "enabled": true,
+        "required_for": [],
+        "skill": "daily-changelog-notion"
+      }
+    }
+  },
+  "override": {
+    "description": "특정 상황에서 게이트 우회 가능 (신중히 사용)",
+    "allowed_overrides": [
+      "hotfix (프로덕션 긴급 수정)",
+      "experimental (실험적 기능)",
+      "prototype (프로토타입)"
+    ],
+    "require_justification": true
+  }
+}

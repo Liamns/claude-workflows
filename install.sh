@@ -433,12 +433,12 @@ install_workflows() {
 
     # Copy slash commands (excluding deprecated and backup)
     if [ -d "$TEMP_DIR/.claude/commands" ]; then
-        print_info "Installing Slash Commands (10개)..."
+        print_info "Installing Slash Commands (9개)..."
         if [ "$DRY_RUN" = false ]; then
             # Copy files, excluding deprecated and backup directories
             find "$TEMP_DIR/.claude/commands" -maxdepth 1 -type f -name "*.md" -exec cp {} "$TARGET_DIR/.claude/commands/" \;
         fi
-        print_success "Slash Commands installed (triage, major, minor, micro, test, commit, pr-review, review 등)"
+        print_success "Slash Commands installed (start, triage, major, minor, micro, commit, pr-review, review, dashboard)"
     else
         print_warning ".claude/commands/ directory not found in repository"
     fi
@@ -483,7 +483,7 @@ install_workflows() {
 
     # Copy skills (excluding deprecated and backup)
     if [ -d "$TEMP_DIR/.claude/skills" ]; then
-        print_info "Installing Skills (13개)..."
+        print_info "Installing Skills (15개)..."
         if [ "$DRY_RUN" = false ]; then
             cp -r "$TEMP_DIR/.claude/skills" "$TARGET_DIR/.claude/"
             # Remove deprecated and backup directories if they exist

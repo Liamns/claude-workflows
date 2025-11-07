@@ -34,7 +34,6 @@ curl -fsSL https://raw.githubusercontent.com/Liamns/claude-workflows/main/instal
 ```bash
 /start              # 프로젝트 초기화 (처음 한 번만)
 /triage "작업"      # ⭐ 자동 워크플로우 선택
-/test "요구사항"    # 테스트 자동 생성/실행
 /review --staged    # 코드 리뷰
 /commit            # 스마트 커밋
 /dashboard         # 📊 실시간 메트릭스 대시보드
@@ -43,8 +42,8 @@ curl -fsSL https://raw.githubusercontent.com/Liamns/claude-workflows/main/instal
 ## 🏗️ 시스템 구성
 
 - **6개 통합 Agents**: 최적화된 전문 AI (v2.4 통합)
-- **13개 Skills**: 상황별 자동 활성화 패턴
-- **12개 아키텍처 지원**: FSD, Clean, DDD 등
+- **15개 Skills**: 상황별 자동 활성화 패턴
+- **6개 아키텍처 지원**: FSD, Atomic, Clean, DDD 등
 
 ## 📁 프로젝트 구조
 
@@ -55,7 +54,6 @@ curl -fsSL https://raw.githubusercontent.com/Liamns/claude-workflows/main/instal
 ├── skills/        # 자동 활성화 스킬
 └── config/        # 설정 파일
 
-docs/              # 상세 문서
 architectures/     # 아키텍처 템플릿
 workflow-gates.json # 품질 게이트 설정
 ```
@@ -78,7 +76,6 @@ workflow-gates.json # 품질 게이트 설정
 - [Sub-agents 가이드](.claude/docs/SUB-AGENTS-GUIDE.md)
 - [Skills 가이드](.claude/docs/SKILLS-GUIDE.md)
 - [모델 최적화](.claude/docs/MODEL-OPTIMIZATION-GUIDE.md)
-- [개선 제안](.claude/docs/IMPROVEMENT-PROPOSALS.md)
 
 ### 예시 및 템플릿
 - [사용 예시](EXAMPLES.md)
@@ -88,7 +85,7 @@ workflow-gates.json # 품질 게이트 설정
 
 1. Fork & Clone
 2. Feature branch 생성
-3. `/test`로 테스트 작성
+3. 코드 작성 및 테스트
 4. `/commit`으로 커밋
 5. Pull Request
 

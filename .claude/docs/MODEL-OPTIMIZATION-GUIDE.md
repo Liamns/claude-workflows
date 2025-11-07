@@ -44,7 +44,6 @@ Context7:
 | **/major** | Sonnet | 복잡도 > 12 → Opus | ✅ (복잡도 > 10) | architect, reviewer, implementer, documenter |
 | **/minor** | Sonnet | 단순 수정 → Haiku | ❌ | implementer, reviewer, documenter |
 | **/micro** | Haiku | - | ❌ | implementer, documenter |
-| **/test** | Sonnet | - | ❌ | implementer |
 | **/review** | Sonnet | 심층 분석 → Opus | ✅ (--adv 옵션) | reviewer |
 
 **v2.4.0 변경사항:**

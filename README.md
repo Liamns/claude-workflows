@@ -11,7 +11,6 @@
 ## 🚀 Quick Start
 
 ```bash
-# 1분 설치
 curl -fsSL https://raw.githubusercontent.com/Liamns/claude-workflows/main/install.sh | bash
 ```
 

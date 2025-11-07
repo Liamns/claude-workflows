@@ -52,6 +52,106 @@ cleanup() {
 # Trap cleanup on exit
 trap cleanup EXIT
 
+# Detect existing installation and version
+detect_installation() {
+    if [ -f "$TARGET_DIR/.claude/workflow-gates.json" ]; then
+        # Extract version using grep (compatible with systems without jq)
+        local version=$(grep -o '"version"[[:space:]]*:[[:space:]]*"[^"]*"' "$TARGET_DIR/.claude/workflow-gates.json" | cut -d'"' -f4)
+        echo "$version"
+    else
+        echo "none"
+    fi
+}
+
+# Compare semantic versions
+version_compare() {
+    local ver1=$1
+    local ver2=$2
+
+    if [ "$ver1" = "$ver2" ]; then
+        echo "equal"
+        return
+    fi
+
+    # Simple version comparison (assumes semantic versioning)
+    local IFS=.
+    local i ver1_arr=($ver1) ver2_arr=($ver2)
+
+    for ((i=0; i<${#ver1_arr[@]}; i++)); do
+        if [[ -z ${ver2_arr[i]} ]]; then
+            echo "greater"
+            return
+        fi
+        if ((10#${ver1_arr[i]} > 10#${ver2_arr[i]})); then
+            echo "greater"
+            return
+        fi
+        if ((10#${ver1_arr[i]} < 10#${ver2_arr[i]})); then
+            echo "less"
+            return
+        fi
+    done
+    echo "equal"
+}
+
+# Create backup of existing installation
+create_backup() {
+    local backup_dir="$TARGET_DIR/.claude/.backup/install-$(date +%Y%m%d-%H%M%S)"
+    mkdir -p "$backup_dir"
+
+    print_info "Creating backup at: $backup_dir"
+
+    # Backup critical files
+    if [ -f "$TARGET_DIR/.claude/workflow-gates.json" ]; then
+        cp "$TARGET_DIR/.claude/workflow-gates.json" "$backup_dir/"
+    fi
+    if [ -d "$TARGET_DIR/.claude/config" ]; then
+        cp -r "$TARGET_DIR/.claude/config" "$backup_dir/" 2>/dev/null || true
+    fi
+    if [ -d "$TARGET_DIR/.claude/cache" ]; then
+        cp -r "$TARGET_DIR/.claude/cache" "$backup_dir/" 2>/dev/null || true
+    fi
+
+    print_success "Backup created"
+    echo "$backup_dir"
+}
+
+# Run migration scripts based on detected version
+run_migrations() {
+    local current_version=$1
+    local target_version="2.5.0"
+
+    print_info "========================================="
+    print_info "  Migration Required"
+    print_info "  Current: $current_version → Target: $target_version"
+    print_info "========================================="
+    echo ""
+
+    # v1.0.x → v2.4.0
+    if [[ "$current_version" =~ ^1\. ]] || [ -f "$TARGET_DIR/.claude/commands/major-specify.md" ]; then
+        print_info "Running v1.0 → v2.4.0 migration..."
+        if [ -f "$TARGET_DIR/.claude/lib/migrate-v1-to-v2.sh" ]; then
+            bash "$TARGET_DIR/.claude/lib/migrate-v1-to-v2.sh"
+            print_success "v1.0 → v2.4.0 migration completed"
+        else
+            print_warning "Migration script not found, will be installed with new files"
+        fi
+        echo ""
+    fi
+
+    # v2.4.x → v2.5.0
+    if [[ "$current_version" =~ ^2\.4\. ]] || [ -f "$TARGET_DIR/.claude/agents/implementer-unified.md" ]; then
+        print_info "Running v2.4 → v2.5.0 migration..."
+        if [ -f "$TARGET_DIR/.claude/lib/migrate-v2-to-v25.sh" ]; then
+            bash "$TARGET_DIR/.claude/lib/migrate-v2-to-v25.sh"
+            print_success "v2.4 → v2.5.0 migration completed"
+        else
+            print_warning "Migration script not found, will be installed with new files"
+        fi
+        echo ""
+    fi
+}
+
 # Main installation
 install_workflows() {
     print_header
@@ -64,6 +164,35 @@ install_workflows() {
     if [ ! -d "$TARGET_DIR" ]; then
         print_error "Target directory does not exist: $TARGET_DIR"
         exit 1
+    fi
+
+    # Detect existing installation
+    EXISTING_VERSION=$(detect_installation)
+
+    if [ "$EXISTING_VERSION" != "none" ]; then
+        print_warning "Existing installation detected: v$EXISTING_VERSION"
+
+        # Create backup
+        BACKUP_DIR=$(create_backup)
+        echo ""
+
+        # Compare versions
+        VERSION_COMPARISON=$(version_compare "$EXISTING_VERSION" "2.5.0")
+
+        if [ "$VERSION_COMPARISON" = "less" ]; then
+            print_info "Upgrade detected: v$EXISTING_VERSION → v2.5.0"
+            print_info "Migration scripts will run after file installation"
+            NEEDS_MIGRATION=true
+        elif [ "$VERSION_COMPARISON" = "equal" ]; then
+            print_warning "Same version detected. Reinstalling..."
+        else
+            print_warning "Downgrade detected. This is not recommended."
+        fi
+        echo ""
+    else
+        print_info "Fresh installation - no existing version detected"
+        NEEDS_MIGRATION=false
+        echo ""
     fi
 
     # Clone repository to temp directory
@@ -203,8 +332,13 @@ install_workflows() {
     fi
 
     echo ""
-    print_success "Installation complete!"
+    print_success "File installation complete!"
     echo ""
+
+    # Run migrations if needed
+    if [ "$NEEDS_MIGRATION" = true ] && [ "$EXISTING_VERSION" != "none" ]; then
+        run_migrations "$EXISTING_VERSION"
+    fi
 
     # Print summary
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"

@@ -178,8 +178,14 @@ score > 4:
 • reusability-enforcer (재사용 모듈 검색)
 • reusability-metrics (메트릭 추적)
 
-이대로 진행하시겠습니까?
-[Enter: 진행 / m: Major로 변경 / n: Minor로 변경 / c: Micro로 변경]
+AskUserQuestion 도구를 사용하여 워크플로우 선택:
+
+질문: "어떤 워크플로우로 진행하시겠습니까?"
+옵션:
+  1. 추천된 {workflow} 워크플로우로 진행
+  2. Major 워크플로우 강제 실행
+  3. Minor 워크플로우 강제 실행
+  4. Micro 워크플로우 강제 실행
 ```
 
 ## 실제 사용 예시
@@ -307,7 +313,6 @@ history:
 ## 단축키
 
 - `/t` - triage의 짧은 버전
-- Enter - 추천 워크플로우 수락
 - M - Major로 강제 변경
 - N - Minor로 강제 변경
 - C - Micro로 강제 변경

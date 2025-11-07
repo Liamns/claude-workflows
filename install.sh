@@ -12,16 +12,36 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Configuration
+# Version Configuration
+INSTALLER_VERSION="2.5.0"
+TARGET_VERSION="2.5.0"
+
+# Repository Configuration
 REPO_URL="https://github.com/Liamns/claude-workflows"
-TARGET_DIR="${1:-.}"
-TEMP_DIR=$(mktemp -d)
+REPO_BRANCH="main"
+
+# Installation Configuration
+TARGET_DIR=""
+TEMP_DIR=""
+BACKUP_DIR=""
+EXISTING_VERSION=""
+NEEDS_MIGRATION=false
+DRY_RUN=false
+FORCE_INSTALL=false
+LOG_FILE=""
 
 # Functions
+# Logging function
+log_to_file() {
+    if [ -n "$LOG_FILE" ]; then
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" >> "$LOG_FILE"
+    fi
+}
+
 print_header() {
     echo -e "${BLUE}╔════════════════════════════════════════╗${NC}"
     echo -e "${BLUE}║   Claude Code Workflows Installer     ║${NC}"
-    echo -e "${BLUE}║   Version 2.5.0                        ║${NC}"
+    echo -e "${BLUE}║   Version ${INSTALLER_VERSION}                        ║${NC}"
     echo -e "${BLUE}║   Real-time Metrics Dashboard         ║${NC}"
     echo -e "${BLUE}╚════════════════════════════════════════╝${NC}"
     echo ""
@@ -29,18 +49,22 @@ print_header() {
 
 print_success() {
     echo -e "${GREEN}✓${NC} $1"
+    log_to_file "SUCCESS: $1"
 }
 
 print_error() {
     echo -e "${RED}✗${NC} $1"
+    log_to_file "ERROR: $1"
 }
 
 print_info() {
     echo -e "${BLUE}ℹ${NC} $1"
+    log_to_file "INFO: $1"
 }
 
 print_warning() {
     echo -e "${YELLOW}⚠${NC} $1"
+    log_to_file "WARNING: $1"
 }
 
 cleanup() {
@@ -51,6 +75,57 @@ cleanup() {
 
 # Trap cleanup on exit
 trap cleanup EXIT
+
+# Validate and normalize target directory
+validate_target_dir() {
+    local dir="$1"
+
+    # Convert to absolute path
+    if [[ ! "$dir" = /* ]]; then
+        dir="$(cd "$dir" 2>/dev/null && pwd)" || {
+            print_error "Cannot access directory: $dir"
+            exit 1
+        }
+    fi
+
+    # Ensure directory exists
+    if [ ! -d "$dir" ]; then
+        print_error "Target directory does not exist: $dir"
+        exit 1
+    fi
+
+    # Check write permissions
+    if [ ! -w "$dir" ]; then
+        print_error "No write permission for directory: $dir"
+        exit 1
+    fi
+
+    # Prevent installation in system directories
+    case "$dir" in
+        /|/bin|/sbin|/usr|/usr/bin|/usr/sbin|/etc|/boot|/sys|/proc|/dev)
+            print_error "Cannot install to system directory: $dir"
+            exit 1
+            ;;
+    esac
+
+    echo "$dir"
+}
+
+# Create safe temp directory
+create_temp_dir() {
+    local temp_dir
+    temp_dir=$(mktemp -d 2>/dev/null) || {
+        print_error "Failed to create temporary directory"
+        exit 1
+    }
+
+    if [ ! -d "$temp_dir" ]; then
+        print_error "Temporary directory creation failed"
+        exit 1
+    fi
+
+    echo "$temp_dir"
+}
 
 # Detect existing installation and version
 detect_installation() {
@@ -119,7 +194,7 @@ create_backup() {
 # Run migration scripts based on detected version
 run_migrations() {
     local current_version=$1
-    local target_version="2.5.0"
+    local target_version="$TARGET_VERSION"
 
     print_info "========================================="
     print_info "  Migration Required"
@@ -131,8 +206,12 @@ run_migrations() {
     if [[ "$current_version" =~ ^1\. ]] || [ -f "$TARGET_DIR/.claude/commands/major-specify.md" ]; then
         print_info "Running v1.0 → v2.4.0 migration..."
         if [ -f "$TARGET_DIR/.claude/lib/migrate-v1-to-v2.sh" ]; then
-            bash "$TARGET_DIR/.claude/lib/migrate-v1-to-v2.sh"
-            print_success "v1.0 → v2.4.0 migration completed"
+            if bash "$TARGET_DIR/.claude/lib/migrate-v1-to-v2.sh"; then
+                print_success "v1.0 → v2.4.0 migration completed"
+            else
+                print_error "v1.0 → v2.4.0 migration failed"
+                return 1
+            fi
         else
             print_warning "Migration script not found, will be installed with new files"
         fi
@@ -143,12 +222,77 @@ run_migrations() {
     if [[ "$current_version" =~ ^2\.4\. ]] || [ -f "$TARGET_DIR/.claude/agents/implementer-unified.md" ]; then
         print_info "Running v2.4 → v2.5.0 migration..."
         if [ -f "$TARGET_DIR/.claude/lib/migrate-v2-to-v25.sh" ]; then
-            bash "$TARGET_DIR/.claude/lib/migrate-v2-to-v25.sh"
-            print_success "v2.4 → v2.5.0 migration completed"
+            if bash "$TARGET_DIR/.claude/lib/migrate-v2-to-v25.sh"; then
+                print_success "v2.4 → v2.5.0 migration completed"
+            else
+                print_error "v2.4 → v2.5.0 migration failed"
+                return 1
+            fi
         else
             print_warning "Migration script not found, will be installed with new files"
         fi
         echo ""
+    fi
+
+    return 0
+}
+
+# Verify installation
+verify_installation() {
+    local errors=0
+
+    print_info "Verifying installation..."
+    echo ""
+
+    # Check critical files
+    local critical_files=(
+        ".claude/workflow-gates.json"
+        ".claude/commands/major.md"
+        ".claude/commands/triage.md"
+        ".claude/lib/cache-helper.sh"
+        ".claude/lib/metrics-collector.sh"
+    )
+
+    for file in "${critical_files[@]}"; do
+        if [ -f "$TARGET_DIR/$file" ]; then
+            print_success "✓ $file"
+        else
+            print_error "✗ $file (MISSING)"
+            ((errors++))
+        fi
+    done
+
+    echo ""
+
+    # Check directories
+    local critical_dirs=(
+        ".claude/commands"
+        ".claude/agents"
+        ".claude/skills"
+        ".claude/lib"
+        ".claude/cache"
+    )
+
+    for dir in "${critical_dirs[@]}"; do
+        if [ -d "$TARGET_DIR/$dir" ]; then
+            local file_count=$(find "$TARGET_DIR/$dir" -type f 2>/dev/null | wc -l | tr -d ' ')
+            print_success "✓ $dir/ ($file_count files)"
+        else
+            print_error "✗ $dir/ (MISSING)"
+            ((errors++))
+        fi
+    done
+
+    echo ""
+
+    if [ $errors -eq 0 ]; then
+        print_success "Installation verification passed!"
+        log_to_file "Installation verification: PASSED"
+        return 0
+    else
+        print_error "Installation verification failed with $errors errors"
+        log_to_file "Installation verification: FAILED ($errors errors)"
+        return 1
     fi
 }
 
@@ -156,15 +300,19 @@ run_migrations() {
 install_workflows() {
     print_header
 
+    # Setup logging
+    if [ -z "$LOG_FILE" ]; then
+        mkdir -p "$TARGET_DIR/.claude/.backup"
+        LOG_FILE="$TARGET_DIR/.claude/.backup/install-$(date +%Y%m%d-%H%M%S).log"
+        log_to_file "Installation started"
+        log_to_file "Installer version: $INSTALLER_VERSION"
+        log_to_file "Target version: $TARGET_VERSION"
+    fi
+
     print_info "Target directory: $TARGET_DIR"
+    print_info "Log file: $LOG_FILE"
     print_info "Installing workflows..."
     echo ""
-
-    # Check if target directory exists
-    if [ ! -d "$TARGET_DIR" ]; then
-        print_error "Target directory does not exist: $TARGET_DIR"
-        exit 1
-    fi
 
     # Detect existing installation
     EXISTING_VERSION=$(detect_installation)
@@ -177,32 +325,85 @@ install_workflows() {
         echo ""
 
         # Compare versions
-        VERSION_COMPARISON=$(version_compare "$EXISTING_VERSION" "2.5.0")
+        VERSION_COMPARISON=$(version_compare "$EXISTING_VERSION" "$TARGET_VERSION")
 
         if [ "$VERSION_COMPARISON" = "less" ]; then
-            print_info "Upgrade detected: v$EXISTING_VERSION → v2.5.0"
+            print_info "Upgrade detected: v$EXISTING_VERSION → v$TARGET_VERSION"
             print_info "Migration scripts will run after file installation"
             NEEDS_MIGRATION=true
         elif [ "$VERSION_COMPARISON" = "equal" ]; then
-            print_warning "Same version detected. Reinstalling..."
+            print_warning "Same version detected: v$EXISTING_VERSION"
+
+            # Ask for confirmation if not forced
+            if [ "$FORCE_INSTALL" = false ]; then
+                echo ""
+                print_warning "This will reinstall the same version."
+                echo -n "Do you want to continue? (y/N): "
+                read -r response
+                case "$response" in
+                    [yY][eE][sS]|[yY])
+                        print_info "Reinstalling..."
+                        ;;
+                    *)
+                        print_info "Installation cancelled by user"
+                        exit 0
+                        ;;
+                esac
+            else
+                print_warning "Reinstalling (forced)..."
+            fi
         else
-            print_warning "Downgrade detected. This is not recommended."
+            print_warning "Downgrade detected: v$EXISTING_VERSION → v$TARGET_VERSION"
+            print_error "Downgrade is not supported and may cause issues."
+
+            if [ "$FORCE_INSTALL" = false ]; then
+                echo -n "Are you sure you want to continue? (y/N): "
+                read -r response
+                case "$response" in
+                    [yY][eE][sS]|[yY])
+                        print_warning "Proceeding with downgrade..."
+                        ;;
+                    *)
+                        print_info "Installation cancelled by user"
+                        exit 0
+                        ;;
+                esac
+            fi
         fi
         echo ""
     else
         print_info "Fresh installation - no existing version detected"
-        NEEDS_MIGRATION=false
         echo ""
     fi
 
     # Clone repository to temp directory
     print_info "Downloading workflows from GitHub..."
-    if git clone --quiet "$REPO_URL" "$TEMP_DIR" 2>/dev/null; then
-        print_success "Downloaded successfully"
+    print_info "Repository: $REPO_URL"
+    print_info "Branch: $REPO_BRANCH"
+
+    # Clone with progress
+    if [ "$DRY_RUN" = true ]; then
+        print_info "[DRY RUN] Would clone: git clone --branch $REPO_BRANCH --depth 1 $REPO_URL"
+        print_success "[DRY RUN] Download simulated"
     else
-        print_error "Failed to download from GitHub"
-        print_info "Please check your internet connection or repository URL"
-        exit 1
+        local git_output
+        git_output=$(git clone --branch "$REPO_BRANCH" --depth 1 "$REPO_URL" "$TEMP_DIR" 2>&1)
+        local git_status=$?
+
+        if [ $git_status -eq 0 ]; then
+            print_success "Downloaded successfully"
+        else
+            print_error "Failed to download from GitHub"
+            echo ""
+            print_error "Git error output:"
+            echo "$git_output"
+            echo ""
+            print_info "Please check:"
+            print_info "  - Internet connection"
+            print_info "  - Repository URL: $REPO_URL"
+            print_info "  - Git is installed: $(command -v git || echo 'NOT FOUND')"
+            exit 1
+        fi
     fi
 
     # Check dependencies
@@ -221,26 +422,36 @@ install_workflows() {
 
     # Create .claude directory structure
     print_info "Creating .claude directory structure..."
-    mkdir -p "$TARGET_DIR/.claude/commands"
-    mkdir -p "$TARGET_DIR/.claude/config"
-    mkdir -p "$TARGET_DIR/.claude/templates"
-    mkdir -p "$TARGET_DIR/.claude/cache/metrics"
-    mkdir -p "$TARGET_DIR/.claude/cache/workflow-history"
+    if [ "$DRY_RUN" = false ]; then
+        mkdir -p "$TARGET_DIR/.claude/commands"
+        mkdir -p "$TARGET_DIR/.claude/config"
+        mkdir -p "$TARGET_DIR/.claude/templates"
+        mkdir -p "$TARGET_DIR/.claude/cache/metrics"
+        mkdir -p "$TARGET_DIR/.claude/cache/workflow-history"
+    fi
     print_success ".claude directory ready"
 
-    # Copy slash commands
+    # Copy slash commands (excluding deprecated and backup)
     if [ -d "$TEMP_DIR/.claude/commands" ]; then
         print_info "Installing Slash Commands (10개)..."
-        cp -r "$TEMP_DIR/.claude/commands/"* "$TARGET_DIR/.claude/commands/" 2>/dev/null || true
+        if [ "$DRY_RUN" = false ]; then
+            # Copy files, excluding deprecated and backup directories
+            find "$TEMP_DIR/.claude/commands" -maxdepth 1 -type f -name "*.md" -exec cp {} "$TARGET_DIR/.claude/commands/" \;
+        fi
         print_success "Slash Commands installed (triage, major, minor, micro, test, commit, pr-review, review 등)"
     else
         print_warning ".claude/commands/ directory not found in repository"
     fi
 
-    # Copy templates
+    # Copy templates (excluding deprecated and backup)
     if [ -d "$TEMP_DIR/.claude/templates" ]; then
         print_info "Installing Templates..."
-        cp -r "$TEMP_DIR/.claude/templates/"* "$TARGET_DIR/.claude/templates/" 2>/dev/null || true
+        if [ "$DRY_RUN" = false ]; then
+            # Copy all files and subdirectories
+            cp -r "$TEMP_DIR/.claude/templates/"* "$TARGET_DIR/.claude/templates/" 2>/dev/null || true
+            # Remove deprecated and backup directories if they exist
+            rm -rf "$TARGET_DIR/.claude/templates/deprecated" "$TARGET_DIR/.claude/templates/.backup" 2>/dev/null || true
+        fi
         print_success "Templates installed"
     else
         print_warning ".claude/templates/ directory not found in repository"
@@ -249,62 +460,89 @@ install_workflows() {
     # Copy workflow-gates.json
     if [ -f "$TEMP_DIR/workflow-gates.json" ]; then
         print_info "Installing workflow-gates.json..."
-        cp "$TEMP_DIR/workflow-gates.json" "$TARGET_DIR/.claude/"
+        if [ "$DRY_RUN" = false ]; then
+            cp "$TEMP_DIR/workflow-gates.json" "$TARGET_DIR/.claude/"
+        fi
         print_success "workflow-gates.json installed (with model optimization)"
     else
         print_warning "workflow-gates.json not found in repository"
     fi
 
-    # Copy agents
+    # Copy agents (excluding deprecated and backup)
     if [ -d "$TEMP_DIR/.claude/agents" ]; then
         print_info "Installing Unified Agents (6개)..."
-        cp -r "$TEMP_DIR/.claude/agents" "$TARGET_DIR/.claude/"
+        if [ "$DRY_RUN" = false ]; then
+            cp -r "$TEMP_DIR/.claude/agents" "$TARGET_DIR/.claude/"
+            # Remove deprecated and backup directories if they exist
+            rm -rf "$TARGET_DIR/.claude/agents/deprecated" "$TARGET_DIR/.claude/agents/.backup" 2>/dev/null || true
+        fi
         print_success "Unified agents installed (architect-unified, reviewer-unified, implementer-unified, documenter-unified 등)"
     else
         print_warning "agents/ directory not found in repository"
     fi
 
-    # Copy skills
+    # Copy skills (excluding deprecated and backup)
     if [ -d "$TEMP_DIR/.claude/skills" ]; then
         print_info "Installing Skills (13개)..."
-        cp -r "$TEMP_DIR/.claude/skills" "$TARGET_DIR/.claude/"
+        if [ "$DRY_RUN" = false ]; then
+            cp -r "$TEMP_DIR/.claude/skills" "$TARGET_DIR/.claude/"
+            # Remove deprecated and backup directories if they exist
+            rm -rf "$TARGET_DIR/.claude/skills/deprecated" "$TARGET_DIR/.claude/skills/.backup" 2>/dev/null || true
+        fi
         print_success "Skills installed (bug-fix-pattern, api-integration, form-validation, platform-detection 등)"
     else
         print_warning "skills/ directory not found in repository"
     fi
 
-    # Copy lib (helper scripts)
+    # Copy lib (helper scripts, excluding deprecated and backup)
     if [ -d "$TEMP_DIR/.claude/lib" ]; then
         print_info "Installing Library Scripts..."
-        cp -r "$TEMP_DIR/.claude/lib" "$TARGET_DIR/.claude/"
-        chmod +x "$TARGET_DIR/.claude/lib/"*.sh 2>/dev/null || true
+        if [ "$DRY_RUN" = false ]; then
+            cp -r "$TEMP_DIR/.claude/lib" "$TARGET_DIR/.claude/"
+            # Remove deprecated and backup directories if they exist
+            rm -rf "$TARGET_DIR/.claude/lib/deprecated" "$TARGET_DIR/.claude/lib/.backup" 2>/dev/null || true
+            chmod +x "$TARGET_DIR/.claude/lib/"*.sh 2>/dev/null || true
+        fi
         print_success "Library scripts installed (cache-helper, metrics-collector, dashboard-generator, git-stats-helper)"
     else
         print_warning "lib/ directory not found in repository"
     fi
 
-    # Copy documentation
+    # Copy documentation (excluding deprecated and backup)
     if [ -d "$TEMP_DIR/docs" ]; then
         print_info "Installing Documentation..."
-        cp -r "$TEMP_DIR/docs" "$TARGET_DIR/.claude/"
+        if [ "$DRY_RUN" = false ]; then
+            cp -r "$TEMP_DIR/docs" "$TARGET_DIR/.claude/"
+            # Remove deprecated and backup directories if they exist
+            rm -rf "$TARGET_DIR/.claude/docs/deprecated" "$TARGET_DIR/.claude/docs/.backup" 2>/dev/null || true
+        fi
         print_success "Documentation installed (SUB-AGENTS-GUIDE, SKILLS-GUIDE, MODEL-OPTIMIZATION-GUIDE 등)"
     else
         print_warning "docs/ directory not found in repository"
     fi
 
-    # Copy architectures system (v2.2.0)
+    # Copy architectures system (v2.2.0, excluding deprecated and backup)
     if [ -d "$TEMP_DIR/architectures" ]; then
         print_info "Installing Multi-Architecture Support System..."
-        cp -r "$TEMP_DIR/architectures" "$TARGET_DIR/.claude/"
+        if [ "$DRY_RUN" = false ]; then
+            cp -r "$TEMP_DIR/architectures" "$TARGET_DIR/.claude/"
+            # Remove deprecated and backup directories if they exist
+            rm -rf "$TARGET_DIR/.claude/architectures/deprecated" "$TARGET_DIR/.claude/architectures/.backup" 2>/dev/null || true
+        fi
         print_success "Architecture system installed (FSD, Atomic, Clean, Hexagonal, DDD 등)"
     else
         print_warning "architectures/ directory not found in repository"
     fi
 
-    # Copy model optimization configs (v2.2.0)
+    # Copy model optimization configs (v2.2.0, excluding deprecated and backup)
     if [ -d "$TEMP_DIR/.claude/config" ]; then
         print_info "Installing Model Optimization Configs..."
-        cp -r "$TEMP_DIR/.claude/config/"* "$TARGET_DIR/.claude/config/" 2>/dev/null || true
+        if [ "$DRY_RUN" = false ]; then
+            # Copy all files and subdirectories
+            cp -r "$TEMP_DIR/.claude/config/"* "$TARGET_DIR/.claude/config/" 2>/dev/null || true
+            # Remove deprecated and backup directories if they exist
+            rm -rf "$TARGET_DIR/.claude/config/deprecated" "$TARGET_DIR/.claude/config/.backup" 2>/dev/null || true
+        fi
         print_success "Model configs installed (model-router.yaml, user-preferences.yaml)"
     else
         print_warning ".claude/config/ directory not found in repository"
@@ -312,24 +550,40 @@ install_workflows() {
 
     # Create .specify directory structure (optional, created by /start command)
     print_info "Creating .specify directory structure..."
-    mkdir -p "$TARGET_DIR/.specify/memory"
-    mkdir -p "$TARGET_DIR/.specify/templates"
-    mkdir -p "$TARGET_DIR/.specify/scripts/bash"
-    mkdir -p "$TARGET_DIR/.specify/steering"
-    mkdir -p "$TARGET_DIR/.specify/specs"
+    if [ "$DRY_RUN" = false ]; then
+        mkdir -p "$TARGET_DIR/.specify/memory"
+        mkdir -p "$TARGET_DIR/.specify/templates"
+        mkdir -p "$TARGET_DIR/.specify/scripts/bash"
+        mkdir -p "$TARGET_DIR/.specify/steering"
+        mkdir -p "$TARGET_DIR/.specify/specs"
+    fi
 
-    # Copy .specify templates
+    # Copy .specify templates (excluding deprecated and backup)
     if [ -d "$TEMP_DIR/.specify/templates" ]; then
         print_info "Installing .specify templates..."
-        cp -r "$TEMP_DIR/.specify/templates/"* "$TARGET_DIR/.specify/templates/" 2>/dev/null || true
+        if [ "$DRY_RUN" = false ]; then
+            cp -r "$TEMP_DIR/.specify/templates/"* "$TARGET_DIR/.specify/templates/" 2>/dev/null || true
+            # Remove deprecated and backup directories if they exist
+            rm -rf "$TARGET_DIR/.specify/templates/deprecated" "$TARGET_DIR/.specify/templates/.backup" 2>/dev/null || true
+        fi
         print_success ".specify templates installed"
     fi
 
     # Copy constitution template
     if [ -f "$TEMP_DIR/.specify/memory/constitution.md" ]; then
-        cp "$TEMP_DIR/.specify/memory/constitution.md" "$TARGET_DIR/.specify/memory/"
+        if [ "$DRY_RUN" = false ]; then
+            cp "$TEMP_DIR/.specify/memory/constitution.md" "$TARGET_DIR/.specify/memory/"
+        fi
         print_success "Constitution template installed"
     fi
+
+    # Final cleanup: Remove any deprecated or backup directories from root levels
+    print_info "Cleaning up deprecated and backup directories..."
+    if [ "$DRY_RUN" = false ]; then
+        rm -rf "$TARGET_DIR/.claude/deprecated" "$TARGET_DIR/.specify/deprecated" 2>/dev/null || true
+    fi
+    # Note: Keep .claude/.backup as it's created by this installer for user backups
+    print_success "Cleanup complete"
 
     echo ""
     print_success "File installation complete!"
@@ -337,12 +591,35 @@ install_workflows() {
 
     # Run migrations if needed
     if [ "$NEEDS_MIGRATION" = true ] && [ "$EXISTING_VERSION" != "none" ]; then
-        run_migrations "$EXISTING_VERSION"
+        if ! run_migrations "$EXISTING_VERSION"; then
+            print_error "Migration failed. Installation may be incomplete."
+            log_to_file "Migration failed"
+            echo ""
+            print_warning "You can find the backup at: $BACKUP_DIR"
+            print_info "You may need to restore manually or reinstall."
+            exit 1
+        fi
+    fi
+
+    # Verify installation
+    echo ""
+    if [ "$DRY_RUN" = true ]; then
+        print_info "[DRY RUN] Installation verification skipped"
+    else
+        if ! verify_installation; then
+            print_warning "Installation completed with errors"
+            print_info "Please check the log file: $LOG_FILE"
+            if [ -n "$BACKUP_DIR" ]; then
+                print_info "Backup location: $BACKUP_DIR"
+            fi
+            exit 1
+        fi
     fi
 
     # Print summary
+    echo ""
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${GREEN}Installed Components (v2.5.0):${NC}"
+    echo -e "${GREEN}Installed Components (v$TARGET_VERSION):${NC}"
     echo ""
     echo "📁 $TARGET_DIR/.claude/"
     echo "   ├── commands/        (11 Slash Commands + /dashboard)"
@@ -433,21 +710,111 @@ install_workflows() {
 
 # Show usage
 usage() {
-    echo "Usage: $0 [target_directory]"
+    echo "Claude Code Workflows Installer v$INSTALLER_VERSION"
     echo ""
-    echo "Example:"
-    echo "  $0                    # Install to current directory"
-    echo "  $0 /path/to/project   # Install to specific directory"
+    echo "Usage: $0 [OPTIONS] [target_directory]"
     echo ""
-    echo "Or use with curl:"
+    echo "Options:"
+    echo "  -h, --help        Show this help message"
+    echo "  -v, --version     Show installer version"
+    echo "  --dry-run         Simulate installation without making changes"
+    echo "  --force           Skip confirmation prompts"
+    echo "  --branch BRANCH   Install from specific branch (default: main)"
+    echo ""
+    echo "Examples:"
+    echo "  $0                        # Install to current directory"
+    echo "  $0 /path/to/project       # Install to specific directory"
+    echo "  $0 --dry-run .            # Simulate installation"
+    echo "  $0 --force .              # Force install without prompts"
+    echo "  $0 --branch dev .         # Install from dev branch"
+    echo ""
+    echo "Remote installation:"
     echo "  curl -fsSL https://raw.githubusercontent.com/Liamns/claude-workflows/main/install.sh | bash"
+    echo "  curl -fsSL https://raw.githubusercontent.com/Liamns/claude-workflows/main/install.sh | bash -s -- --force"
+}
+
+# Show version
+show_version() {
+    echo "Claude Code Workflows Installer"
+    echo "Version: $INSTALLER_VERSION"
+    echo "Target Version: $TARGET_VERSION"
+    echo "Repository: $REPO_URL"
 }
 
 # Parse arguments
-if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
-    usage
-    exit 0
-fi
+parse_arguments() {
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            -h|--help)
+                usage
+                exit 0
+                ;;
+            -v|--version)
+                show_version
+                exit 0
+                ;;
+            --dry-run)
+                DRY_RUN=true
+                shift
+                ;;
+            --force)
+                FORCE_INSTALL=true
+                shift
+                ;;
+            --branch)
+                if [ -z "$2" ]; then
+                    echo "Error: --branch requires a branch name"
+                    exit 1
+                fi
+                REPO_BRANCH="$2"
+                shift 2
+                ;;
+            -*)
+                echo "Unknown option: $1"
+                usage
+                exit 1
+                ;;
+            *)
+                # This is the target directory
+                TARGET_DIR="$1"
+                shift
+                ;;
+        esac
+    done
+
+    # Set default target directory if not specified
+    if [ -z "$TARGET_DIR" ]; then
+        TARGET_DIR="."
+    fi
+
+    # Validate and normalize target directory
+    TARGET_DIR=$(validate_target_dir "$TARGET_DIR")
+
+    # Create temp directory
+    TEMP_DIR=$(create_temp_dir)
+
+    # Display parsed options if dry-run
+    if [ "$DRY_RUN" = true ]; then
+        echo -e "${YELLOW}[DRY RUN MODE]${NC}"
+        echo "Target Directory: $TARGET_DIR"
+        echo "Repository Branch: $REPO_BRANCH"
+        echo "Force Install: $FORCE_INSTALL"
+        echo ""
+    fi
+}
+
+# Parse command line arguments
+parse_arguments "$@"
 
 # Run installation
 install_workflows
+
+# Final summary
+echo ""
+if [ -n "$BACKUP_DIR" ]; then
+    print_info "Backup location: $BACKUP_DIR"
+fi
+print_info "Installation log: $LOG_FILE"
+echo ""
+log_to_file "Installation completed successfully"
+print_success "Installation completed successfully!"

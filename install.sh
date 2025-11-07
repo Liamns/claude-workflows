@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Claude Code Workflows Installer
-# Version: 2.0.0
+# Version: 2.3.0 - Code Review System, Multi-Architecture & Model Optimization
 
 set -e
 
@@ -21,7 +21,8 @@ TEMP_DIR=$(mktemp -d)
 print_header() {
     echo -e "${BLUE}╔════════════════════════════════════════╗${NC}"
     echo -e "${BLUE}║   Claude Code Workflows Installer     ║${NC}"
-    echo -e "${BLUE}║   Version 2.0.0                        ║${NC}"
+    echo -e "${BLUE}║   Version 2.3.0                        ║${NC}"
+    echo -e "${BLUE}║   Code Review + Multi-Architecture    ║${NC}"
     echo -e "${BLUE}╚════════════════════════════════════════╝${NC}"
     echo ""
 }
@@ -78,6 +79,7 @@ install_workflows() {
     # Create .claude directory structure
     print_info "Creating .claude directory structure..."
     mkdir -p "$TARGET_DIR/.claude/commands"
+    mkdir -p "$TARGET_DIR/.claude/config"
     mkdir -p "$TARGET_DIR/.claude/templates"
     print_success ".claude directory ready"
 
@@ -99,8 +101,12 @@ install_workflows() {
         print_warning ".claude/templates/ directory not found in repository"
     fi
 
-    # Copy workflow-gates.json
-    if [ -f "$TEMP_DIR/workflow-gates.json" ]; then
+    # Copy workflow-gates.json (v2 with model optimization)
+    if [ -f "$TEMP_DIR/workflow-gates-v2.json" ]; then
+        print_info "Installing workflow-gates-v2.json..."
+        cp "$TEMP_DIR/workflow-gates-v2.json" "$TARGET_DIR/.claude/workflow-gates.json"
+        print_success "workflow-gates.json installed (v2 with model optimization)"
+    elif [ -f "$TEMP_DIR/workflow-gates.json" ]; then
         print_info "Installing workflow-gates.json..."
         cp "$TEMP_DIR/workflow-gates.json" "$TARGET_DIR/.claude/"
         print_success "workflow-gates.json installed"
@@ -110,18 +116,18 @@ install_workflows() {
 
     # Copy agents
     if [ -d "$TEMP_DIR/agents" ]; then
-        print_info "Installing Sub-agents (8개)..."
+        print_info "Installing Sub-agents (10개)..."
         cp -r "$TEMP_DIR/agents" "$TARGET_DIR/.claude/"
-        print_success "Sub-agents installed (smart-committer, code-reviewer, quick-fixer 등)"
+        print_success "Sub-agents installed (code-reviewer, security-scanner, impact-analyzer 등)"
     else
         print_warning "agents/ directory not found in repository"
     fi
 
     # Copy skills
     if [ -d "$TEMP_DIR/skills" ]; then
-        print_info "Installing Skills (10개)..."
+        print_info "Installing Skills (13개)..."
         cp -r "$TEMP_DIR/skills" "$TARGET_DIR/.claude/"
-        print_success "Skills installed (reusability-enforcer, reusability-metrics, api-integration 등)"
+        print_success "Skills installed (test-coverage-analyzer, code-metrics-collector, dependency-tracer 등)"
     else
         print_warning "skills/ directory not found in repository"
     fi
@@ -130,9 +136,27 @@ install_workflows() {
     if [ -d "$TEMP_DIR/docs" ]; then
         print_info "Installing Documentation..."
         cp -r "$TEMP_DIR/docs" "$TARGET_DIR/.claude/"
-        print_success "Documentation installed (SUB-AGENTS-GUIDE, SKILLS-GUIDE 등)"
+        print_success "Documentation installed (SUB-AGENTS-GUIDE, SKILLS-GUIDE, MODEL-OPTIMIZATION-GUIDE 등)"
     else
         print_warning "docs/ directory not found in repository"
+    fi
+
+    # Copy architectures system (v2.2.0)
+    if [ -d "$TEMP_DIR/architectures" ]; then
+        print_info "Installing Multi-Architecture Support System..."
+        cp -r "$TEMP_DIR/architectures" "$TARGET_DIR/.claude/"
+        print_success "Architecture system installed (FSD, Atomic, Clean, Hexagonal, DDD 등)"
+    else
+        print_warning "architectures/ directory not found in repository"
+    fi
+
+    # Copy model optimization configs (v2.2.0)
+    if [ -d "$TEMP_DIR/.claude/config" ]; then
+        print_info "Installing Model Optimization Configs..."
+        cp -r "$TEMP_DIR/.claude/config/"* "$TARGET_DIR/.claude/config/" 2>/dev/null || true
+        print_success "Model configs installed (model-router.yaml, user-preferences.yaml)"
+    else
+        print_warning ".claude/config/ directory not found in repository"
     fi
 
     # Create .specify directory structure (optional, created by /start command)
@@ -162,15 +186,22 @@ install_workflows() {
 
     # Print summary
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${GREEN}Installed Components:${NC}"
+    echo -e "${GREEN}Installed Components (v2.3.0):${NC}"
     echo ""
     echo "📁 $TARGET_DIR/.claude/"
-    echo "   ├── commands/        (12 Slash Commands)"
+    echo "   ├── commands/        (13 Slash Commands + /review)"
     echo "   ├── templates/       (문서 템플릿)"
-    echo "   ├── agents/          (8 Sub-agents)"
-    echo "   ├── skills/          (10 Skills)"
-    echo "   ├── docs/            (가이드 문서)"
-    echo "   └── workflow-gates.json"
+    echo "   ├── agents/          (10 Sub-agents with Review System)"
+    echo "   ├── skills/          (13 Skills with Analysis Tools)"
+    echo "   ├── docs/            (가이드 문서 + Model Optimization Guide)"
+    echo "   ├── architectures/   (🆕 Multi-Architecture Support)"
+    echo "   │   ├── frontend/    (FSD, Atomic, MVC)"
+    echo "   │   ├── backend/     (Clean, Hexagonal, DDD)"
+    echo "   │   └── fullstack/   (Monorepo, JAMstack)"
+    echo "   ├── config/          (🆕 Model & User Preferences)"
+    echo "   │   ├── model-router.yaml"
+    echo "   │   └── user-preferences.yaml"
+    echo "   └── workflow-gates.json (v2 with Model Optimization)"
     echo ""
     echo "📁 $TARGET_DIR/.specify/"
     echo "   ├── memory/          (constitution.md)"
@@ -185,32 +216,45 @@ install_workflows() {
     # Print next steps
     echo -e "${GREEN}Next Steps:${NC}"
     echo ""
-    echo "1. 프로젝트 초기 설정:"
-    echo "   /start              # Constitution 생성 및 .specify/ 구조 완성"
+    echo "1. 프로젝트 초기 설정 (🆕 아키텍처 선택 포함):"
+    echo "   /start              # Architecture 선택 및 Constitution 생성"
     echo ""
-    echo "2. 자동 워크플로 선택 (🆕 재사용성 검사 포함):"
-    echo "   /triage [작업 설명]         # AI가 최적 워크플로 자동 선택 + 재사용 모듈 검색"
+    echo "2. 자동 워크플로 선택 (🆕 모델 최적화 포함):"
+    echo "   /triage [작업 설명]         # 최적 워크플로 + 모델 자동 선택"
     echo ""
-    echo "3. 워크플로 명령어:"
-    echo "   /major [feature-name]        # 신규 기능 (통합 워크플로)"
-    echo "   /minor [feature-or-issue]    # 버그 수정, 기능 개선"
-    echo "   /micro [description]         # 빠른 수정"
+    echo "3. 코드 리뷰 (🆕 v2.3):"
+    echo "   /review [target]             # 종합 코드 리뷰"
+    echo "   /review --staged             # 스테이징 변경사항 리뷰"
+    echo "   /review --diff HEAD~1        # Git diff 리뷰"
+    echo "   /review [target] --adv       # 심층 분석 모드"
     echo ""
-    echo "4. Git 자동화 (🆕):"
+    echo "4. 워크플로 명령어 (지능형 모델 스위칭):"
+    echo "   /major [feature-name]        # Opus → Sonnet 자동 전환"
+    echo "   /minor [feature-or-issue]    # Sonnet/Haiku 자동 선택"
+    echo "   /micro [description]         # Haiku 우선 사용"
+    echo ""
+    echo "5. Git 자동화:"
     echo "   /commit             # Conventional Commits 자동 생성"
     echo "   /pr-review [PR#]    # GitHub PR 자동 리뷰"
     echo ""
-    echo "5. 단계별 실행 (Major):"
-    echo "   /major-specify [feature-name]"
-    echo "   /major-clarify [feature-number]"
-    echo "   /major-plan [feature-number]"
-    echo "   /major-tasks [feature-number]"
-    echo "   /major-implement [feature-number]"
+    echo "6. 모델 옵션 (🆕):"
+    echo "   --model=opus        # 특정 모델 강제 사용"
+    echo "   --use-context7      # Context7 강제 활성화"
+    echo "   --optimize-cost     # 비용 최적화 우선"
     echo ""
-    echo "6. Sub-agents 및 Skills는 자동으로 활성화됩니다"
+    echo "7. 아키텍처 관련:"
+    echo "   /architecture-info  # 현재 아키텍처 정보"
+    echo "   /architecture-switch # 아키텍처 변경"
     echo ""
-    echo "7. 자세한 사용법:"
+    echo "8. Sub-agents 및 Skills:"
+    echo "   - 자동으로 활성화됩니다"
+    echo "   - Model Optimization 적용됨"
+    echo "   - Context7 통합 (조건부)"
+    echo ""
+    echo "9. 자세한 사용법:"
     echo "   ${REPO_URL}#readme"
+    echo "   .claude/docs/MODEL-OPTIMIZATION-GUIDE.md"
+    echo "   .claude/docs/ARCHITECTURE-GUIDE.md"
     echo ""
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 }

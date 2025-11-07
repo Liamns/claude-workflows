@@ -1,0 +1,190 @@
+# User Preferences Configuration
+# Customize model selection and optimization strategies
+version: 1.0.0
+
+# Model preference strategy
+model_preferences:
+  default_strategy: "balanced"  # Options: quality, balanced, aggressive
+
+  strategies:
+    # Quality-first: Prioritize best models for accuracy
+    quality:
+      description: "Maximum quality, higher cost"
+      settings:
+        specify: opus        # Always use Opus for requirements
+        plan: opus          # Always use Opus for planning
+        clarify: opus       # Use Opus for clarifications
+        tasks: sonnet       # Use Sonnet for task breakdown
+        implement: sonnet   # Use Sonnet for implementation
+        context7: always    # Always use Context7 when available
+        token_budget: unlimited
+
+    # Balanced (Recommended default)
+    balanced:
+      description: "Optimal balance between quality and cost"
+      settings:
+        specify: opus        # Opus for critical requirements
+        plan: sonnet        # Sonnet default, Opus for complex
+        clarify: sonnet     # Sonnet for clarifications
+        tasks: sonnet       # Sonnet for tasks
+        implement: sonnet   # Sonnet for implementation
+        context7: conditional  # Use Context7 based on complexity
+        token_budget: 10000   # Per-stage limit
+
+    # Aggressive cost optimization
+    aggressive:
+      description: "Minimize costs, accept quality trade-offs"
+      settings:
+        specify: sonnet     # Use Sonnet even for requirements
+        plan: sonnet        # Always Sonnet for planning
+        clarify: haiku      # Use Haiku for clarifications
+        tasks: haiku        # Use Haiku for tasks
+        implement: haiku    # Use Haiku for implementation
+        context7: never     # Never use Context7
+        token_budget: 5000  # Strict per-stage limit
+
+  # Allow runtime overrides
+  allow_override: true
+
+  # Show cost estimates before execution
+  show_cost_estimates: true
+
+  # Warn when exceeding budget
+  budget_warning_threshold: "$5"
+
+# Context7 preferences
+context7_preferences:
+  # Default activation mode
+  default_mode: "auto"  # Options: auto, manual, never
+
+  # Maximum tokens to use for Context7
+  max_tokens: 3000
+
+  # Minimum complexity score to auto-activate
+  auto_activation_threshold: 10
+
+  # Preferred loading strategy
+  loading_strategy: "selective"  # Options: selective, comprehensive
+
+  # Cache duration (seconds)
+  cache_ttl: 1800  # 30 minutes
+
+# Notification preferences
+notifications:
+  # Model switch notifications
+  model_switches:
+    enabled: true
+    verbose: false  # Set to true for detailed info
+
+  # Quota warnings
+  quota_warnings:
+    enabled: true
+    threshold: 10  # Warn when less than 10 requests remaining
+
+  # Context7 usage
+  context7_usage:
+    enabled: true
+    show_token_count: true
+
+  # Cost tracking
+  cost_tracking:
+    enabled: true
+    show_per_stage: false  # Set to true for detailed breakdown
+    show_cumulative: true
+
+# Performance preferences
+performance:
+  # Parallel execution
+  parallel_execution:
+    enabled: true
+    max_concurrent: 3
+
+  # Caching
+  cache:
+    enabled: true
+    constitution_ttl: "session"
+    structure_ttl: 3600
+    patterns_ttl: 7200
+
+  # Retry logic
+  retry:
+    enabled: true
+    max_attempts: 3
+    wait_seconds: 5
+
+# Quality gates
+quality_gates:
+  # Minimum quality threshold
+  minimum_quality_score: 0.85
+
+  # Automatic quality checks
+  auto_quality_checks:
+    enabled: true
+    block_on_fail: false  # Set to true to prevent continuation
+
+  # Test requirements
+  test_requirements:
+    enforce_tdd: true
+    minimum_coverage: 80
+
+# CLI shortcuts
+cli_shortcuts:
+  # Quick model selection
+  opus: "--model=opus"
+  sonnet: "--model=sonnet"
+  haiku: "--model=haiku"
+
+  # Context7 control
+  context: "--use-context7"
+  nocontext: "--no-context7"
+
+  # Strategy shortcuts
+  quality: "--prefer-quality"
+  cost: "--optimize-cost"
+  fast: "--optimize-speed"
+
+# Advanced settings
+advanced:
+  # Model fallback chain
+  fallback_chain:
+    - opus
+    - sonnet
+    - haiku
+
+  # Enhancement strategies when using lower models
+  enhancement_when_downgrading:
+    add_examples: true
+    include_patterns: true
+    expand_context: true
+
+  # Quota management
+  quota_management:
+    reserve_opus_for: ["specify", "critical_plan"]
+    auto_switch_threshold: 20  # Switch to Sonnet when < 20 Opus remaining
+    retry_after_minutes: 5
+
+  # Metrics collection
+  metrics:
+    enabled: true
+    track_model_usage: true
+    track_token_consumption: true
+    track_cost_per_workflow: true
+    export_format: "json"  # Options: json, csv
+    export_path: ".claude/metrics/"
+
+# User profile
+profile:
+  # User role (affects default settings)
+  role: "developer"  # Options: developer, architect, manager
+
+  # Experience level
+  experience: "intermediate"  # Options: beginner, intermediate, expert
+
+  # Primary focus
+  focus: "feature_development"  # Options: feature_development, bug_fixing, architecture
+
+  # Budget constraints
+  budget:
+    daily_limit: null  # Set to number for daily budget cap
+    monthly_limit: null  # Set to number for monthly budget cap
+    alert_percentage: 80  # Alert when reaching 80% of budget

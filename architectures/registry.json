@@ -1,0 +1,133 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "description": "Architecture patterns registry for multi-architecture support",
+  "architectures": {
+    "frontend": {
+      "fsd": {
+        "name": "Feature-Sliced Design",
+        "description": "Layered architecture for frontend projects with strict isolation",
+        "aliases": ["feature-sliced", "FSD"],
+        "compatibility": ["react", "vue", "angular", "next", "nuxt"],
+        "configPath": "architectures/frontend/fsd/config.json",
+        "enabled": true
+      },
+      "atomic": {
+        "name": "Atomic Design",
+        "description": "Component hierarchy from atoms to pages",
+        "aliases": ["atomic-design"],
+        "compatibility": ["react", "vue", "angular"],
+        "configPath": "architectures/frontend/atomic/config.json",
+        "enabled": true
+      },
+      "mvc": {
+        "name": "MVC/MVP/MVVM",
+        "description": "Model-View-Controller and variants",
+        "aliases": ["model-view-controller", "mvp", "mvvm"],
+        "compatibility": ["angular", "vue", "react"],
+        "configPath": "architectures/frontend/mvc/config.json",
+        "enabled": true
+      },
+      "micro-frontend": {
+        "name": "Micro Frontend",
+        "description": "Independently deployable frontend modules",
+        "aliases": ["micro-frontends", "module-federation"],
+        "compatibility": ["react", "vue", "angular"],
+        "configPath": "architectures/frontend/micro-frontend/config.json",
+        "enabled": true
+      }
+    },
+    "backend": {
+      "clean": {
+        "name": "Clean Architecture",
+        "description": "Domain-centric architecture with clear boundaries",
+        "aliases": ["clean-arch", "onion"],
+        "compatibility": ["node", "python", "java", "go", "dotnet"],
+        "configPath": "architectures/backend/clean/config.json",
+        "enabled": true
+      },
+      "hexagonal": {
+        "name": "Hexagonal Architecture",
+        "description": "Ports and Adapters pattern for testability",
+        "aliases": ["ports-and-adapters", "hexagon"],
+        "compatibility": ["node", "python", "java", "go", "dotnet"],
+        "configPath": "architectures/backend/hexagonal/config.json",
+        "enabled": true
+      },
+      "ddd": {
+        "name": "Domain-Driven Design",
+        "description": "Complex domain modeling with bounded contexts",
+        "aliases": ["domain-driven"],
+        "compatibility": ["node", "python", "java", "go", "dotnet"],
+        "configPath": "architectures/backend/ddd/config.json",
+        "enabled": true
+      },
+      "layered": {
+        "name": "Layered Architecture",
+        "description": "Traditional n-tier architecture",
+        "aliases": ["n-tier", "3-tier"],
+        "compatibility": ["node", "python", "java", "go", "dotnet"],
+        "configPath": "architectures/backend/layered/config.json",
+        "enabled": true
+      },
+      "serverless": {
+        "name": "Serverless Architecture",
+        "description": "Function-as-a-Service and event-driven patterns",
+        "aliases": ["faas", "lambda"],
+        "compatibility": ["node", "python", "go", "java"],
+        "configPath": "architectures/backend/serverless/config.json",
+        "enabled": true
+      }
+    },
+    "fullstack": {
+      "monorepo": {
+        "name": "Monorepo Architecture",
+        "description": "Unified repository for multiple projects",
+        "aliases": ["mono-repo", "nx", "turborepo"],
+        "compatibility": ["nx", "turborepo", "lerna", "rush"],
+        "configPath": "architectures/fullstack/monorepo/config.json",
+        "enabled": true
+      },
+      "jamstack": {
+        "name": "JAMstack",
+        "description": "JavaScript, APIs, and Markup architecture",
+        "aliases": ["jam"],
+        "compatibility": ["gatsby", "next", "nuxt", "11ty"],
+        "configPath": "architectures/fullstack/jamstack/config.json",
+        "enabled": true
+      },
+      "microservices": {
+        "name": "Microservices",
+        "description": "Distributed services architecture",
+        "aliases": ["micro-services"],
+        "compatibility": ["docker", "kubernetes", "all"],
+        "configPath": "architectures/fullstack/microservices/config.json",
+        "enabled": true
+      }
+    },
+    "mobile": {
+      "mvvm": {
+        "name": "MVVM for Mobile",
+        "description": "Model-View-ViewModel for mobile apps",
+        "aliases": ["mobile-mvvm"],
+        "compatibility": ["react-native", "flutter", "ionic"],
+        "configPath": "architectures/mobile/mvvm/config.json",
+        "enabled": true
+      },
+      "clean-mobile": {
+        "name": "Clean Architecture Mobile",
+        "description": "Clean architecture adapted for mobile",
+        "aliases": ["mobile-clean"],
+        "compatibility": ["react-native", "flutter", "ionic"],
+        "configPath": "architectures/mobile/clean/config.json",
+        "enabled": true
+      }
+    }
+  },
+  "defaultArchitectures": {
+    "frontend": "fsd",
+    "backend": "clean",
+    "fullstack": "monorepo",
+    "mobile": "mvvm"
+  }
+}

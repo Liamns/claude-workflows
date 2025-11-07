@@ -1,12 +1,14 @@
 # 🤖 Claude Workflows
 
-[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](https://github.com/Liamns/claude-workflows)
+[![Version](https://img.shields.io/badge/version-2.3.0-blue.svg)](https://github.com/Liamns/claude-workflows)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-purple.svg)](https://claude.ai/code)
+[![Architecture](https://img.shields.io/badge/Architecture-Multi--Support-orange.svg)](ARCHITECTURE-GUIDE.md)
+[![Models](https://img.shields.io/badge/Models-Opus%2FSonnet%2FHaiku-green.svg)](docs/MODEL-OPTIMIZATION-GUIDE.md)
 
-> Smart workflows for Claude Code - Auto-triage, smart commits, and PR reviews
+> Smart workflows for Claude Code with Comprehensive Code Review, Multi-Architecture Support & Intelligent Model Optimization
 
-Claude Code를 통한 개발 효율성 극대화를 위한 스마트 워크플로우 시스템
+Claude Code를 통한 개발 효율성 극대화를 위한 지능형 워크플로우 시스템
 
 ## 🚀 Quick Start
 
@@ -30,7 +32,47 @@ cd claude-workflows
 → Minor 워크플로우 자동 선택 (75% 토큰 절약)
 ```
 
-## ✨ 새로운 기능 (v2.0.0)
+## ✨ 새로운 기능 (v2.3.0)
+
+### 📋 종합 코드 리뷰 시스템 (v2.3 신규)
+**`/review` 명령어** - PR 없이도 언제든 코드 리뷰 수행
+- **유연한 스코프**: 파일, 디렉토리, git diff, staged/unstaged 변경사항
+- **Constitution 인식**: `/start`로 설정한 프로젝트 규칙 자동 적용
+- **고급 분석 (--adv)**: 파일 간 영향도, 의존성 그래프, Breaking Changes
+- **다양한 출력**: 요약(기본), 상세, JSON(CI/CD용)
+- **지능형 보안 스캔**: OWASP Top 10, 민감 데이터, 의존성 취약점
+
+```bash
+# 기본 사용
+/review src/features/order
+/review --staged              # 커밋 전 검토
+/review --diff main...HEAD    # 브랜치 차이
+
+# 고급 분석
+/review src/ --adv            # 심층 분석 모드
+
+# 출력 형식
+/review src/ --format json    # CI/CD 통합용
+```
+
+## ✨ 기존 기능 (v2.2.0)
+
+### 🏗️ 다중 아키텍처 지원 (v2.2 신규)
+**모든 프로젝트 타입 지원** - Frontend, Backend, Fullstack, Mobile
+- **Frontend**: FSD, Atomic Design, MVC/MVP/MVVM, Micro Frontend
+- **Backend**: Clean, Hexagonal, DDD, Layered, Serverless
+- **Fullstack**: Monorepo, JAMstack, Microservices
+- **자동 감지**: 기존 프로젝트 구조 자동 인식
+- **마이그레이션**: 아키텍처 간 전환 도구 제공
+
+### 🎯 지능형 모델 최적화 (v2.2 신규)
+**Opus/Sonnet/Haiku 자동 전환** - 작업 복잡도에 따른 최적 모델 선택
+- **복잡도 점수**: 파일 수, 변경 범위, Breaking Changes 자동 평가
+- **Context7 통합**: Plan 단계에서 프로젝트 컨텍스트 선택적 로드 (3,000 토큰)
+- **쿼터 관리**: Opus 한도 도달 시 자동 Sonnet 폴백
+- **비용 절감**: 토큰 사용량 40-50% 감소, 품질 유지
+
+## ✨ 기존 기능 (v2.0)
 
 ### 🔄 재사용성 우선 원칙 (신규)
 **Article X** - 모든 코드 작성 시 기존 패턴과 모듈을 우선 검색하고 재사용
@@ -63,7 +105,12 @@ GitHub PR을 자동으로 분석하고 코드 리뷰 수행
 
 ### 프로젝트 초기 설정
 ```bash
-/start    # .specify/ 디렉토리 및 Constitution 생성
+# 대화형 설정 (아키텍처 선택 포함)
+/start
+
+→ 프로젝트 타입 선택 (Frontend/Backend/Fullstack/Mobile)
+→ 아키텍처 패턴 선택 (FSD/Clean/DDD/Atomic 등)
+→ 모델 전략 선택 (Quality/Balanced/Aggressive)
 ```
 
 ### Major 워크플로 (신규 기능)
@@ -71,8 +118,9 @@ GitHub PR을 자동으로 분석하고 코드 리뷰 수행
 # 자동 선택 (권장)
 /triage "사용자 인증 기능 추가"
 
-# 또는 직접 실행
-/major user-authentication
+# 직접 실행 + 모델 옵션
+/major user-authentication --model=opus --use-context7
+/major simple-feature --optimize-cost
 ```
 
 ### Minor 워크플로 (버그 수정/개선)
@@ -133,90 +181,96 @@ GitHub PR을 자동으로 분석하고 코드 리뷰 수행
 **Quality Gates**:
 - ✅ 문법 체크
 
-## 🤖 Sub-agents (7개)
+## 🤖 Sub-agents (10개)
 
-1. **quick-fixer**: 빠른 버그 수정 및 코드 개선
-2. **changelog-writer**: Git diff 분석 및 변경사항 문서화
-3. **fsd-architect**: FSD 아키텍처 규칙 검증 및 가이드
-4. **test-guardian**: TDD 적용 및 테스트 품질 관리
-5. **api-designer**: API 계약 설계 및 통합 구현
-6. **mobile-specialist**: Capacitor 플랫폼 분기 및 네이티브 API 통합
-7. **code-reviewer**: 보안, 성능, 베스트 프랙티스 검증
+1. **architect**: 아키텍처 검증 (모든 아키텍처 지원, 모델 자동 선택)
+2. **code-reviewer**: 종합 코드 리뷰 (보안, 성능, 품질)
+3. **security-scanner**: 전문 보안 취약점 스캔 (OWASP Top 10)
+4. **impact-analyzer**: 파일 간 영향도 분석 (--adv 모드 전용)
+5. **quick-fixer**: 빠른 버그 수정 (Haiku 자동 다운그레이드)
+6. **changelog-writer**: Git diff 분석 및 변경사항 문서화
+7. **test-guardian**: TDD 적용 및 테스트 품질 관리
+8. **api-designer**: API 계약 설계 (복잡한 API는 Opus 사용)
+9. **mobile-specialist**: Capacitor 플랫폼 분기 및 네이티브 API 통합
+10. **smart-committer**: Conventional Commits 자동 생성
 
-## 🛠️ Skills (7개)
+## 🛠️ Skills (13개)
 
-1. **bug-fix-pattern**: 일관된 버그 수정 프로세스
-2. **daily-changelog-notion**: Git 변경사항을 Notion 형식으로 자동 정리
-3. **fsd-component-creation**: FSD 규칙 준수 컴포넌트 자동 생성
-4. **api-integration**: httpClient 기반 API 통합 자동화
-5. **form-validation**: React Hook Form + Zod 검증 패턴
-6. **platform-detection**: Capacitor 플랫폼 분기 자동화
-7. **mobile-build**: Android/iOS 빌드 프로세스 자동화
+1. **reusability-enforcer**: 재사용 모듈 자동 검색 (Context7 통합)
+2. **test-coverage-analyzer**: 테스트 커버리지 분석 및 갭 식별 (신규)
+3. **code-metrics-collector**: 코드 복잡도, 중복률 메트릭 수집 (신규)
+4. **dependency-tracer**: 의존성 그래프 및 순환 의존성 감지 (신규)
+5. **component-creation**: 아키텍처별 컴포넌트 생성 (Context7 통합)
+6. **api-integration**: httpClient 기반 API 통합 (Context7 통합)
+7. **bug-fix-pattern**: 일관된 버그 수정 프로세스
+8. **daily-changelog-notion**: Git 변경사항 Notion 자동화
+9. **form-validation**: React Hook Form + Zod 검증
+10. **platform-detection**: Capacitor 플랫폼 분기
+11. **mobile-build**: Android/iOS 빌드 자동화
+12. **commit-guard**: 커밋 전 검증 (3단계)
+13. **fsd-component-creation**: FSD 컴포넌트 생성 (레거시)
 
 ## 📁 구조
 
 ```
 .claude/
 ├── commands/                    # Slash Commands
-│   ├── start.md                 # 프로젝트 초기화
-│   ├── major.md                 # 통합 Major 워크플로
-│   ├── major-specify.md         # Step 1: Specification
-│   ├── major-clarify.md         # Step 2: Clarification
-│   ├── major-plan.md            # Step 3: Plan
-│   ├── major-tasks.md           # Step 4: Tasks
-│   ├── major-implement.md       # Step 5: Implementation
-│   ├── minor.md                 # Minor 워크플로
-│   └── micro.md                 # Micro 워크플로
+│   ├── start.md                 # 프로젝트 초기화 (아키텍처 선택)
+│   ├── triage.md                # 자동 워크플로우 선택
+│   ├── review.md                # 종합 코드 리뷰 (신규)
+│   ├── commit.md                # 스마트 커밋
+│   ├── pr-review.md             # PR 자동 리뷰
+│   └── major/minor/micro.md     # 워크플로우 명령
 │
-├── templates/                   # 문서 템플릿
-│   ├── spec-template.md
-│   ├── plan-template.md
-│   └── tasks-template.md
+├── config/                      # 설정 파일 (신규)
+│   ├── model-router.yaml        # 모델 선택 규칙
+│   └── user-preferences.yaml    # 사용자 전략 설정
 │
-├── agents/                      # Sub-agents (7개)
-│   ├── quick-fixer.md
-│   ├── changelog-writer.md
-│   ├── fsd-architect.md
-│   ├── test-guardian.md
-│   ├── api-designer.md
-│   ├── mobile-specialist.md
-│   └── code-reviewer.md
+├── agents/                      # Sub-agents (10개)
+│   ├── architect.md             # 아키텍처 검증 (다중 지원)
+│   ├── code-reviewer.md         # 코드 리뷰 (개선됨)
+│   ├── security-scanner.md      # 보안 스캔 (신규)
+│   ├── impact-analyzer.md       # 영향도 분석 (신규)
+│   └── ...
 │
-└── skills/                      # Skills (7개)
-    ├── bug-fix-pattern/
-    ├── daily-changelog-notion/
-    ├── fsd-component-creation/
-    ├── api-integration/
-    ├── form-validation/
-    ├── platform-detection/
-    └── mobile-build/
+└── skills/                      # Skills (13개)
+    ├── reusability-enforcer/    # Context7 통합
+    ├── test-coverage-analyzer/  # 커버리지 분석 (신규)
+    ├── code-metrics-collector/  # 메트릭 수집 (신규)
+    ├── dependency-tracer/       # 의존성 추적 (신규)
+    └── ...
+
+architectures/                    # 아키텍처 시스템 (신규)
+├── registry.json                # 아키텍처 레지스트리
+├── base/
+│   └── ArchitectureAdapter.ts   # 어댑터 인터페이스
+├── frontend/                    # Frontend 아키텍처
+│   ├── fsd/config.json
+│   ├── atomic/config.json
+│   ├── mvc/config.json
+│   └── micro-frontend/
+├── backend/                     # Backend 아키텍처
+│   ├── clean/config.json
+│   ├── hexagonal/config.json
+│   ├── ddd/config.json
+│   ├── layered/config.json
+│   └── serverless/
+├── fullstack/                   # Fullstack 아키텍처
+│   ├── monorepo/
+│   ├── jamstack/
+│   └── microservices/
+└── tools/                       # 아키텍처 도구
+    ├── detector.ts              # 자동 감지
+    └── migrator.ts              # 마이그레이션
 
 .specify/                        # Spec-Kit 구조
-├── memory/
-│   └── constitution.md          # 프로젝트 거버넌스
-├── templates/
-│   ├── spec-template.md
-│   ├── plan-template.md
-│   └── tasks-template.md
-├── scripts/bash/
-│   ├── common.sh
-│   ├── create-new-feature.sh
-│   └── check-prerequisites.sh
-├── steering/                    # 선택사항
-│   ├── product.md
-│   ├── tech.md
-│   └── structure.md
+├── config/                      # 프로젝트 설정 (신규)
+│   ├── architecture.json        # 선택된 아키텍처
+│   └── architecture-rules.json  # 커스텀 규칙
+├── memory/constitution.md       # 프로젝트 거버넌스
 └── specs/                       # Feature별 저장소
-    └── 001-feature-name/
-        ├── spec.md
-        ├── plan.md
-        ├── tasks.md
-        ├── research.md
-        ├── data-model.md
-        ├── contracts/
-        └── checklists/
 
-workflow-gates.json              # Quality Gates 설정
+workflow-gates-v2.json           # 아키텍처별 품질 게이트
 ```
 
 ## 🎯 핵심 원칙

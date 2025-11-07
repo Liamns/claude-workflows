@@ -1,0 +1,132 @@
+{
+  "name": "Clean Architecture",
+  "type": "backend",
+  "version": "1.0.0",
+  "description": "Domain-centric architecture with dependency inversion",
+
+  "structure": {
+    "directories": {
+      "domain": "Core business logic and entities",
+      "application": "Use cases and application services",
+      "infrastructure": "External dependencies and frameworks",
+      "presentation": "API controllers and DTOs",
+      "tests": "Test files organized by layer"
+    },
+    "namingConventions": {
+      "entity": "PascalCase",
+      "useCase": "PascalCase",
+      "repository": "PascalCase",
+      "service": "PascalCase",
+      "controller": "PascalCase"
+    },
+    "fileExtensions": {
+      "typescript": ["ts"],
+      "javascript": ["js"],
+      "python": ["py"],
+      "java": ["java"],
+      "go": ["go"]
+    }
+  },
+
+  "layers": {
+    "domain": {
+      "description": "Enterprise business rules",
+      "components": ["entities", "valueObjects", "domainServices", "repositories"],
+      "dependencies": [],
+      "rules": {
+        "noDependencies": true,
+        "pureBusinessLogic": true,
+        "noFrameworks": true
+      }
+    },
+    "application": {
+      "description": "Application business rules",
+      "components": ["useCases", "applicationServices", "ports"],
+      "dependencies": ["domain"],
+      "rules": {
+        "orchestrationOnly": true,
+        "noFrameworks": true
+      }
+    },
+    "infrastructure": {
+      "description": "Frameworks and drivers",
+      "components": ["repositories", "services", "adapters", "config"],
+      "dependencies": ["domain", "application"],
+      "rules": {
+        "implementsPorts": true,
+        "externalDependencies": true
+      }
+    },
+    "presentation": {
+      "description": "Interface adapters",
+      "components": ["controllers", "presenters", "viewModels", "mappers"],
+      "dependencies": ["application"],
+      "rules": {
+        "httpHandling": true,
+        "validation": true,
+        "noBusinessLogic": true
+      }
+    }
+  },
+
+  "dependencies": {
+    "allowed": {
+      "presentation": ["application"],
+      "infrastructure": ["application", "domain"],
+      "application": ["domain"],
+      "domain": []
+    },
+    "forbidden": {
+      "domain": ["application", "infrastructure", "presentation"],
+      "application": ["infrastructure", "presentation"],
+      "presentation": ["infrastructure", "domain"],
+      "infrastructure": ["presentation"]
+    },
+    "circular": false
+  },
+
+  "components": {
+    "entity": {
+      "location": "domain/entities",
+      "template": "class with business rules and identity"
+    },
+    "useCase": {
+      "location": "application/useCases",
+      "template": "single operation with input/output ports"
+    },
+    "repository": {
+      "interface": "domain/repositories",
+      "implementation": "infrastructure/repositories"
+    },
+    "controller": {
+      "location": "presentation/controllers",
+      "template": "HTTP request handler"
+    }
+  },
+
+  "qualityRules": {
+    "dependencyInversion": {
+      "description": "Depend on abstractions, not concretions",
+      "severity": "error"
+    },
+    "singleResponsibility": {
+      "description": "Each class should have one reason to change",
+      "severity": "warning"
+    },
+    "domainPurity": {
+      "description": "Domain layer must not depend on any other layer",
+      "severity": "error"
+    },
+    "testability": {
+      "description": "All business logic must be testable without external dependencies",
+      "severity": "error"
+    }
+  },
+
+  "templates": {
+    "entity": "architectures/backend/clean/templates/entity.template",
+    "useCase": "architectures/backend/clean/templates/useCase.template",
+    "repository": "architectures/backend/clean/templates/repository.template",
+    "controller": "architectures/backend/clean/templates/controller.template"
+  }
+}

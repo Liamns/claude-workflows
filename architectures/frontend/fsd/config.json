@@ -1,0 +1,114 @@
+{
+  "name": "Feature-Sliced Design",
+  "type": "frontend",
+  "version": "2.0.0",
+  "description": "Architectural methodology for frontend projects with layers and slices",
+
+  "structure": {
+    "directories": {
+      "app": "Application initialization and providers",
+      "processes": "Complex multi-page scenarios (deprecated in v2)",
+      "pages": "Full pages composed from features",
+      "widgets": "Compositional blocks from features and entities",
+      "features": "User interactions and scenarios",
+      "entities": "Business entities",
+      "shared": "Reusable components, utilities, and configs"
+    },
+    "namingConventions": {
+      "component": "PascalCase",
+      "slice": "kebab-case",
+      "segment": "camelCase"
+    },
+    "fileExtensions": {
+      "component": ["tsx", "jsx", "vue"],
+      "style": ["css", "scss", "sass", "less"],
+      "test": ["test.ts", "test.tsx", "spec.ts", "spec.tsx"],
+      "story": ["stories.tsx", "stories.jsx"]
+    }
+  },
+
+  "layers": {
+    "order": ["app", "processes", "pages", "widgets", "features", "entities", "shared"],
+    "rules": {
+      "app": {
+        "canImport": ["processes", "pages", "widgets", "features", "entities", "shared"],
+        "description": "초기화 로직과 프로바이더"
+      },
+      "processes": {
+        "canImport": ["pages", "widgets", "features", "entities", "shared"],
+        "deprecated": true,
+        "description": "복잡한 다중 페이지 시나리오 (v2에서 deprecated)"
+      },
+      "pages": {
+        "canImport": ["widgets", "features", "entities", "shared"],
+        "description": "라우팅 엔트리 포인트"
+      },
+      "widgets": {
+        "canImport": ["features", "entities", "shared"],
+        "description": "독립적인 UI 블록"
+      },
+      "features": {
+        "canImport": ["entities", "shared"],
+        "description": "사용자 시나리오"
+      },
+      "entities": {
+        "canImport": ["shared"],
+        "description": "비즈니스 엔티티"
+      },
+      "shared": {
+        "canImport": [],
+        "description": "재사용 가능한 인프라"
+      }
+    }
+  },
+
+  "segments": {
+    "standard": ["ui", "model", "lib", "api", "config"],
+    "descriptions": {
+      "ui": "UI components and their styles",
+      "model": "Business logic and state management",
+      "lib": "Infrastructure logic and helpers",
+      "api": "Backend interaction logic",
+      "config": "Configuration and constants"
+    }
+  },
+
+  "dependencies": {
+    "allowed": {
+      "features": ["entities", "shared"],
+      "entities": ["shared"],
+      "shared": []
+    },
+    "forbidden": {
+      "entities": ["features", "widgets", "pages", "processes", "app"],
+      "shared": ["entities", "features", "widgets", "pages", "processes", "app"]
+    },
+    "circular": false
+  },
+
+  "qualityRules": {
+    "entityPurity": {
+      "description": "Entities must not have external dependencies except shared",
+      "severity": "error"
+    },
+    "publicApi": {
+      "description": "Each slice must have an explicit public API (index file)",
+      "severity": "error"
+    },
+    "sliceIsolation": {
+      "description": "Slices within the same layer cannot import each other",
+      "severity": "error"
+    },
+    "crossImport": {
+      "description": "Use only public API imports between slices",
+      "severity": "warning"
+    }
+  },
+
+  "templates": {
+    "feature": "architectures/frontend/fsd/templates/feature.template",
+    "entity": "architectures/frontend/fsd/templates/entity.template",
+    "widget": "architectures/frontend/fsd/templates/widget.template",
+    "page": "architectures/frontend/fsd/templates/page.template"
+  }
+}

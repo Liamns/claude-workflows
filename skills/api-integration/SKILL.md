@@ -1,12 +1,54 @@
 ---
 name: api-integration
 description: httpClient 기반 API 통합 패턴을 제공합니다. 자동 토큰 관리, 401 에러 처리, React Query 훅 생성을 자동화하며, MSW 목업도 함께 생성합니다. Major 워크플로우에서 사용됩니다.
-allowed-tools: Read, Write, Grep, Glob
+allowed-tools: Read, Write, Grep, Glob, mcp__context7*
+context7_enabled: conditional
+context7_conditions:
+  - new_api_endpoint: true
+  - multiple_endpoints: ">3"
+context7_loading:
+  max_tokens: 1500
+  scope:
+    - "features/*/api/*.ts"
+    - "features/*/api/use*.ts"
+    - "shared/api/httpClient.ts"
+  filters:
+    - "httpClient usage patterns"
+    - "React Query hooks"
+    - "Error handling patterns"
 ---
 
 # API Integration Skill
 
 httpClient를 활용한 API 통합 패턴을 자동화합니다.
+
+## Context7 통합
+
+### 자동 활성화 조건
+```yaml
+Context7 활성화:
+  - 새 API 엔드포인트 추가
+  - 3개 이상 엔드포인트 동시 작업
+  - 복잡한 에러 처리 필요
+```
+
+### Context7 로딩 전략
+```yaml
+🔍 Context7 로딩 (최대 1500 토큰):
+  ├─ 기존 API 패턴 (600 토큰)
+  │  └─ features/*/api/*.ts
+  ├─ React Query 훅 (500 토큰)
+  │  └─ features/*/api/use*.ts
+  └─ httpClient 설정 (400 토큰)
+     └─ shared/api/httpClient.ts
+```
+
+### 폴백 전략
+Context7 불가 시 수동 검색:
+```bash
+grep -r "httpClient" features/*/api/
+grep -r "useQuery\|useMutation" features/
+```
 
 ## 실행 조건
 

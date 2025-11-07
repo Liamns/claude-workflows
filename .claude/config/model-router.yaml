@@ -1,0 +1,223 @@
+# Model Router Configuration
+# Strategic model allocation for optimal quality/cost balance
+version: 2.0.0
+
+# Model selection strategy
+model_selection:
+  strategy: "adaptive"  # Options: fixed, adaptive, user-controlled
+
+  # Opus configuration (Premium model for critical stages)
+  opus:
+    description: "Highest quality for critical planning stages"
+    usage_quota: 100  # Daily request limit
+    priority_stages: ["specify"]  # Always use Opus here
+    conditional_stages:  # Use Opus only when conditions met
+      plan:
+        conditions:
+          - complexity_score: ">12"
+          - architecture_change: true
+          - breaking_changes: true
+          - user_request: "--use-opus"
+    fallback: "sonnet"
+    token_budget: 8000  # Max tokens per request
+
+  # Sonnet configuration (Default balanced model)
+  sonnet:
+    description: "Balanced quality and cost for most tasks"
+    default_for: ["plan", "clarify", "tasks", "implement", "minor"]
+    fallback: "haiku"
+    token_budget: 5000
+
+  # Haiku configuration (Fast, cost-effective model)
+  haiku:
+    description: "Fast and efficient for simple tasks"
+    default_for: ["micro"]
+    use_cases:
+      - "simple_bug_fixes"
+      - "typo_corrections"
+      - "documentation_updates"
+      - "fallback_option"
+    token_budget: 3000
+
+# MCP Context7 Integration
+context_enhancement:
+  mcp_context7:
+    enabled: false  # Default off, activate conditionally
+    stages: ["plan"]  # Only available in plan stage
+
+    activation_conditions:
+      automatic:  # Auto-activate when these conditions met
+        - complexity_score: ">10"
+        - feature_type: "cross_cutting"
+        - architecture_modification: true
+      manual:  # User can force activation
+        - flag: "--use-context7"
+        - command: "/enable-context7"
+
+    # Selective loading to minimize tokens
+    loading_strategy: "selective"
+    token_budget: 3000  # Strict limit (not 50,000!)
+
+    load_components:
+      project_structure:
+        enabled: true
+        max_tokens: 500
+        priority: 1
+
+      related_components:
+        enabled: true
+        max_tokens: 1500
+        priority: 2
+        scope: "feature_dependencies"
+
+      existing_patterns:
+        enabled: true
+        max_tokens: 1500
+        priority: 3
+        scope: "similar_implementations"
+
+      architecture_rules:
+        enabled: true
+        max_tokens: 500
+        priority: 4
+
+    fallback: "manual_search"  # If Context7 fails, use grep/glob
+
+# Fallback chain configuration
+fallback_chain:
+  primary_chain:
+    - model: "opus"
+      condition: "available && quota_remaining"
+    - model: "sonnet"
+      condition: "available"
+      enhancement: "add_examples"  # Enhance Sonnet when replacing Opus
+    - model: "haiku"
+      condition: "always"
+
+  enhancement_strategies:
+    add_examples:
+      description: "Add more examples when using lower model"
+      actions:
+        - load_stage_examples: true
+        - add_structured_format: true
+        - include_best_practices: true
+
+# Stage-specific configurations
+stage_configs:
+  major:
+    specify:
+      preferred_model: "opus"
+      fallback_model: "sonnet"
+      require_opus: true  # Try to wait for Opus if quota exhausted
+      retry_after: 300  # Wait 5 minutes if Opus unavailable
+      token_range: [2000, 3000]
+
+    plan:
+      preferred_model: "sonnet"  # Default to Sonnet
+      conditional_upgrade: "opus"  # Upgrade based on conditions
+      upgrade_conditions:
+        - major_architecture_change: true
+        - complexity_score: ">12"
+        - breaking_changes_detected: true
+      context7_available: true
+      token_range: [3000, 8000]
+
+    clarify:
+      preferred_model: "sonnet"
+      fallback_model: "haiku"
+      token_range: [1500, 2500]
+
+    tasks:
+      preferred_model: "sonnet"
+      fallback_model: "haiku"
+      token_range: [2000, 3000]
+
+    implement:
+      preferred_model: "sonnet"
+      fallback_model: "haiku"
+      allow_user_override: true
+      token_range: [2000, 5000]
+
+  minor:
+    all_stages:
+      preferred_model: "sonnet"
+      fallback_model: "haiku"
+      allow_haiku_for_simple: true  # Auto-switch to Haiku for very simple fixes
+      token_range: [1000, 3000]
+
+  micro:
+    all_stages:
+      preferred_model: "haiku"
+      fallback_model: "haiku"  # No fallback needed
+      token_range: [500, 1500]
+
+# User notification settings
+notifications:
+  model_switch:
+    enabled: true
+    format: "ℹ️ Using {model} for {stage} stage {reason}"
+    reasons:
+      quota_exhausted: "(Opus quota exhausted, using fallback)"
+      user_override: "(per user request)"
+      complexity_trigger: "(high complexity detected)"
+      cost_saving: "(optimizing for cost)"
+
+  context7_usage:
+    enabled: true
+    format: "🔍 Context7 {status} for enhanced analysis"
+    show_token_usage: true
+
+# Monitoring and metrics
+monitoring:
+  enabled: true
+  track_metrics:
+    - model_usage_per_stage
+    - token_consumption_by_model
+    - fallback_frequency
+    - quality_scores
+    - cost_per_workflow
+    - context7_activation_rate
+    - user_satisfaction_rating
+
+  quality_thresholds:
+    minimum_acceptable: 0.85
+    alert_on_degradation: true
+
+  cost_tracking:
+    show_estimates: true
+    warn_threshold: "$5"  # Warn if single workflow exceeds
+
+  reporting:
+    daily_summary: true
+    location: ".claude/metrics/daily/"
+
+# Cache configuration
+cache_strategy:
+  constitution:
+    ttl: "session"
+    invalidate_on: ["constitution_update"]
+
+  codebase_structure:
+    ttl: 3600  # 1 hour
+    invalidate_on: ["git_commit", "file_structure_change"]
+
+  pattern_library:
+    ttl: 7200  # 2 hours
+    shared_across_workflows: true
+
+  context7_results:
+    ttl: 1800  # 30 minutes
+    max_size: "10MB"
+
+# Override options
+user_overrides:
+  allow_model_selection: true
+  allow_context7_toggle: true
+  allow_quality_preference: true
+
+  cli_flags:
+    "--model": "Force specific model"
+    "--prefer-opus": "Request Opus when possible"
+    "--use-context7": "Force Context7 activation"
+    "--optimize-cost": "Prefer cheaper models"
+    "--maximize-quality": "Always use best available model"

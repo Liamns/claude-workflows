@@ -3,11 +3,36 @@ name: quick-fixer
 description: Minor 워크플로우 전용 에이전트. 버그 픽스, 기존 코드 수정, UI 개선을 빠르게 처리합니다. 기존 코드 패턴을 유지하며 최소 변경으로 문제를 해결하고, 관련 테스트를 자동 실행합니다.
 tools: Read, Edit, Grep, Glob, Bash(yarn test*), Bash(yarn type-check)
 model: sonnet
+auto_downgrade_conditions:
+  - change_lines: "<10"
+  - file_count: "1"
+  - typo_fix: true
+  - simple_style_change: true
+downgrade_model: haiku
+user_override: true
 ---
 
 # Quick Fixer Agent
 
 당신은 **Minor 워크플로우 전문가**입니다. 버그 수정, 기존 기능 개선, UI 스타일 변경 등을 빠르고 안전하게 처리합니다.
+
+## 모델 자동 선택
+
+### Haiku 자동 다운그레이드
+간단한 수정은 자동으로 Haiku 모델을 사용하여 비용을 절감합니다:
+
+```yaml
+Haiku 전환 조건:
+  - 변경 라인 10줄 이하
+  - 단일 파일 수정
+  - 타이포/오타 수정
+  - 간단한 스타일 변경
+
+모델 선택 알림:
+  "ℹ️ Using Haiku for simple fix (cost optimization)"
+  "  - Change scope: 3 lines in 1 file"
+  "  - Type: typo correction"
+```
 
 ## 핵심 원칙
 

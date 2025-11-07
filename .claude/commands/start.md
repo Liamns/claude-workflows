@@ -1,283 +1,257 @@
-# /start - 프로젝트 초기화 및 Constitution 설정
+# /start - 프로젝트 초기화 및 Architecture 설정
 
-프로젝트에 Specification-Driven Development 환경을 초기화합니다.
+프로젝트에 Specification-Driven Development 환경과 아키텍처를 설정합니다.
 
 ## 실행 순서
 
-### 1단계: .specify 디렉토리 구조 생성
+### 1단계: 프로젝트 타입 선택
 
-프로젝트 루트에 다음 구조를 생성합니다:
+"프로젝트 타입을 선택하세요:"
+1. Frontend (React, Vue, Angular, Next.js...)
+2. Backend (Node.js, Python, Java, Go...)
+3. Fullstack (Frontend + Backend)
+4. Mobile (React Native, Flutter, Ionic...)
+5. Custom (직접 정의)
+
+### 2단계: 아키텍처 패턴 선택
+
+선택한 프로젝트 타입에 따라 적절한 아키텍처를 제안:
+
+#### Frontend 선택 시:
+"Frontend 아키텍처를 선택하세요:"
+1. **FSD (Feature-Sliced Design)** - 레이어와 슬라이스 기반 [추천: 대규모 프로젝트]
+2. **Atomic Design** - 원자부터 페이지까지 계층 구조 [추천: 컴포넌트 라이브러리]
+3. **MVC/MVP/MVVM** - Model-View 분리 패턴 [추천: 엔터프라이즈]
+4. **Micro Frontend** - 독립 배포 가능한 모듈 [추천: 대규모 팀]
+5. **None** - 아키텍처 중립 (자유 구조)
+
+#### Backend 선택 시:
+"Backend 아키텍처를 선택하세요:"
+1. **Clean Architecture** - 도메인 중심 설계 [추천: 복잡한 비즈니스 로직]
+2. **Hexagonal (Ports & Adapters)** - 테스트 용이성 극대화 [추천: 다양한 외부 연동]
+3. **DDD (Domain-Driven Design)** - 복잡한 도메인 모델링 [추천: 엔터프라이즈]
+4. **Layered Architecture** - 전통적인 n-tier [추천: 간단한 CRUD]
+5. **Serverless** - 함수 기반 아키텍처 [추천: 이벤트 기반]
+6. **None** - 아키텍처 중립
+
+#### Fullstack 선택 시:
+"Fullstack 아키텍처를 선택하세요:"
+1. **Monorepo** - 단일 저장소 다중 프로젝트 [추천: 코드 공유 필요]
+2. **JAMstack** - JavaScript, APIs, Markup [추천: 정적 사이트]
+3. **Microservices** - 분산 서비스 아키텍처 [추천: 대규모 시스템]
+4. **Custom** - Frontend + Backend 개별 선택
+
+### 3단계: .specify 디렉토리 구조 생성
 
 ```
 .specify/
+├── config/
+│   ├── architecture.json        # 선택된 아키텍처 설정
+│   └── architecture-rules.json  # 커스텀 규칙
 ├── memory/
-│   └── constitution.md          # 프로젝트 거버넌스 규칙 (9개 Article)
+│   └── constitution.md          # 프로젝트 거버넌스 규칙
 ├── scripts/
 │   └── bash/
-│       ├── common.sh            # 공통 유틸리티 함수
-│       ├── create-new-feature.sh # 자동 브랜치 생성 및 번호 부여
-│       └── check-prerequisites.sh # 파일 유효성 검증
+│       ├── common.sh
+│       ├── create-new-feature.sh
+│       └── check-prerequisites.sh
 ├── templates/
-│   ├── spec-template.md         # WHAT/WHY만 포함 (HOW 제외)
-│   ├── plan-template.md         # Phase 0+1, Constitution 체크
-│   └── tasks-template.md        # [T001] [P?] [Story?] 형식
-├── steering/                    # 선택사항
-│   ├── product.md               # 제품 컨텍스트 (60-80% 토큰 절감)
-│   ├── tech.md                  # 기술 스택 및 아키텍처
-│   └── structure.md             # 프로젝트 구조 설명
-└── specs/                       # 기능별 spec 저장소 (명령 실행 시 자동 생성)
-    └── 001-feature-name/
-        ├── spec.md
-        ├── plan.md
-        ├── tasks.md
-        ├── research.md
-        ├── data-model.md
-        ├── contracts/
-        │   └── openapi.yaml
-        ├── quickstart.md
-        └── checklists/
-            └── requirements.md
+│   ├── spec-template.md
+│   ├── plan-template.md
+│   └── tasks-template.md
+├── steering/
+│   ├── product.md
+│   ├── tech.md
+│   └── structure.md
+└── specs/
 ```
 
-**실행**:
+### 4단계: architecture.json 생성
+
+선택에 따라 `.specify/config/architecture.json` 생성:
+
+```json
+{
+  "projectType": "frontend|backend|fullstack|mobile",
+  "architecture": {
+    "primary": "fsd|clean|ddd|atomic|...",
+    "secondary": null,  // fullstack의 경우
+    "version": "1.0.0"
+  },
+  "config": {
+    "strictness": "high|medium|low",
+    "autoValidation": true,
+    "customRules": []
+  },
+  "createdAt": "2025-01-07",
+  "lastModified": "2025-01-07"
+}
+```
+
+### 5단계: 아키텍처별 디렉토리 구조 생성
+
+선택된 아키텍처에 따라 기본 디렉토리 구조 생성:
+
+#### FSD 예시:
 ```bash
-mkdir -p .specify/{memory,scripts/bash,templates,steering,specs}
+mkdir -p src/{app,pages,widgets,features,entities,shared}
 ```
 
-### 2단계: Constitution 생성
+#### Clean Architecture 예시:
+```bash
+mkdir -p src/{domain,application,infrastructure,presentation}
+```
 
-사용자에게 다음 질문을 통해 Constitution을 생성합니다:
+#### Atomic Design 예시:
+```bash
+mkdir -p src/components/{atoms,molecules,organisms,templates,pages}
+```
 
-#### Q1: 프로젝트 타입
-"이 프로젝트는 어떤 유형인가요?"
-- Web Application
-- Mobile App (iOS/Android)
-- API/Backend Service
-- Library/Package
-- Desktop Application
-- Full-stack (Multiple projects)
+### 6단계: Constitution 생성
 
-#### Q2: 핵심 원칙 선택 (다중 선택 가능)
-"프로젝트에 적용할 핵심 개발 원칙을 선택하세요:"
-- [x] Library-First (외부 라이브러리 우선 사용)
-- [x] Test-First (구현 전 테스트 작성)
-- [x] Anti-Abstraction (과도한 추상화 금지)
-- [x] Integration-First Testing (통합 테스트 우선)
-- [ ] Contract-First (API 계약 우선 설계)
-- [ ] Mobile-First (모바일 우선 설계)
-- [ ] Accessibility-First (접근성 우선)
+아키텍처와 독립적으로 프로젝트 원칙을 설정:
 
-#### Q3: 기술 스택 제약사항
-"반드시 지켜야 할 기술 스택이 있나요? (있으면 입력, 없으면 Enter)"
-예시: "React 19, TypeScript, FSD 아키텍처"
+#### 핵심 원칙 선택:
+"프로젝트에 적용할 원칙을 선택하세요 (다중 선택):"
+- [x] **Library-First** - 외부 라이브러리 우선 사용
+- [x] **Test-First** - TDD (구현 전 테스트 작성)
+- [x] **Architecture-First** - 아키텍처 규칙 엄격 준수
+- [x] **Reusability-First** - 재사용성 우선 (Article X)
+- [ ] **Performance-First** - 성능 최적화 우선
+- [ ] **Security-First** - 보안 우선
+- [ ] **Accessibility-First** - 접근성 우선
+- [ ] **Mobile-First** - 모바일 우선
 
-#### Q4: 프로젝트 복잡도
-"초기 프로젝트 복잡도는?"
-- Simple (단일 프로젝트, ≤3 주요 모듈)
-- Moderate (2-3 프로젝트, 통합 필요)
-- Complex (다중 프로젝트, 복잡한 의존성)
+### 7단계: 아키텍처별 템플릿 설치
 
-### 3단계: Constitution 파일 생성
+선택된 아키텍처의 템플릿을 복사:
 
-답변을 기반으로 `.specify/memory/constitution.md` 파일을 생성합니다.
+```bash
+# 예: FSD 선택 시
+cp -r architectures/frontend/fsd/templates/* .specify/templates/architecture/
 
-**템플릿 구조**:
+# 예: Clean Architecture 선택 시
+cp -r architectures/backend/clean/templates/* .specify/templates/architecture/
+```
+
+### 8단계: workflow-gates.json 업데이트
+
+아키텍처에 맞는 품질 게이트 활성화:
+
+```json
+{
+  "activeArchitecture": "fsd|clean|ddd|...",
+  "architectureGates": {
+    // 아키텍처별 게이트 로드
+  }
+}
+```
+
+### 9단계: 아키텍처 가이드 생성
+
+`.specify/docs/architecture-guide.md` 생성:
+
 ```markdown
-# Constitution
+# ${ARCHITECTURE_NAME} 가이드
 
-## Metadata
-- Version: 1.0.0
-- Created: {YYYY-MM-DD}
-- Last Amended: {YYYY-MM-DD}
-- Status: Active
+## 구조
+[선택된 아키텍처의 디렉토리 구조 설명]
 
-## Preamble
-{프로젝트 타입 및 목적 설명}
+## 규칙
+[아키텍처별 핵심 규칙]
 
-## Article I: Library-First Principle
-{enabled/disabled 및 근거}
+## 컴포넌트 생성
+[컴포넌트/모듈 생성 방법]
 
-## Article II: External Configuration
-{설정 파일 외부화 규칙}
+## 베스트 프랙티스
+[권장 패턴]
 
-## Article III: Test-First Imperative
-{TDD 적용 규칙}
-
-## Article IV: Repository Structure
-{Git 저장소 구조}
-
-## Article V: Issue Tracking
-{이슈 트래킹 시스템}
-
-## Article VI: Deployment
-{배포 전략}
-
-## Article VII: Simplicity
-{복잡도 제한: ≤3 projects initially}
-
-## Article VIII: Anti-Abstraction
-{과도한 추상화 금지}
-
-## Article IX: Integration-First Testing
-{통합 테스트 우선 전략}
-
-## Amendment Procedure
-{Constitution 수정 절차}
+## 안티패턴
+[피해야 할 패턴]
 ```
 
-### 4단계: 템플릿 파일 생성
-
-**spec-template.md** (`.specify/templates/spec-template.md`):
-- WHAT/WHY만 포함 (HOW 제외)
-- User Scenarios & Testing 중심
-- 우선순위별 분류 ([P1], [P2], [P3+])
-- Story 단위 구분 ([US1], [US2], ...)
-
-**plan-template.md** (`.specify/templates/plan-template.md`):
-- Technical Foundation 섹션
-- Constitution Check 테이블
-- Phase 0: Research
-- Phase 1: Design Artifacts
-- Source Code Structure
-
-**tasks-template.md** (`.specify/templates/tasks-template.md`):
-- Task Format: `[T001] [P?] [Story?] Description /absolute/path`
-- Phase별 그룹핑
-- Test-First 강제 (Tests → Implementation 순서)
-
-### 5단계: Steering Documents 생성 (선택사항)
-
-사용자에게 물어봅니다:
-"Steering Documents를 생성하여 AI 컨텍스트를 최적화하시겠습니까? (60-80% 토큰 절감)"
-- Yes → product.md, tech.md, structure.md 생성
-- No → 건너뛰기
-
-**Steering Documents 내용**:
-- `product.md`: 제품 비전, 타겟 사용자, 핵심 기능
-- `tech.md`: 기술 스택, 아키텍처 패턴, 의존성
-- `structure.md`: 디렉토리 구조, 모듈 관계도
-
-### 6단계: Bash 스크립트 생성
-
-**common.sh** (공통 유틸리티):
-```bash
-#!/bin/bash
-
-# Get next feature number
-get_next_feature_number() {
-    local max_num=0
-    if [ -d ".specify/specs" ]; then
-        for dir in .specify/specs/*/; do
-            num=$(basename "$dir" | grep -oE '^[0-9]+')
-            if [ "$num" -gt "$max_num" ]; then
-                max_num=$num
-            fi
-        done
-    fi
-    printf "%03d" $((max_num + 1))
-}
-
-# Validate spec file
-validate_spec() {
-    local spec_file="$1"
-    # Check required sections
-    grep -q "## Overview" "$spec_file" || return 1
-    grep -q "## User Scenarios & Testing" "$spec_file" || return 1
-    grep -q "## Success Criteria" "$spec_file" || return 1
-    return 0
-}
-```
-
-**create-new-feature.sh** (자동 브랜치 생성):
-```bash
-#!/bin/bash
-source "$(dirname "$0")/common.sh"
-
-FEATURE_NAME="$1"
-FEATURE_NUM=$(get_next_feature_number)
-BRANCH_NAME="${FEATURE_NUM}-${FEATURE_NAME}"
-
-# Create spec directory
-mkdir -p ".specify/specs/$BRANCH_NAME"/{contracts,checklists}
-
-# Copy templates
-cp .specify/templates/spec-template.md ".specify/specs/$BRANCH_NAME/spec.md"
-cp .specify/templates/plan-template.md ".specify/specs/$BRANCH_NAME/plan.md"
-cp .specify/templates/tasks-template.md ".specify/specs/$BRANCH_NAME/tasks.md"
-
-# Create git branch
-git checkout -b "$BRANCH_NAME"
-
-echo "Created feature: $BRANCH_NAME"
-echo "Spec directory: .specify/specs/$BRANCH_NAME"
-```
-
-**check-prerequisites.sh** (파일 검증):
-```bash
-#!/bin/bash
-source "$(dirname "$0")/common.sh"
-
-SPEC_DIR="$1"
-
-# Check required files
-[ -f "$SPEC_DIR/spec.md" ] || { echo "spec.md missing"; exit 1; }
-[ -f "$SPEC_DIR/plan.md" ] || { echo "plan.md missing"; exit 1; }
-[ -f "$SPEC_DIR/tasks.md" ] || { echo "tasks.md missing"; exit 1; }
-
-# Validate spec
-validate_spec "$SPEC_DIR/spec.md" || { echo "spec.md invalid"; exit 1; }
-
-echo "All prerequisites met"
-```
-
-### 7단계: Git 초기화 (필요시)
-
-프로젝트가 Git 저장소가 아닌 경우:
-```bash
-git init
-echo ".specify/specs/*/research.md" >> .gitignore
-echo ".specify/specs/*/data-model.md" >> .gitignore
-```
-
-### 8단계: 완료 보고
-
-사용자에게 다음을 보고합니다:
+### 10단계: 완료 보고
 
 ```
 ✅ 프로젝트 초기화 완료!
 
+📊 설정된 아키텍처:
+- 프로젝트 타입: ${PROJECT_TYPE}
+- 아키텍처: ${ARCHITECTURE_NAME}
+- 엄격도: ${STRICTNESS}
+
 📁 생성된 구조:
 .specify/
+├── config/
+│   ├── architecture.json        ✅
+│   └── architecture-rules.json  ✅
 ├── memory/constitution.md       ✅
 ├── templates/                   ✅
-│   ├── spec-template.md
-│   ├── plan-template.md
-│   └── tasks-template.md
-├── scripts/bash/                ✅
-│   ├── common.sh
-│   ├── create-new-feature.sh
-│   └── check-prerequisites.sh
-├── steering/                    {선택사항 여부}
-│   ├── product.md
-│   ├── tech.md
-│   └── structure.md
-└── specs/                       (빈 디렉토리)
+└── docs/architecture-guide.md   ✅
+
+src/
+└── [아키텍처별 디렉토리]       ✅
 
 📋 다음 단계:
 1. 새 기능 추가: /major [feature-name]
-2. 기존 기능 수정: /minor [feature-number]
-3. 버그 수정: /micro [description]
+2. 컴포넌트 생성: "새 [아키텍처 용어] 만들어줘"
+3. 아키텍처 검증: "아키텍처 규칙 검사해줘"
 
-💡 Tip: Steering Documents를 생성하면 AI 응답 속도가 빨라집니다 (60-80% 토큰 절감)
+💡 Tips:
+- 아키텍처 변경: /switch-architecture
+- 규칙 조정: .specify/config/architecture-rules.json 편집
+- 마이그레이션: /migrate-architecture [from] [to]
 ```
 
-## 실행 조건
+## 아키텍처 자동 감지
 
-- 프로젝트 루트 디렉토리에서 실행
-- `.specify/` 디렉토리가 없어야 함 (이미 있으면 경고 후 덮어쓰기 여부 확인)
+`.specify/config/architecture.json`이 없는 경우:
+
+1. **디렉토리 구조 분석**:
+```typescript
+function detectArchitecture(): string {
+  const patterns = {
+    'fsd': ['src/entities', 'src/features', 'src/widgets'],
+    'atomic': ['components/atoms', 'components/molecules'],
+    'clean': ['domain/', 'application/', 'infrastructure/'],
+    'hexagonal': ['core/ports', 'adapters/'],
+    'ddd': ['boundedContexts/', 'domain/aggregates'],
+    'mvc': ['models/', 'views/', 'controllers/']
+  };
+
+  // 패턴 매칭으로 아키텍처 추론
+  return matchPatterns(patterns);
+}
+```
+
+2. **package.json 분석**:
+- 의존성에서 힌트 찾기 (예: atomic-design, clean-architecture 패키지)
+
+3. **사용자 확인**:
+"감지된 아키텍처: ${DETECTED}. 맞습니까? (y/n)"
+
+## 다중 아키텍처 지원 (Fullstack)
+
+Fullstack 프로젝트의 경우 Frontend/Backend 개별 설정:
+
+```json
+{
+  "projectType": "fullstack",
+  "architecture": {
+    "frontend": {
+      "type": "atomic",
+      "path": "frontend/"
+    },
+    "backend": {
+      "type": "clean",
+      "path": "backend/"
+    }
+  }
+}
+```
 
 ## 에러 처리
 
 - `.specify/` 이미 존재 → "기존 설정을 덮어쓰시겠습니까? (y/N)"
+- 아키텍처 충돌 → "기존 구조와 충돌. 마이그레이션 하시겠습니까?"
 - Git 저장소 아님 → "Git 저장소를 초기화하시겠습니까? (y/N)"
-- 파일 생성 실패 → 권한 확인 및 재시도 안내

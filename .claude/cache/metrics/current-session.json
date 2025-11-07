@@ -1,0 +1,33 @@
+{
+  "session_start": null,
+  "session_id": null,
+  "workflow_type": null,
+  "performance": {
+    "execution_time_seconds": 0,
+    "cache_hits": 0,
+    "cache_misses": 0,
+    "cache_hit_rate_percent": 0,
+    "parallel_agents": 0,
+    "parallel_success": true
+  },
+  "tokens": {
+    "total_used": 0,
+    "saved": 0,
+    "efficiency_percent": 0
+  },
+  "quality": {
+    "test_coverage_percent": 0,
+    "type_check_passed": false,
+    "lint_passed": false,
+    "architecture_valid": false,
+    "security_issues": 0
+  },
+  "productivity": {
+    "tasks_completed": 0,
+    "bugs_fixed": 0,
+    "features_added": 0,
+    "files_changed": 27,
+    "lines_added": 112,
+    "lines_removed": 2650
+  }
+}

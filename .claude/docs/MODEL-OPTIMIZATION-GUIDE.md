@@ -1,6 +1,6 @@
 # 🎯 Model Optimization & Context7 Integration Guide
 
-Claude Workflows v2.1에서 도입된 지능형 모델 최적화 시스템 사용 가이드입니다.
+Claude Workflows v2.4.0 지능형 모델 최적화 시스템 사용 가이드입니다.
 
 ## 📚 목차
 
@@ -37,17 +37,20 @@ Context7:
 
 ## 모델 전략
 
-### 단계별 기본 모델
+### 워크플로우별 기본 모델 (v2.4.0)
 
-| 단계 | 기본 모델 | 업그레이드 조건 | Context7 |
-|------|----------|----------------|----------|
-| **Specify** | Opus | - | ❌ |
-| **Plan** | Sonnet | 복잡도 > 12 → Opus | ✅ (복잡도 > 10) |
-| **Clarify** | Sonnet | - | ❌ |
-| **Tasks** | Sonnet | - | ❌ |
-| **Implement** | Sonnet | - | ❌ |
-| **Minor** | Sonnet | 단순 수정 → Haiku | ❌ |
-| **Micro** | Haiku | - | ❌ |
+| 워크플로우 | 기본 모델 | 업그레이드 조건 | Context7 | 에이전트 |
+|-----------|----------|----------------|----------|----------|
+| **/major** | Sonnet | 복잡도 > 12 → Opus | ✅ (복잡도 > 10) | architect, reviewer, implementer, documenter |
+| **/minor** | Sonnet | 단순 수정 → Haiku | ❌ | implementer, reviewer, documenter |
+| **/micro** | Haiku | - | ❌ | implementer, documenter |
+| **/test** | Sonnet | - | ❌ | implementer |
+| **/review** | Sonnet | 심층 분석 → Opus | ✅ (--adv 옵션) | reviewer |
+
+**v2.4.0 변경사항:**
+- Major 워크플로우 통합 (6개 단계 → 1개 명령어)
+- 에이전트 통합 (11개 → 6개)
+- 질문 수 80% 감소 (10개 → 2개)
 
 ### 복잡도 점수 계산
 
@@ -119,14 +122,15 @@ Context7 로딩 구성 (최대 3,000 토큰):
     - architecture.json
 ```
 
-### 통합된 Skills/Agents
+### 통합된 Skills/Agents (v2.4.0)
 
 | 컴포넌트 | Context7 사용 | 토큰 예산 | 용도 |
 |----------|-------------|----------|------|
 | **reusability-enforcer** | ✅ | 2,000 | 재사용 모듈 검색 |
-| **major-plan** | ✅ | 3,000 | 기술 계획 수립 |
+| **Plan 에이전트** | ✅ | 3,000 | 기술 계획 수립 (Major 워크플로우 내) |
 | **api-integration** | ✅ | 1,500 | API 패턴 검색 |
-| **component-creation** | ✅ | 1,000 | 컴포넌트 템플릿 |
+| **fsd-component-creation** | ✅ | 1,000 | FSD 컴포넌트 템플릿 |
+| **reviewer-unified** | ✅ | 2,500 | 영향도 분석 (--adv 옵션) |
 
 ## 설정 방법
 
@@ -188,42 +192,44 @@ notifications:
 
 ## 사용 예시
 
-### 1. 기본 사용
+### 1. 기본 사용 (v2.4.0 통합 워크플로우)
 
 ```bash
 # 자동 모델 선택 및 Context7
-/major user-authentication
+/major
 
 # 출력:
-ℹ️ Using Opus for specify stage (critical requirements)
-🔍 Context7 activated for plan stage (complexity: 14)
-ℹ️ Using Sonnet for tasks stage
+ℹ️ Using Sonnet for Major workflow (balanced mode)
+🔍 Context7 activated (complexity: 14)
+📊 2개 질문만으로 요구사항 확인 완료
+ℹ️ architect-unified, implementer-unified 에이전트 활성화
 ```
 
 ### 2. 모델 강제 지정
 
 ```bash
 # 특정 모델 강제 사용
-/major user-auth --model=sonnet
+/major --model=opus
 
 # Opus 우선 사용 요청
-/major user-auth --prefer-opus
+/major --prefer-opus
 
 # Context7 강제 활성화
-/major user-auth --use-context7
+/major --use-context7
 ```
 
 ### 3. 비용 최적화 모드
 
 ```bash
 # 비용 최적화 우선
-/major user-auth --optimize-cost
+/major --optimize-cost
 
 # Context7 비활성화
-/major user-auth --no-context7
+/major --no-context7
 
 # Haiku 사용 (매우 간단한 작업)
-/micro fix-typo
+/micro
+# → 타이포 수정, 스타일 변경 등
 ```
 
 ### 4. Minor 워크플로우 자동 다운그레이드
@@ -379,6 +385,16 @@ jq '.total_tokens' .claude/metrics/daily/*.json | awk '{sum+=$1} END {print sum/
 
 ## 업데이트 내역
 
+### v2.4.0 (2025-11-07)
+- Major 워크플로우 통합 (6개 단계 → 1개 명령어)
+- 에이전트 통합 (11개 → 6개)
+- 질문 수 80% 감소 (10개 → 2개)
+- 통합 에이전트 모델 최적화
+
+### v2.3.0 (2025-01-07)
+- 코드 리뷰 시스템 추가
+- Multi-Architecture 지원
+
 ### v2.1.0 (2024-01-07)
 - 모델 라우터 시스템 도입
 - Context7 선택적 로딩
@@ -390,3 +406,7 @@ jq '.total_tokens' .claude/metrics/daily/*.json | awk '{sum+=$1} END {print sum/
 - 팀 공유 쿼터 관리
 - 실시간 비용 알림
 - A/B 테스트 기반 최적화
+
+---
+
+**v2.4.0** | 통합 워크플로우 & 에이전트 최적화 | Made with ❤️ for Claude Code

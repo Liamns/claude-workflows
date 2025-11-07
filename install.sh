@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Claude Code Workflows Installer
-# Version: 2.3.0 - Code Review System, Multi-Architecture & Model Optimization
+# Version: 2.5.0 - Real-time Metrics Dashboard
 
 set -e
 
@@ -21,8 +21,8 @@ TEMP_DIR=$(mktemp -d)
 print_header() {
     echo -e "${BLUE}╔════════════════════════════════════════╗${NC}"
     echo -e "${BLUE}║   Claude Code Workflows Installer     ║${NC}"
-    echo -e "${BLUE}║   Version 2.3.0                        ║${NC}"
-    echo -e "${BLUE}║   Code Review + Multi-Architecture    ║${NC}"
+    echo -e "${BLUE}║   Version 2.5.0                        ║${NC}"
+    echo -e "${BLUE}║   Real-time Metrics Dashboard         ║${NC}"
     echo -e "${BLUE}╚════════════════════════════════════════╝${NC}"
     echo ""
 }
@@ -76,18 +76,34 @@ install_workflows() {
         exit 1
     fi
 
+    # Check dependencies
+    print_info "Checking dependencies..."
+
+    # Check for jq (optional but recommended for metrics dashboard)
+    if ! command -v jq &> /dev/null; then
+        print_warning "jq not found - Metrics dashboard will have limited functionality"
+        print_info "Install jq for full metrics support:"
+        print_info "  macOS: brew install jq"
+        print_info "  Ubuntu/Debian: sudo apt-get install jq"
+        print_info "  CentOS/RHEL: sudo yum install jq"
+    else
+        print_success "jq found - Full metrics support enabled"
+    fi
+
     # Create .claude directory structure
     print_info "Creating .claude directory structure..."
     mkdir -p "$TARGET_DIR/.claude/commands"
     mkdir -p "$TARGET_DIR/.claude/config"
     mkdir -p "$TARGET_DIR/.claude/templates"
+    mkdir -p "$TARGET_DIR/.claude/cache/metrics"
+    mkdir -p "$TARGET_DIR/.claude/cache/workflow-history"
     print_success ".claude directory ready"
 
     # Copy slash commands
     if [ -d "$TEMP_DIR/.claude/commands" ]; then
-        print_info "Installing Slash Commands (12개)..."
+        print_info "Installing Slash Commands (10개)..."
         cp -r "$TEMP_DIR/.claude/commands/"* "$TARGET_DIR/.claude/commands/" 2>/dev/null || true
-        print_success "Slash Commands installed (triage, commit, pr-review, major, minor, micro 등)"
+        print_success "Slash Commands installed (triage, major, minor, micro, test, commit, pr-review, review 등)"
     else
         print_warning ".claude/commands/ directory not found in repository"
     fi
@@ -101,35 +117,41 @@ install_workflows() {
         print_warning ".claude/templates/ directory not found in repository"
     fi
 
-    # Copy workflow-gates.json (v2 with model optimization)
-    if [ -f "$TEMP_DIR/workflow-gates-v2.json" ]; then
-        print_info "Installing workflow-gates-v2.json..."
-        cp "$TEMP_DIR/workflow-gates-v2.json" "$TARGET_DIR/.claude/workflow-gates.json"
-        print_success "workflow-gates.json installed (v2 with model optimization)"
-    elif [ -f "$TEMP_DIR/workflow-gates.json" ]; then
+    # Copy workflow-gates.json
+    if [ -f "$TEMP_DIR/workflow-gates.json" ]; then
         print_info "Installing workflow-gates.json..."
         cp "$TEMP_DIR/workflow-gates.json" "$TARGET_DIR/.claude/"
-        print_success "workflow-gates.json installed"
+        print_success "workflow-gates.json installed (with model optimization)"
     else
         print_warning "workflow-gates.json not found in repository"
     fi
 
     # Copy agents
-    if [ -d "$TEMP_DIR/agents" ]; then
-        print_info "Installing Sub-agents (10개)..."
-        cp -r "$TEMP_DIR/agents" "$TARGET_DIR/.claude/"
-        print_success "Sub-agents installed (code-reviewer, security-scanner, impact-analyzer 등)"
+    if [ -d "$TEMP_DIR/.claude/agents" ]; then
+        print_info "Installing Unified Agents (6개)..."
+        cp -r "$TEMP_DIR/.claude/agents" "$TARGET_DIR/.claude/"
+        print_success "Unified agents installed (architect-unified, reviewer-unified, implementer-unified, documenter-unified 등)"
     else
         print_warning "agents/ directory not found in repository"
     fi
 
     # Copy skills
-    if [ -d "$TEMP_DIR/skills" ]; then
+    if [ -d "$TEMP_DIR/.claude/skills" ]; then
         print_info "Installing Skills (13개)..."
-        cp -r "$TEMP_DIR/skills" "$TARGET_DIR/.claude/"
-        print_success "Skills installed (test-coverage-analyzer, code-metrics-collector, dependency-tracer 등)"
+        cp -r "$TEMP_DIR/.claude/skills" "$TARGET_DIR/.claude/"
+        print_success "Skills installed (bug-fix-pattern, api-integration, form-validation, platform-detection 등)"
     else
         print_warning "skills/ directory not found in repository"
+    fi
+
+    # Copy lib (helper scripts)
+    if [ -d "$TEMP_DIR/.claude/lib" ]; then
+        print_info "Installing Library Scripts..."
+        cp -r "$TEMP_DIR/.claude/lib" "$TARGET_DIR/.claude/"
+        chmod +x "$TARGET_DIR/.claude/lib/"*.sh 2>/dev/null || true
+        print_success "Library scripts installed (cache-helper, metrics-collector, dashboard-generator, git-stats-helper)"
+    else
+        print_warning "lib/ directory not found in repository"
     fi
 
     # Copy documentation
@@ -186,22 +208,30 @@ install_workflows() {
 
     # Print summary
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${GREEN}Installed Components (v2.3.0):${NC}"
+    echo -e "${GREEN}Installed Components (v2.5.0):${NC}"
     echo ""
     echo "📁 $TARGET_DIR/.claude/"
-    echo "   ├── commands/        (13 Slash Commands + /review)"
+    echo "   ├── commands/        (11 Slash Commands + /dashboard)"
     echo "   ├── templates/       (문서 템플릿)"
-    echo "   ├── agents/          (10 Sub-agents with Review System)"
-    echo "   ├── skills/          (13 Skills with Analysis Tools)"
-    echo "   ├── docs/            (가이드 문서 + Model Optimization Guide)"
-    echo "   ├── architectures/   (🆕 Multi-Architecture Support)"
-    echo "   │   ├── frontend/    (FSD, Atomic, MVC)"
+    echo "   ├── agents/          (6 Unified Agents - 통합 최적화)"
+    echo "   ├── skills/          (13 Skills - 자동 활성화)"
+    echo "   ├── lib/             (Helper Scripts)"
+    echo "   │   ├── cache-helper.sh"
+    echo "   │   ├── metrics-collector.sh"
+    echo "   │   ├── dashboard-generator.sh"
+    echo "   │   └── git-stats-helper.sh"
+    echo "   ├── cache/           (Metrics & Cache Data)"
+    echo "   │   ├── metrics/"
+    echo "   │   └── workflow-history/"
+    echo "   ├── docs/            (PROJECT-CONTEXT, 가이드 문서)"
+    echo "   ├── architectures/   (Multi-Architecture Support)"
+    echo "   │   ├── frontend/    (FSD, Atomic Design)"
     echo "   │   ├── backend/     (Clean, Hexagonal, DDD)"
     echo "   │   └── fullstack/   (Monorepo, JAMstack)"
-    echo "   ├── config/          (🆕 Model & User Preferences)"
+    echo "   ├── config/          (Model & User Preferences)"
     echo "   │   ├── model-router.yaml"
     echo "   │   └── user-preferences.yaml"
-    echo "   └── workflow-gates.json (v2 with Model Optimization)"
+    echo "   └── workflow-gates.json (Model Optimization 포함)"
     echo ""
     echo "📁 $TARGET_DIR/.specify/"
     echo "   ├── memory/          (constitution.md)"
@@ -219,39 +249,47 @@ install_workflows() {
     echo "1. 프로젝트 초기 설정 (🆕 아키텍처 선택 포함):"
     echo "   /start              # Architecture 선택 및 Constitution 생성"
     echo ""
-    echo "2. 자동 워크플로 선택 (🆕 모델 최적화 포함):"
+    echo "2. 자동 워크플로 선택:"
     echo "   /triage [작업 설명]         # 최적 워크플로 + 모델 자동 선택"
     echo ""
-    echo "3. 코드 리뷰 (🆕 v2.3):"
+    echo "3. 테스트 자동화 (🆕 v2.4):"
+    echo "   /test                        # 테스트 요구사항 분석 및 자동 생성"
+    echo ""
+    echo "4. 코드 리뷰:"
     echo "   /review [target]             # 종합 코드 리뷰"
     echo "   /review --staged             # 스테이징 변경사항 리뷰"
     echo "   /review --diff HEAD~1        # Git diff 리뷰"
     echo "   /review [target] --adv       # 심층 분석 모드"
     echo ""
-    echo "4. 워크플로 명령어 (지능형 모델 스위칭):"
-    echo "   /major [feature-name]        # Opus → Sonnet 자동 전환"
-    echo "   /minor [feature-or-issue]    # Sonnet/Haiku 자동 선택"
-    echo "   /micro [description]         # Haiku 우선 사용"
+    echo "5. 워크플로 명령어 (🆕 통합 Major):"
+    echo "   /major                       # 통합 Major 워크플로 (2개 질문만)"
+    echo "   /minor [feature-or-issue]    # 버그 수정 워크플로"
+    echo "   /micro [description]         # 간단한 변경"
     echo ""
-    echo "5. Git 자동화:"
+    echo "6. Git 자동화:"
     echo "   /commit             # Conventional Commits 자동 생성"
     echo "   /pr-review [PR#]    # GitHub PR 자동 리뷰"
     echo ""
-    echo "6. 모델 옵션 (🆕):"
+    echo "7. 📊 실시간 메트릭스 대시보드 (🆕 v2.5):"
+    echo "   /dashboard          # 현재 세션 메트릭"
+    echo "   /dashboard --today  # 오늘의 통계"
+    echo "   /dashboard --summary # 전체 누적 통계"
+    echo ""
+    echo "8. 모델 옵션:"
     echo "   --model=opus        # 특정 모델 강제 사용"
     echo "   --use-context7      # Context7 강제 활성화"
     echo "   --optimize-cost     # 비용 최적화 우선"
     echo ""
-    echo "7. 아키텍처 관련:"
+    echo "8. 아키텍처 관련:"
     echo "   /architecture-info  # 현재 아키텍처 정보"
     echo "   /architecture-switch # 아키텍처 변경"
     echo ""
-    echo "8. Sub-agents 및 Skills:"
-    echo "   - 자동으로 활성화됩니다"
-    echo "   - Model Optimization 적용됨"
-    echo "   - Context7 통합 (조건부)"
+    echo "9. Agents 및 Skills:"
+    echo "   - 6개 통합 에이전트 자동 활성화"
+    echo "   - 13개 스킬 자동 적용"
+    echo "   - 워크플로우별 최적화 적용"
     echo ""
-    echo "9. 자세한 사용법:"
+    echo "10. 자세한 사용법:"
     echo "   ${REPO_URL}#readme"
     echo "   .claude/docs/MODEL-OPTIMIZATION-GUIDE.md"
     echo "   .claude/docs/ARCHITECTURE-GUIDE.md"

@@ -1,0 +1,18 @@
+{
+  "lifetime": {
+    "total_workflows": 0,
+    "total_tokens_used": 0,
+    "total_tokens_saved": 0,
+    "total_tasks_completed": 0,
+    "total_bugs_fixed": 0,
+    "total_features_added": 0,
+    "first_run": null,
+    "last_run": null
+  },
+  "averages": {
+    "workflow_duration_seconds": 0,
+    "cache_hit_rate_percent": 0,
+    "parallel_success_rate_percent": 0,
+    "test_coverage_percent": 0
+  }
+}

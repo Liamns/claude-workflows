@@ -1,6 +1,6 @@
 # 🏗️ Multi-Architecture Support Guide
 
-Claude Workflows v2.0은 다양한 아키텍처 패턴을 지원하여 모든 프로젝트 타입에서 사용할 수 있습니다.
+Claude Workflows v2.4.0은 다양한 아키텍처 패턴을 지원하여 모든 프로젝트 타입에서 사용할 수 있습니다.
 
 ## 📚 목차
 

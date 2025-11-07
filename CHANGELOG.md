@@ -5,6 +5,76 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.0] - 2025-11-07
+
+### Added 🆕
+- **📊 Real-time Metrics Dashboard** (`/dashboard` command)
+  - Live workflow performance monitoring
+  - Token usage tracking with savings calculation
+  - Performance metrics (execution time, cache hit rate, parallel processing)
+  - Quality indicators (test coverage, type check, lint results)
+  - Productivity tracking (tasks, bugs, features)
+  - Git integration (commits, changes, branch status)
+- **Metrics Collection System**
+  - `git-stats-helper.sh` - Git statistics collector
+  - `metrics-collector.sh` - Core metrics collection functions
+  - `dashboard-generator.sh` - Terminal dashboard renderer with colors
+  - JSON-based metrics storage (current session, daily, summary)
+  - Three view modes: `--current`, `--today`, `--summary`
+
+### Enhanced ✨
+- Integrated metrics collection with cache-helper.sh
+- Beautiful ASCII dashboard with colors and emojis
+- Automatic Git statistics tracking
+- Session-based metric persistence
+
+### Infrastructure 🏗️
+- `.claude/cache/metrics/` - Metrics data storage
+- `.claude/cache/workflow-history/` - Workflow execution history
+- Metrics JSON schemas for structured data
+
+## [2.4.0] - 2025-11-07
+
+### Added 🆕
+- `/test` command - Smart test workflow with automated test generation and execution
+- **Unified agents** - New consolidated agents for better performance:
+  - `architect-unified` - All architecture pattern validation (FSD, Clean, Hexagonal, DDD, etc.)
+  - `reviewer-unified` - Comprehensive code review (quality, security, performance, impact)
+  - `implementer-unified` - TDD-based implementation and bug fixing
+  - `documenter-unified` - Commit messages and changelog documentation
+
+### Changed 🔄
+- **Major workflow consolidation**: 6 commands → 1 unified `/major` command
+- **Question reduction**: 10 questions → 2 essential questions only
+- **State management**: Added automatic save/resume for Major workflow
+- **Agent consolidation**: 11 agents → 6 agents (45% reduction)
+- **Command reduction**: 16 commands → 10 commands (38% reduction)
+- **README optimization**: 395 lines → 104 lines (74% reduction)
+
+### Removed 🗑️
+- Individual major commands (`major-specify`, `major-clarify`, `major-plan`, `major-tasks`, `major-implement`)
+- Duplicate folders (`agents/`, `skills/` at root level)
+- Redundant agents (separate `architect`, `fsd-architect`, `code-reviewer`, etc.)
+- `workflow-gates-v2.json` (consolidated into single version)
+
+### Fixed 🐛
+- triage.md: Replaced `[Enter]` key input with `AskUserQuestion` tool for Claude Code compatibility
+- Registry.json: Clearly marked implemented vs planned architectures
+- File structure: Applied single source principle, removed all duplications
+
+### Breaking Changes 💥
+- Major workflow commands changed: Use `/major` instead of individual `major-*` commands
+- Agent names changed: e.g., `architect` → `architect-unified`
+- File paths changed: Root `agents/` and `skills/` folders removed, use `.claude/` paths
+
+## [2.3.0] - 2025-01-07
+
+### Added 🆕
+- `/review` command - Comprehensive code review system
+- Multi-architecture support (12 patterns)
+- Model optimization (Opus/Sonnet/Haiku auto-switching)
+- Context7 integration
+
 ## [2.0.0] - 2025-01-06
 
 ### Added 🆕

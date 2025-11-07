@@ -1,0 +1,197 @@
+# Claude Workflows - Smart Cache Configuration
+# Version: 1.0.0
+
+# ════════════════════════════════════════════════════════════════════════════
+# CACHE SETTINGS
+# ════════════════════════════════════════════════════════════════════════════
+
+cache:
+  # Enable/disable entire cache system
+  enabled: true
+
+  # Cache root directory
+  root: .claude/cache
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # FILE CACHE
+  # ══════════════════════════════════════════════════════════════════════════
+  files:
+    enabled: true
+    ttl: 300  # 5 minutes (in seconds)
+    max_size: 100  # Maximum number of cached files
+    max_file_size: 1048576  # 1MB - don't cache files larger than this
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # TEST RESULTS CACHE
+  # ══════════════════════════════════════════════════════════════════════════
+  tests:
+    enabled: true
+    ttl: 600  # 10 minutes
+    invalidate_on:
+      - file-change  # Invalidate when source file changes
+      - git-commit   # Invalidate on commit
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # GIT INFORMATION CACHE
+  # ══════════════════════════════════════════════════════════════════════════
+  git:
+    enabled: true
+    ttl: 60  # 1 minute (short TTL for git info)
+    invalidate_on:
+      - commit
+      - push
+      - pull
+      - checkout
+      - merge
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # ANALYSIS RESULTS CACHE
+  # ══════════════════════════════════════════════════════════════════════════
+  analysis:
+    enabled: true
+    ttl: 1800  # 30 minutes (long TTL for expensive analysis)
+    key_strategy: file-hash  # Use file hash for cache key
+
+# ════════════════════════════════════════════════════════════════════════════
+# CLEANUP SETTINGS
+# ════════════════════════════════════════════════════════════════════════════
+
+cleanup:
+  # Enable automatic cleanup
+  enabled: true
+
+  # Cleanup schedule
+  schedule: daily  # daily, hourly, or manual
+
+  # Maximum age for cache entries (in days)
+  max_age_days: 7
+
+  # Maximum total cache size
+  max_total_size: 100M  # 100 megabytes
+
+  # Cleanup strategy when max size is reached
+  strategy: lru  # lru (least recently used) or fifo (first in first out)
+
+# ════════════════════════════════════════════════════════════════════════════
+# MONITORING & LOGGING
+# ════════════════════════════════════════════════════════════════════════════
+
+monitoring:
+  # Enable cache monitoring
+  enabled: true
+
+  # Log cache hits
+  log_hits: true
+
+  # Log cache misses
+  log_misses: false  # Set to true for debugging
+
+  # Display stats every N requests
+  stats_interval: 100
+
+  # Save detailed metrics
+  save_metrics: true
+  metrics_path: .claude/cache/metrics
+
+# ════════════════════════════════════════════════════════════════════════════
+# PERFORMANCE TUNING
+# ════════════════════════════════════════════════════════════════════════════
+
+performance:
+  # Parallel cache operations
+  parallel_save: true
+
+  # Compression (future feature)
+  compression:
+    enabled: false
+    algorithm: gzip
+
+  # Prefetch frequently accessed files (future feature)
+  prefetch:
+    enabled: false
+    patterns:
+      - "src/**/*.tsx"
+      - "src/**/*.ts"
+
+# ════════════════════════════════════════════════════════════════════════════
+# ADVANCED SETTINGS
+# ════════════════════════════════════════════════════════════════════════════
+
+advanced:
+  # Dependency-based invalidation (future feature)
+  dependency_tracking:
+    enabled: false
+
+  # Hierarchical caching (future feature)
+  hierarchical:
+    enabled: false
+    levels:
+      - name: content
+        ttl: 300
+      - name: parsed
+        ttl: 900
+      - name: analyzed
+        ttl: 1800
+
+  # Cache warming (future feature)
+  warming:
+    enabled: false
+    on_startup: false
+
+# ════════════════════════════════════════════════════════════════════════════
+# EXCLUSIONS
+# ════════════════════════════════════════════════════════════════════════════
+
+exclusions:
+  # File patterns to never cache
+  patterns:
+    - "**/*.env"
+    - "**/*.key"
+    - "**/*.pem"
+    - "**/secrets/**"
+    - "**/credentials/**"
+
+  # Directories to exclude
+  directories:
+    - "node_modules"
+    - ".git"
+    - "dist"
+    - "build"
+
+# ════════════════════════════════════════════════════════════════════════════
+# ALERTS & NOTIFICATIONS
+# ════════════════════════════════════════════════════════════════════════════
+
+alerts:
+  # Alert when cache size exceeds threshold
+  size_threshold: 80M  # 80MB
+
+  # Alert when hit rate is below threshold
+  hit_rate_threshold: 40  # 40%
+
+  # Alert when disk space is low
+  disk_space_threshold: 1G  # 1GB free space required
+
+# ════════════════════════════════════════════════════════════════════════════
+# TARGET METRICS
+# ════════════════════════════════════════════════════════════════════════════
+
+targets:
+  # Target cache hit rate
+  hit_rate: 60  # 60% or higher
+
+  # Target token savings
+  token_savings: 70  # 70% or higher
+
+  # Target speed improvement
+  speed_improvement: 5  # 5x faster or better
+
+# ════════════════════════════════════════════════════════════════════════════
+# END OF CONFIGURATION
+# ════════════════════════════════════════════════════════════════════════════
+
+# Notes:
+# - TTL values are in seconds
+# - Size values support: K (kilobytes), M (megabytes), G (gigabytes)
+# - Patterns use glob syntax
+# - Some features marked as "future feature" are planned but not yet implemented

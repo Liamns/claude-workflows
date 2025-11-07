@@ -10,7 +10,44 @@
 
 {프로젝트 타입 및 목적 설명}
 
-This Constitution establishes the inviolable principles governing the development of {Project Name}. These articles form the foundation of all technical decisions and development processes.
+이 헌장(Constitution)은 {Project Name} 개발을 관장하는 불가침의 원칙들을 수립합니다. 이 조항들은 모든 기술적 의사결정과 개발 프로세스의 기반을 형성합니다.
+
+## Article 0: Official Language Policy
+
+**Status:** Enabled
+
+**Principle:**
+이 프로젝트의 공식 언어는 **한글**입니다. 모든 문서, 설명, Claude의 응답은 한글로 작성됩니다.
+
+**Scope:**
+- **한글로 작성:** 문서(README, 가이드, 튜토리얼), 코드 주석, 커밋 메시지 본문, PR/이슈 설명, CHANGELOG, Claude 응답
+- **영어 사용 가능:** 코드(변수명, 함수명, 클래스명), Conventional Commits 키워드(feat, fix, docs 등), 외부 라이브러리 인용
+- **병기 원칙:** 기술 용어는 한글 번역 후 괄호 안에 영어 표기 (예: 컴포넌트(Component), 엔드포인트(Endpoint))
+
+**Implementation:**
+```
+# 커밋 메시지 예시
+feat: 사용자 프로필 편집 기능 추가
+
+사용자가 이름, 이메일, 프로필 사진을 수정할 수 있도록
+프로필 편집 폼과 API 연동을 구현했습니다.
+
+# 코드 주석 예시
+// 사용자 인증 토큰을 검증하고 갱신합니다
+function validateAndRefreshToken() { ... }
+```
+
+**Rationale:**
+- 팀 커뮤니케이션 효율성 극대화
+- 도메인 지식의 명확한 전달
+- 문서 접근성 향상
+- 유지보수 용이성
+
+**Documentation Migration:**
+기존 영어 문서는 점진적으로 한글로 전환합니다:
+1. 우선순위 높음: README, 주요 가이드, constitution
+2. 우선순위 중간: agent/skill/command 설명, CHANGELOG, ARCHITECTURE
+3. 우선순위 낮음: 예제 코드 주석, 템플릿
 
 ## Article I: Library-First Principle
 

@@ -2,6 +2,28 @@
 # Customize model selection and optimization strategies
 version: 1.0.0
 
+# Language settings
+language:
+  # Official project language
+  default: "ko"  # Korean
+
+  # Response language for Claude
+  response_language: "ko"
+
+  # Documentation language
+  documentation_language: "ko"
+
+  # Code comments language
+  comments_language: "ko"
+
+  # Technical term notation
+  technical_terms:
+    format: "korean_with_english"  # 한글(English) format
+    examples:
+      - "컴포넌트(Component)"
+      - "엔드포인트(Endpoint)"
+      - "타입스크립트(TypeScript)"
+
 # Model preference strategy
 model_preferences:
   default_strategy: "balanced"  # Options: quality, balanced, aggressive

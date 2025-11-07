@@ -1,18 +1,21 @@
-# /major - 통합 Major 워크플로 (Specify → Clarify → Plan → Tasks)
+---
+name: major
+description: 신규 기능 개발을 위한 통합 워크플로우. 모든 단계를 자동으로 진행하며 상태 저장/재개 지원
+---
 
-신규 기능 추가, 아키텍처 변경, API 엔드포인트 추가를 위한 통합 워크플로입니다.
+# 🚀 Major - 통합 워크플로우 v2.0
+
+신규 기능, API 엔드포인트, 아키텍처 변경 등 복잡한 작업을 체계적으로 진행합니다.
+**개선**: 6개 명령어를 1개로 통합, 질문 10개→2개로 축소, 상태 자동 저장/재개
 
 ## 사용법
 
-```
-/major [feature-name]
-```
+```bash
+/major "기능 설명"
 
-예시:
-```
-/major user-authentication
-/major payment-integration
-/major order-tracking-dashboard
+# 예시
+/major "사용자 인증 시스템"
+/major "결제 모듈 통합"
 ```
 
 ## 실행 순서
@@ -38,16 +41,27 @@ bash .specify/scripts/bash/create-new-feature.sh [feature-name]
 - 디렉토리: `.specify/specs/001-feature-name/`
 - 파일: `spec.md`, `plan.md`, `tasks.md` (템플릿에서 복사)
 
-### 2단계: Interactive Specification (Specify)
+### 2단계: Specification (자동 생성)
 
-사용자에게 다음 질문들을 통해 `spec.md`를 생성합니다.
+**필수 질문 2개만** (기존 10개에서 대폭 축소)
 
-#### Phase 1: 작업 범위 파악
+#### 자동 상태 관리
+```typescript
+// .specify/state/current-major.json
+{
+  "featureName": "사용자 인증",
+  "currentPhase": "spec",
+  "progress": 25,
+  "lastUpdated": "2024-11-07T14:00:00"
+}
+```
 
-**Q1: 작업 타입**
-"이 작업은 무엇인가요?"
-- [ ] 새로운 도메인/모듈 추가
-- [ ] 기존 도메인 확장 (새 엔드포인트/기능)
+#### Phase 1: 핵심 질문만
+
+**Q1: 기능 목표**
+"이 기능의 핵심 목표는?"
+- [ ] 새로운 기능 추가
+- [ ] 기존 기능 확장
 - [ ] 다른 도메인과의 통합
 - [ ] 아키텍처 변경/리팩토링
 - [ ] 기타: [입력]

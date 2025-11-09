@@ -285,3 +285,334 @@ yarn test:critical
 - 타입 체크 실패 → 자동 수정 제안
 - 테스트 실패 → 원인 분석 및 수정 가이드
 - FSD 위반 → fsd-architect의 수정 제안
+
+---
+
+## 🔧 Implementation
+
+이제 위의 프로세스를 실제로 실행하세요.
+
+### Step 1: 작업 타입 식별
+
+**AskUserQuestion 도구 사용**:
+```
+질문: "어떤 작업을 수행하시겠습니까?"
+헤더: "작업 타입"
+multiSelect: false
+옵션:
+  1. label: "기존 feature 업데이트 (spec 있음)"
+     description: ".specify/specs/ 디렉토리에 있는 기존 feature를 수정합니다"
+  2. label: "버그 수정 (spec 없음)"
+     description: "새로운 버그 수정 작업을 시작합니다"
+  3. label: "UI/UX 개선"
+     description: "사용자 인터페이스 개선 작업을 수행합니다"
+  4. label: "성능 최적화"
+     description: "성능 개선 작업을 수행합니다"
+```
+
+사용자의 선택을 `{workType}` 변수에 저장하세요.
+
+### Step 2: 작업 대상 로드
+
+**Case A: "기존 feature 업데이트" 선택 시**
+
+1. **AskUserQuestion 도구 사용**:
+```
+질문: "Feature 번호를 입력하세요"
+헤더: "Feature 번호"
+multiSelect: false
+옵션:
+  1. label: "001"
+     description: "Feature 001"
+  2. label: "002"
+     description: "Feature 002"
+  3. label: "기타"
+     description: "직접 입력"
+```
+
+사용자의 선택을 `{featureNumber}` 변수에 저장하세요.
+
+2. **Read 도구로 기존 문서 로드**:
+```
+Read: .specify/specs/{featureNumber}-*/spec.md
+Read: .specify/specs/{featureNumber}-*/plan.md
+Read: .specify/specs/{featureNumber}-*/tasks.md
+```
+
+3. **로드 결과 보고**:
+```markdown
+✅ 기존 Feature 로드 완료
+
+📄 문서:
+- spec.md: ✅
+- plan.md: ✅
+- tasks.md: ✅
+```
+
+**Case B: "버그 수정" 또는 기타 선택 시**
+
+1. **AskUserQuestion 도구 사용**:
+```
+질문: "작업 설명을 간단히 입력하세요"
+헤더: "작업 설명"
+multiSelect: false
+옵션:
+  1. label: "로그인 폼 유효성 검사 개선"
+     description: "예시 1"
+  2. label: "차량 번호 검증 오류 수정"
+     description: "예시 2"
+  3. label: "기타"
+     description: "직접 입력"
+```
+
+사용자 입력을 `{taskDescription}` 변수에 저장하세요.
+
+2. **새 브랜치 및 디렉토리 생성**:
+```
+Bash:
+- command: "mkdir -p .specify/specs/minor-$(date +%Y%m%d-%H%M%S)"
+- description: "Create new minor work directory"
+```
+
+생성된 디렉토리 경로를 `{workDir}` 변수에 저장하세요.
+
+### Step 3: 문제 식별
+
+**AskUserQuestion 도구 사용** (Q2-Q3 통합):
+```
+질문: "문제를 재현 가능하게 설명해주세요"
+헤더: "문제 설명"
+multiSelect: false
+옵션:
+  1. label: "Given-When-Then 형식으로 설명하겠습니다"
+     description: "사용자 행동 → 현재 결과 → 예상 결과 형식"
+  2. label: "영향받는 파일을 알고 있습니다"
+     description: "파일 경로를 직접 입력"
+  3. label: "자동 분석을 원합니다"
+     description: "AI가 관련 파일을 자동으로 찾습니다"
+```
+
+선택에 따라:
+- **Option 1**: 사용자에게 Given-When-Then 설명 요청
+- **Option 2**: 파일 경로 직접 입력 받기
+- **Option 3**: Grep으로 자동 검색
+
+**Option 3 선택 시 (자동 분석)**:
+```
+1. 작업 설명에서 키워드 추출
+2. Grep 도구 사용:
+   Grep:
+   - pattern: "{keyword}"
+   - output_mode: "files_with_matches"
+   - head_limit: 10
+3. 결과 분석 후 `{affectedFiles}` 변수에 저장
+```
+
+### Step 4: 재사용성 검토
+
+**Skill 도구로 reusability-enforcer 실행**:
+```
+Skill: reusability-enforcer
+```
+
+결과를 분석하여:
+```markdown
+🔍 재사용 가능 모듈 검색 완료
+
+✅ 발견된 패턴:
+• {pattern1} - {description1}
+• {pattern2} - {description2}
+
+💡 적용 권장:
+• 기존 에러 처리 패턴 사용
+• {shared-util} 유틸리티 재사용
+```
+
+결과를 `{reusablePatterns}` 변수에 저장하세요.
+
+### Step 5: 변경 계획 생성
+
+**Write 도구로 plan.md 생성**:
+```
+Write:
+- file_path: "{workDir}/plan.md"
+- content: """
+# Minor Update: {taskDescription}
+
+## Issue
+{문제 설명}
+
+## Root Cause
+{근본 원인 분석 - 코드 분석 결과}
+
+## Solution
+{해결 방법 - Step 4에서 발견한 패턴 활용}
+
+## Files to Change
+{affectedFiles 목록}
+
+## Reusable Patterns
+{reusablePatterns 목록}
+
+## Related Tests
+{관련 테스트 파일 목록}
+
+## Verification Steps
+1. yarn type-check
+2. yarn test {affected}
+3. 수동 테스트: {테스트 시나리오}
+"""
+```
+
+### Step 6: 구현 여부 확인
+
+**AskUserQuestion 도구 사용**:
+```
+질문: "즉시 구현을 시작하시겠습니까?"
+헤더: "구현 시작"
+multiSelect: false
+옵션:
+  1. label: "예, 즉시 구현"
+     description: "AI가 자동으로 파일을 수정합니다"
+  2. label: "아니오, 계획만 저장"
+     description: "plan.md만 생성하고 수동으로 작업합니다"
+```
+
+**Option 1 선택 시**: 다음 단계 계속 진행
+**Option 2 선택 시**: Step 11로 이동 (완료 보고)
+
+### Step 7: 파일 수정
+
+`{affectedFiles}` 목록의 각 파일에 대해:
+
+1. **Read 도구로 파일 읽기**:
+```
+Read: {filePath}
+```
+
+2. **수정할 부분 분석**:
+   - plan.md의 Solution 참고
+   - reusablePatterns 적용
+   - 최소 변경 원칙 준수
+
+3. **Edit 도구로 파일 수정**:
+```
+Edit:
+- file_path: {filePath}
+- old_string: "{기존 코드}"
+- new_string: "{수정된 코드}"
+```
+
+4. **수정 후 즉시 타입 체크**:
+```
+Bash:
+- command: "yarn type-check"
+- description: "Type check after modification"
+```
+
+타입 에러 발견 시 즉시 수정하고 재실행.
+
+### Step 8: 관련 테스트 실행
+
+**Bash 도구로 영향받는 테스트 실행**:
+```
+Bash:
+- command: "yarn test {affected-test-files}"
+- description: "Run affected tests"
+- timeout: 120000
+```
+
+**테스트 실패 시**:
+1. 실패 원인 분석
+2. 코드 재수정 (Edit 도구)
+3. 재실행
+
+**테스트 통과 시**:
+```markdown
+✅ 관련 테스트 {N}개 통과
+```
+
+### Step 9: FSD 아키텍처 검증 (자동)
+
+현재 프로젝트가 FSD 아키텍처를 사용하는 경우:
+
+**Task 도구로 fsd-architect agent 실행**:
+```
+Task:
+- subagent_type: "fsd-architect"
+- description: "Validate FSD compliance"
+- prompt: "변경된 파일들이 FSD 아키텍처 규칙을 준수하는지 검증하세요: {affectedFiles}"
+```
+
+검증 결과를 확인하고 위반 사항이 있으면 수정.
+
+### Step 10: 회귀 테스트 (선택)
+
+**AskUserQuestion 도구 사용**:
+```
+질문: "Critical path 테스트를 실행하시겠습니까?"
+헤더: "회귀 테스트"
+multiSelect: false
+옵션:
+  1. label: "예, 실행"
+     description: "Critical path 테스트를 실행하여 기존 기능 영향 확인"
+  2. label: "아니오, 건너뛰기"
+     description: "회귀 테스트를 생략하고 완료"
+```
+
+**Option 1 선택 시**:
+```
+Bash:
+- command: "yarn test:critical"
+- description: "Run critical path tests"
+- timeout: 300000
+```
+
+### Step 11: 완료 보고
+
+다음 형식으로 완료 보고를 출력하세요:
+
+```markdown
+✅ Minor 워크플로 완료!
+
+📝 변경 사항:
+- 작업 타입: {workType}
+- 수정된 파일: {affectedFiles.length}개
+  {affectedFiles 목록}
+- 테스트 통과: {passedTests}개
+
+📊 품질 지표:
+- 타입 에러: 0개 ✅
+- Lint 에러: 0개 ✅
+- FSD 준수: ✅
+- 재사용 패턴 적용: {reusablePatterns.length}개
+
+📋 생성된 문서:
+- {workDir}/plan.md
+
+📋 다음 단계:
+1. 변경사항 확인:
+   git diff
+
+2. Git commit:
+   git add .
+   git commit -m "fix: {taskDescription}"
+
+3. (선택) PR 생성:
+   gh pr create --title "fix: {taskDescription}"
+
+💡 Tip:
+- 대규모 변경이 필요하면 /major 워크플로 사용을 권장합니다
+- Changelog 업데이트: /changelog
+```
+
+---
+
+**중요 사항:**
+- Step 1-11을 순차적으로 실행하세요
+- 각 단계의 결과를 변수에 저장하여 다음 단계에서 사용하세요
+- 기존 feature 업데이트 시 반드시 spec/plan/tasks를 Read로 로드하세요
+- 재사용성 검토는 필수입니다 (Skill: reusability-enforcer)
+- 파일 수정 시마다 즉시 yarn type-check를 실행하세요
+- 테스트 실패 시 반드시 수정 후 재실행하세요
+- FSD 프로젝트인 경우 fsd-architect 검증을 생략하지 마세요

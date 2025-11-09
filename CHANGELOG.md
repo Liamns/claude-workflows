@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed 🐛
+- **Critical: All workflows now executable** - Fixed major issue where triage/major/minor/micro were description-only documents
+- **triage.md** - Added Implementation section with actual tool calls (AskUserQuestion, Skill, SlashCommand)
+- **micro.md** - Added Implementation section with work type detection, file search (Grep), modification (Edit), and validation (Bash)
+- **minor.md** - Added Implementation section with 11 steps including questions, reusability checks, file operations, and testing
+- **major.md** - Added comprehensive Implementation section with 14 steps generating 7 files (spec.md, plan.md, tasks.md, research.md, data-model.md, quickstart.md, contracts/openapi.yaml)
 - **Consolidated workflow-gates.json** - Merged duplicate files from root and .claude/ directories
 - **Organized backup files** - Moved all backup files to `.claude/.backup/v1-v2-migration/` directory
 - **Updated documentation** - Added missing `/micro` command explanation in README.md
@@ -16,6 +21,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Enhanced v1.0 detection** - Added root fallback for workflow-gates.json version detection
 
 ### Changed 🔄
+- **Workflow execution model** - All workflows transformed from "descriptions" to "executable commands" with explicit tool calls
+- **major.md question reduction** - Consolidated 10 questions into 2 AskUserQuestion blocks (3 essential + 6 optional multiselect)
+- **File generation automation** - major workflow now auto-generates 7 specification/planning files
+- **Inline branch creation** - Replaced create-new-feature.sh script with inline Bash commands in major.md
 - workflow-gates.json location standardized to `.claude/` directory
 - workflow-gates.json version updated to 2.5.0
 - Backup files organized under `.claude/.backup/` for better project structure

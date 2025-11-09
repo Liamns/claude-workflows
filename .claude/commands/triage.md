@@ -326,3 +326,137 @@ history:
 ---
 
 이제 작업을 시작할 때 `/triage`만 입력하면 자동으로 최적의 워크플로우가 선택됩니다!
+
+---
+
+## 🔧 Implementation
+
+이제 위의 프로세스를 실제로 실행하세요.
+
+### Step 1: 사용자 요청 분석
+
+사용자가 제공한 작업 설명을 분석하세요:
+- 작업 내용: {사용자가 입력한 내용}
+- 키워드 추출
+- 작업 유형 파악
+
+### Step 2: 복잡도 점수 계산
+
+위의 `calculateComplexity` 로직을 사용하여 점수를 계산하세요:
+
+1. **MICRO 신호 확인** (점수 감소):
+   - 오타/typo → -3점
+   - console.log/로그 → -2점
+   - 스타일/CSS → -2점
+
+2. **MINOR 신호 확인** (점수 증가):
+   - 버그/에러/수정 → +2점
+   - 개선/리팩토링 → +3점
+   - 타입 이슈 → +1점
+
+3. **MAJOR 신호 확인** (점수 증가):
+   - 새 기능/추가 → +5점
+   - API/통합 → +5점
+   - 아키텍처 → +6점
+   - 다중 파일 → +3점
+   - 테스트 작성 → +2점
+
+4. **최종 점수 계산**:
+   - score < 0 → Micro
+   - score 0-4 → Minor
+   - score > 4 → Major
+
+5. 계산 결과를 다음 변수에 저장:
+   - `{complexityScore}`: 계산된 점수
+   - `{factors}`: 점수에 기여한 요인들 (배열)
+   - `{recommendedWorkflow}`: 추천 워크플로우 (Micro/Minor/Major)
+
+### Step 3: 재사용 가능 모듈 검색
+
+Skill 도구를 사용하여 reusability-enforcer를 실행하세요:
+
+```
+Skill: reusability-enforcer
+```
+
+결과를 `{reusableModules}` 변수에 저장하세요.
+
+### Step 4: 사용자에게 분석 결과 보고
+
+다음 형식으로 분석 결과를 출력하세요:
+
+```markdown
+📊 작업 분류 완료
+
+작업: "{사용자 요청}"
+
+🔍 분석 결과:
+• 복잡도 점수: {complexityScore}점
+• 주요 요인:
+{factors 목록}
+
+📦 재사용 가능 모듈:
+{reusableModules 목록}
+
+🎯 추천 워크플로우: **{recommendedWorkflow}**
+```
+
+### Step 5: 워크플로우 선택
+
+AskUserQuestion 도구를 사용하여 사용자에게 확인하세요:
+
+질문: "어떤 워크플로우로 진행하시겠습니까?"
+헤더: "워크플로우 선택"
+multiSelect: false
+옵션:
+  1. label: "추천된 {recommendedWorkflow} 워크플로우로 진행"
+     description: "AI가 분석한 최적의 워크플로우로 자동 진행합니다."
+  2. label: "Major 워크플로우 강제 실행"
+     description: "신규 기능 개발 프로세스 (Spec-Kit 사용)"
+  3. label: "Minor 워크플로우 강제 실행"
+     description: "버그 수정 및 개선 프로세스"
+  4. label: "Micro 워크플로우 강제 실행"
+     description: "빠른 수정 프로세스"
+
+사용자의 선택을 `{selectedWorkflow}` 변수에 저장하세요.
+
+### Step 6: 선택된 워크플로우 실행
+
+사용자가 선택한 워크플로우에 따라 SlashCommand 도구를 사용하여 해당 워크플로우를 실행하세요:
+
+**Option 1을 선택한 경우:**
+```
+SlashCommand: /{recommendedWorkflow를 소문자로} "{사용자 요청}"
+```
+
+**Option 2를 선택한 경우:**
+```
+SlashCommand: /major "{사용자 요청}"
+```
+
+**Option 3을 선택한 경우:**
+```
+SlashCommand: /minor "{사용자 요청}"
+```
+
+**Option 4를 선택한 경우:**
+```
+SlashCommand: /micro "{사용자 요청}"
+```
+
+### Step 7: 완료
+
+워크플로우가 성공적으로 시작되었음을 사용자에게 알립니다:
+
+```markdown
+✅ {selectedWorkflow} 워크플로우 시작됨
+
+재사용 가능 모듈 {reusableModules.length}개가 자동으로 제공됩니다.
+```
+
+---
+
+**중요 사항:**
+- Step 1-7을 순차적으로 실행하세요
+- 각 단계의 결과를 변수에 저장하여 다음 단계에서 사용하세요
+- SlashCommand 실행 후에는 해당 워크플로우가 자동으로 진행됩니다

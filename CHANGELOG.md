@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed 🐛
+- **Consolidated workflow-gates.json** - Merged duplicate files from root and .claude/ directories
+- **Organized backup files** - Moved all backup files to `.claude/.backup/v1-v2-migration/` directory
+- **Updated documentation** - Added missing `/micro` command explanation in README.md
+- **Fixed install.sh file counts** - Corrected command count (11→9) and skill count (13→15)
+- **Removed non-existent /test command** - Cleaned up Next Steps section
+- **Enhanced v1.0 detection** - Added root fallback for workflow-gates.json version detection
+
+### Changed 🔄
+- workflow-gates.json location standardized to `.claude/` directory
+- workflow-gates.json version updated to 2.5.0
+- Backup files organized under `.claude/.backup/` for better project structure
+- install.sh now shows complete lib/ and config/ file lists including migration scripts
+
 ## [2.5.0] - 2025-11-07
 
 ### Added 🆕

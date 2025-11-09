@@ -129,9 +129,14 @@ create_temp_dir() {
 
 # Detect existing installation and version
 detect_installation() {
+    # v2.0+ location
     if [ -f "$TARGET_DIR/.claude/workflow-gates.json" ]; then
         # Extract version using grep (compatible with systems without jq)
         local version=$(grep -o '"version"[[:space:]]*:[[:space:]]*"[^"]*"' "$TARGET_DIR/.claude/workflow-gates.json" | cut -d'"' -f4)
+        echo "$version"
+    # v1.0 legacy location (fallback)
+    elif [ -f "$TARGET_DIR/workflow-gates.json" ]; then
+        local version=$(grep -o '"version"[[:space:]]*:[[:space:]]*"[^"]*"' "$TARGET_DIR/workflow-gates.json" | cut -d'"' -f4)
         echo "$version"
     else
         echo "none"
@@ -458,10 +463,10 @@ install_workflows() {
     fi
 
     # Copy workflow-gates.json
-    if [ -f "$TEMP_DIR/workflow-gates.json" ]; then
+    if [ -f "$TEMP_DIR/.claude/workflow-gates.json" ]; then
         print_info "Installing workflow-gates.json..."
         if [ "$DRY_RUN" = false ]; then
-            cp "$TEMP_DIR/workflow-gates.json" "$TARGET_DIR/.claude/"
+            cp "$TEMP_DIR/.claude/workflow-gates.json" "$TARGET_DIR/.claude/"
         fi
         print_success "workflow-gates.json installed (with model optimization)"
     else
@@ -585,6 +590,16 @@ install_workflows() {
     # Note: Keep .claude/.backup as it's created by this installer for user backups
     print_success "Cleanup complete"
 
+    # Migrate old workflow-gates.json from root to .claude/.backup/ (v2.5.1+)
+    if [ -f "$TARGET_DIR/workflow-gates.json" ]; then
+        print_info "Migrating old workflow-gates.json from root..."
+        if [ "$DRY_RUN" = false ]; then
+            mkdir -p "$TARGET_DIR/.claude/.backup/v1-v2-migration"
+            mv "$TARGET_DIR/workflow-gates.json" "$TARGET_DIR/.claude/.backup/v1-v2-migration/workflow-gates-root-old.json"
+        fi
+        print_success "Old workflow-gates.json migrated to .claude/.backup/"
+    fi
+
     echo ""
     print_success "File installation complete!"
     echo ""
@@ -622,15 +637,17 @@ install_workflows() {
     echo -e "${GREEN}Installed Components (v$TARGET_VERSION):${NC}"
     echo ""
     echo "📁 $TARGET_DIR/.claude/"
-    echo "   ├── commands/        (11 Slash Commands + /dashboard)"
+    echo "   ├── commands/        (9 Slash Commands)"
     echo "   ├── templates/       (문서 템플릿)"
     echo "   ├── agents/          (6 Unified Agents - 통합 최적화)"
-    echo "   ├── skills/          (13 Skills - 자동 활성화)"
+    echo "   ├── skills/          (15 Skills - 자동 활성화)"
     echo "   ├── lib/             (Helper Scripts)"
     echo "   │   ├── cache-helper.sh"
     echo "   │   ├── metrics-collector.sh"
     echo "   │   ├── dashboard-generator.sh"
-    echo "   │   └── git-stats-helper.sh"
+    echo "   │   ├── git-stats-helper.sh"
+    echo "   │   ├── migrate-v1-to-v2.sh"
+    echo "   │   └── migrate-v2-to-v25.sh"
     echo "   ├── cache/           (Metrics & Cache Data)"
     echo "   │   ├── metrics/"
     echo "   │   └── workflow-history/"
@@ -641,7 +658,9 @@ install_workflows() {
     echo "   │   └── fullstack/   (Monorepo, JAMstack)"
     echo "   ├── config/          (Model & User Preferences)"
     echo "   │   ├── model-router.yaml"
-    echo "   │   └── user-preferences.yaml"
+    echo "   │   ├── user-preferences.yaml"
+    echo "   │   ├── cache-config.yaml"
+    echo "   │   └── parallel-config.yaml"
     echo "   └── workflow-gates.json (Model Optimization 포함)"
     echo ""
     echo "📁 $TARGET_DIR/.specify/"
@@ -663,30 +682,27 @@ install_workflows() {
     echo "2. 자동 워크플로 선택:"
     echo "   /triage [작업 설명]         # 최적 워크플로 + 모델 자동 선택"
     echo ""
-    echo "3. 테스트 자동화 (🆕 v2.4):"
-    echo "   /test                        # 테스트 요구사항 분석 및 자동 생성"
-    echo ""
-    echo "4. 코드 리뷰:"
+    echo "3. 코드 리뷰:"
     echo "   /review [target]             # 종합 코드 리뷰"
     echo "   /review --staged             # 스테이징 변경사항 리뷰"
     echo "   /review --diff HEAD~1        # Git diff 리뷰"
     echo "   /review [target] --adv       # 심층 분석 모드"
     echo ""
-    echo "5. 워크플로 명령어 (🆕 통합 Major):"
+    echo "4. 워크플로 명령어 (🆕 통합 Major):"
     echo "   /major                       # 통합 Major 워크플로 (2개 질문만)"
     echo "   /minor [feature-or-issue]    # 버그 수정 워크플로"
     echo "   /micro [description]         # 간단한 변경"
     echo ""
-    echo "6. Git 자동화:"
+    echo "5. Git 자동화:"
     echo "   /commit             # Conventional Commits 자동 생성"
     echo "   /pr-review [PR#]    # GitHub PR 자동 리뷰"
     echo ""
-    echo "7. 📊 실시간 메트릭스 대시보드 (🆕 v2.5):"
+    echo "6. 📊 실시간 메트릭스 대시보드 (🆕 v2.5):"
     echo "   /dashboard          # 현재 세션 메트릭"
     echo "   /dashboard --today  # 오늘의 통계"
     echo "   /dashboard --summary # 전체 누적 통계"
     echo ""
-    echo "8. 모델 옵션:"
+    echo "7. 모델 옵션:"
     echo "   --model=opus        # 특정 모델 강제 사용"
     echo "   --use-context7      # Context7 강제 활성화"
     echo "   --optimize-cost     # 비용 최적화 우선"
@@ -697,7 +713,7 @@ install_workflows() {
     echo ""
     echo "9. Agents 및 Skills:"
     echo "   - 6개 통합 에이전트 자동 활성화"
-    echo "   - 13개 스킬 자동 적용"
+    echo "   - 15개 스킬 자동 적용"
     echo "   - 워크플로우별 최적화 적용"
     echo ""
     echo "10. 자세한 사용법:"

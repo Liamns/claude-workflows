@@ -46,6 +46,21 @@ check_v24_installation() {
        [ -f ".claude/agents/reviewer-unified.md" ] && \
        [ -f ".claude/commands/major.md" ]; then
         log_success "v2.4.x 설치 감지됨"
+
+        # v2.5.0에서 추가된 /pr 명령어 확인
+        if [ -f ".claude/commands/pr.md" ]; then
+            log_success "/pr 명령어가 이미 설치되어 있습니다"
+        else
+            log_info "/pr 명령어가 없습니다 - 설치 스크립트에서 추가됩니다"
+        fi
+
+        # v2.5.0에서 추가된 템플릿 디렉토리 확인
+        if [ -d ".claude/templates/git" ]; then
+            log_success "PR 템플릿이 이미 설치되어 있습니다"
+        else
+            log_info "PR 템플릿이 없습니다 - 설치 스크립트에서 추가됩니다"
+        fi
+
         return 0
     else
         log_warning "v2.4.x 설치가 아님 - 먼저 v2.4로 업그레이드 필요"

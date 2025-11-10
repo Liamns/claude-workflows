@@ -93,7 +93,7 @@ health_check() {
     local agents_count=$(find "$TARGET_DIR/.claude/agents" -maxdepth 1 -type f -name '*.md' ! -path '*/_deprecated/*' 2>/dev/null | wc -l | tr -d ' ')
     local skills_count=$(find "$TARGET_DIR/.claude/skills" -maxdepth 1 -type d ! -name 'skills' 2>/dev/null | wc -l | tr -d ' ')
 
-    echo "  Commands: $commands_count (expected: 9)"
+    echo "  Commands: $commands_count (expected: 10)"
     echo "  Agents: $agents_count (expected: 6)"
     echo "  Skills: $skills_count (expected: 15)"
 
@@ -420,8 +420,12 @@ verify_installation() {
         ".claude/workflow-gates.json"
         ".claude/commands/major.md"
         ".claude/commands/triage.md"
+        ".claude/commands/pr.md"
         ".claude/lib/cache-helper.sh"
         ".claude/lib/metrics-collector.sh"
+        ".claude/templates/git/pr-template.md"
+        ".claude/templates/git/pr-auto-fill.yaml"
+        ".claude/templates/git/pr-sections-map.json"
     )
 
     for file in "${critical_files[@]}"; do
@@ -676,8 +680,15 @@ install_workflows() {
 
     # Copy slash commands (excluding deprecated and backup)
     if [ -d "$TEMP_DIR/.claude/commands" ]; then
-        print_info "Installing Slash Commands (9개)..."
+        print_info "Installing Slash Commands (10개)..."
         if [ "$DRY_RUN" = false ]; then
+            # Backup existing pr.md if present (user might have customized it)
+            if [ -f "$TARGET_DIR/.claude/commands/pr.md" ]; then
+                mkdir -p "$TARGET_DIR/.claude/.backup/command-backups"
+                cp "$TARGET_DIR/.claude/commands/pr.md" "$TARGET_DIR/.claude/.backup/command-backups/pr-$(date +%Y%m%d-%H%M%S).md"
+                print_info "Existing pr.md backed up to .claude/.backup/command-backups/"
+            fi
+
             # Copy files, excluding deprecated and backup directories
             find "$TEMP_DIR/.claude/commands" -maxdepth 1 -type f -name "*.md" -exec cp {} "$TARGET_DIR/.claude/commands/" \;
         fi
@@ -888,7 +899,7 @@ install_workflows() {
     echo -e "${GREEN}Installed Components (v$TARGET_VERSION):${NC}"
     echo ""
     echo "📁 $TARGET_DIR/.claude/"
-    echo "   ├── commands/        (9 Slash Commands)"
+    echo "   ├── commands/        (10 Slash Commands)"
     echo "   ├── templates/       (문서 템플릿)"
     echo "   ├── agents/          (6 Unified Agents - 통합 최적화)"
     echo "   ├── skills/          (15 Skills - 자동 활성화)"

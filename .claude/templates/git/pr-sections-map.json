@@ -1,0 +1,258 @@
+{
+  "template_version": "1.0.0",
+  "description": "PR 템플릿 섹션과 데이터 소스 매핑",
+  "sections": [
+    {
+      "id": "changes",
+      "emoji": "📋",
+      "title": "변경사항",
+      "type": "checkbox",
+      "data_sources": [
+        {
+          "source": "git_commits",
+          "method": "analyze_commit_types",
+          "mapping": {
+            "feat": "새로운 기능 추가",
+            "fix": "버그 수정",
+            "refactor": "리팩터링",
+            "docs": "문서 업데이트",
+            "test": "테스트 추가/수정"
+          }
+        }
+      ],
+      "automation": {
+        "auto_check": true,
+        "check_condition": "commit_type_exists"
+      }
+    },
+    {
+      "id": "description",
+      "emoji": "🎯",
+      "title": "작업 내용",
+      "type": "text",
+      "data_sources": [
+        {
+          "source": "spec_file",
+          "path": ".specify/spec.md",
+          "extract_sections": ["Overview", "Summary"],
+          "priority": 1,
+          "optional": true
+        },
+        {
+          "source": "git_commits",
+          "method": "group_by_type",
+          "format": "bullet_list",
+          "priority": 2
+        },
+        {
+          "source": "plan_file",
+          "path": ".specify/plan.md",
+          "extract_sections": ["Implementation", "Core Features"],
+          "priority": 3,
+          "optional": true
+        },
+        {
+          "source": "breaking_changes",
+          "method": "detect_from_commits",
+          "highlight": true
+        }
+      ],
+      "automation": {
+        "generate_summary": true,
+        "max_length": 500,
+        "include_commit_list": true
+      }
+    },
+    {
+      "id": "test",
+      "emoji": "🧪",
+      "title": "테스트",
+      "type": "checkbox",
+      "data_sources": [
+        {
+          "source": "tasks_file",
+          "path": ".specify/tasks.md",
+          "extract_sections": ["Verification"],
+          "convert_to_checkbox": true,
+          "priority": 1,
+          "optional": true
+        },
+        {
+          "source": "git_diff",
+          "patterns": [
+            "*.test.ts",
+            "*.test.tsx",
+            "*.spec.ts",
+            "*.spec.tsx",
+            "__tests__/**"
+          ],
+          "method": "detect_test_files",
+          "priority": 2
+        }
+      ],
+      "automation": {
+        "auto_check": {
+          "단위 테스트 추가/수정": {
+            "condition": "test_files_changed",
+            "append_file_list": true
+          },
+          "통합 테스트 확인": {
+            "condition": "integration_test_exists"
+          },
+          "수동 테스트 완료": {
+            "condition": "manual_verification_required",
+            "auto_check": false
+          }
+        }
+      }
+    },
+    {
+      "id": "screenshots",
+      "emoji": "📸",
+      "title": "스크린샷 (UI 변경시)",
+      "type": "conditional",
+      "data_sources": [
+        {
+          "source": "git_diff",
+          "patterns": [
+            "*.tsx",
+            "*.jsx",
+            "*.vue",
+            "*.html",
+            "*.css",
+            "*.scss",
+            "*.sass",
+            "*.styled.ts"
+          ],
+          "method": "detect_ui_changes"
+        }
+      ],
+      "automation": {
+        "remove_if_no_ui_change": true,
+        "placeholder_if_ui_changed": "<!-- ⚠️ UI 변경이 감지되었습니다. 변경 전후 스크린샷을 추가해주세요 -->"
+      }
+    },
+    {
+      "id": "references",
+      "emoji": "📚",
+      "title": "참고 자료",
+      "type": "text",
+      "data_sources": [
+        {
+          "source": "commit_messages",
+          "method": "extract_issue_numbers",
+          "patterns": [
+            "#(\\d+)",
+            "closes #(\\d+)",
+            "fixes #(\\d+)",
+            "resolves #(\\d+)"
+          ],
+          "format": "Closes #{{number}}",
+          "priority": 1
+        },
+        {
+          "source": "spec_file",
+          "path": ".specify/spec.md",
+          "extract_sections": ["Research", "References"],
+          "priority": 2,
+          "optional": true
+        },
+        {
+          "source": "commit_messages",
+          "method": "extract_notion_links",
+          "patterns": [
+            "https://www\\.notion\\.so/[^\\s]+"
+          ],
+          "format": "Notion: {{url}}",
+          "priority": 3
+        },
+        {
+          "source": "spec_files",
+          "method": "auto_link",
+          "files": [
+            ".specify/spec.md",
+            ".specify/plan.md",
+            ".specify/tasks.md"
+          ],
+          "priority": 4,
+          "optional": true
+        }
+      ],
+      "automation": {
+        "deduplicate": true,
+        "format_as_list": true
+      }
+    },
+    {
+      "id": "checklist",
+      "emoji": "✅",
+      "title": "체크리스트",
+      "type": "checkbox",
+      "data_sources": [
+        {
+          "source": "command_execution",
+          "items": [
+            {
+              "name": "코딩 컨벤션 준수",
+              "command": "yarn type-check",
+              "auto_check_on_success": true,
+              "timeout": 30000
+            },
+            {
+              "name": "테스트 통과",
+              "command": "yarn test",
+              "auto_check_on_success": true,
+              "timeout": 60000
+            }
+          ]
+        },
+        {
+          "source": "git_diff",
+          "items": [
+            {
+              "name": "문서 업데이트",
+              "patterns": ["*.md", "docs/**"],
+              "auto_check_if_changed": true
+            }
+          ]
+        },
+        {
+          "source": "manual",
+          "items": [
+            {
+              "name": "성능 영향도 검토",
+              "auto_check": false,
+              "note": "성능에 영향을 주는 변경이 있다면 수동으로 체크하세요"
+            }
+          ]
+        }
+      ],
+      "automation": {
+        "run_validations": false,
+        "run_validations_flag": "--validate"
+      }
+    }
+  ],
+  "footer": {
+    "enabled": true,
+    "content": "\n---\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>"
+  },
+  "pr_settings": {
+    "default_base": "main",
+    "title_generation": {
+      "single_commit": "use_commit_message",
+      "multiple_commits": "auto_summarize"
+    },
+    "auto_labels": {
+      "enabled": true,
+      "mappings": {
+        "feat": ["feature", "enhancement"],
+        "fix": ["bug", "fix"],
+        "refactor": ["refactor", "code-quality"],
+        "docs": ["documentation"],
+        "test": ["testing"],
+        "perf": ["performance"]
+      }
+    }
+  }
+}

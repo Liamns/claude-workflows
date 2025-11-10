@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added 🆕
+- **/pr**: Git 변경사항을 분석하여 GitHub PR을 자동으로 생성하고 템플릿을 자동 완성
+  - 커밋 히스토리 자동 분석 및 타입별 그룹화
+  - Breaking changes 자동 감지
+  - `.specify/*.md` 워크플로우 파일과 연동하여 PR body 자동 생성
+  - 템플릿 자동 완성 (변경사항, 작업 내용, 테스트, 참고 자료 섹션)
+  - `--dry-run`, `--draft`, `--review`, `--validate` 등 다양한 옵션 지원
+
 ### Fixed 🐛
 - **Critical: All workflows now executable** - Fixed major issue where triage/major/minor/micro were description-only documents
 - **triage.md** - Added Implementation section with actual tool calls (AskUserQuestion, Skill, SlashCommand)

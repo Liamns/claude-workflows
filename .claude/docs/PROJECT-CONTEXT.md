@@ -16,13 +16,14 @@ Claude Workflows는 Claude Code에서 개발 생산성을 극대화하는 토큰
 ```
 claude-workflow/
 ├── .claude/
-│   ├── commands/           # 슬래시 명령어 (9개)
+│   ├── commands/           # 슬래시 명령어 (10개)
 │   │   ├── start.md        # 프로젝트 초기화
 │   │   ├── triage.md       # 워크플로우 자동 선택
 │   │   ├── major.md        # 통합 Major 워크플로우
 │   │   ├── minor.md        # 버그 수정 워크플로우
 │   │   ├── micro.md        # 간단한 변경
 │   │   ├── commit.md       # 스마트 커밋
+│   │   ├── pr.md           # PR 자동 생성
 │   │   ├── pr-review.md    # PR 자동 리뷰
 │   │   ├── review.md       # 종합 코드 리뷰
 │   │   └── dashboard.md    # 메트릭스 대시보드
@@ -106,6 +107,7 @@ claude-workflow/
 
 # Git 자동화
 /commit
+/pr
 /pr-review 123
 ```
 

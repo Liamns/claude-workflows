@@ -39,6 +39,7 @@ curl -fsSL https://raw.githubusercontent.com/Liamns/claude-workflows/main/instal
 /micro "설명"       # 간단한 수정 (85% 토큰 절감)
 /review --staged    # 코드 리뷰
 /commit            # 스마트 커밋
+/pr                # PR 자동 생성
 /dashboard         # 📊 실시간 메트릭스 대시보드
 ```
 

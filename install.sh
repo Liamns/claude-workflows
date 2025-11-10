@@ -681,7 +681,7 @@ install_workflows() {
             # Copy files, excluding deprecated and backup directories
             find "$TEMP_DIR/.claude/commands" -maxdepth 1 -type f -name "*.md" -exec cp {} "$TARGET_DIR/.claude/commands/" \;
         fi
-        print_success "Slash Commands installed (start, triage, major, minor, micro, commit, pr-review, review, dashboard)"
+        print_success "Slash Commands installed (start, triage, major, minor, micro, commit, pr, pr-review, review, dashboard)"
     else
         print_warning ".claude/commands/ directory not found in repository"
     fi
@@ -946,6 +946,7 @@ install_workflows() {
     echo ""
     echo "5. Git 자동화:"
     echo "   /commit             # Conventional Commits 자동 생성"
+    echo "   /pr                 # PR 자동 생성"
     echo "   /pr-review [PR#]    # GitHub PR 자동 리뷰"
     echo ""
     echo "6. 📊 실시간 메트릭스 대시보드 (🆕 v2.5):"

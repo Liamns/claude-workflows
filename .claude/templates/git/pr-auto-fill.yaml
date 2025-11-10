@@ -1,0 +1,201 @@
+# PR 자동 채우기 설정
+# /pr 커맨드가 이 설정을 참조하여 템플릿을 자동으로 완성합니다
+
+# 📋 변경사항 섹션 자동 체크 규칙
+changes_detection:
+  # 커밋 타입에 따른 체크박스 자동 선택
+  commit_type_mapping:
+    feat: "새로운 기능 추가"
+    fix: "버그 수정"
+    refactor: "리팩터링"
+    docs: "문서 업데이트"
+    test: "테스트 추가/수정"
+    style: "리팩터링"  # 코드 스타일 변경도 리팩터링으로 분류
+    perf: "리팩터링"   # 성능 개선도 리팩터링으로 분류
+    chore: null  # 체크 안함
+    build: null
+    ci: null
+
+# 🎯 작업 내용 섹션 자동 생성
+description_generation:
+  sources:
+    # 데이터 소스 우선순위 (위에서부터 순서대로 시도)
+    - type: spec_file
+      path: .specify/spec.md
+      sections: [Overview, Summary]
+      priority: 1
+
+    - type: git_commits
+      format: grouped_by_type  # feat, fix, refactor 등으로 그룹화
+      include_breaking_changes: true
+      priority: 2
+
+    - type: plan_file
+      path: .specify/plan.md
+      sections: [Implementation, Core Features]
+      priority: 3
+
+  # 출력 포맷
+  template: |
+    {{spec_overview}}
+
+    **주요 변경사항**:
+    {{#each commits_by_type}}
+    - {{this}}
+    {{/each}}
+
+    {{#if breaking_changes}}
+    **⚠️ Breaking Changes**:
+    {{#each breaking_changes}}
+    - {{this}}
+    {{/each}}
+    {{/if}}
+
+# 🧪 테스트 섹션 자동 생성
+test_generation:
+  sources:
+    # tasks.md의 Verification 체크리스트
+    - type: tasks_verification
+      path: .specify/tasks.md
+      section: Verification
+      convert_to_checkbox: true
+
+    # 테스트 파일 변경 감지
+    - type: git_diff
+      patterns:
+        - "*.test.ts"
+        - "*.test.tsx"
+        - "*.spec.ts"
+        - "*.spec.tsx"
+        - "__tests__/**"
+      auto_check: true  # 테스트 파일 변경 시 자동 체크
+
+  # 테스트 실행 결과 포함 여부 (optional)
+  include_test_results:
+    enabled: false  # 기본값 false, /pr --with-tests로 활성화 가능
+    commands:
+      - yarn test
+      - yarn type-check
+
+# 📸 스크린샷 섹션 처리
+screenshots:
+  # UI 변경 감지
+  ui_change_detection:
+    file_extensions:
+      - .tsx
+      - .jsx
+      - .vue
+      - .html
+      - .css
+      - .scss
+      - .sass
+      - .styled.ts
+
+    # UI 변경이 없으면 이 섹션 제거
+    remove_if_no_change: true
+
+    # UI 변경이 있으면 안내 메시지 추가
+    placeholder_message: |
+      <!-- ⚠️ UI 변경이 감지되었습니다. 변경 전후 스크린샷을 추가해주세요 -->
+      <!-- 추천: 브라우저 개발자 도구에서 스크린샷 캡처 -->
+
+# 📚 참고 자료 섹션 자동 생성
+references_generation:
+  sources:
+    # 1. 커밋 메시지에서 이슈 번호 추출
+    - type: commit_messages
+      patterns:
+        - "#(\\d+)"  # #123 형식
+        - "closes #(\\d+)"
+        - "fixes #(\\d+)"
+        - "resolves #(\\d+)"
+      format: "Closes #{{issue_number}}"
+
+    # 2. spec.md의 Research 링크
+    - type: spec_file
+      path: .specify/spec.md
+      sections: [Research, References, Related Work]
+
+    # 3. Notion 링크 자동 감지
+    - type: commit_messages
+      patterns:
+        - "(https://www\\.notion\\.so/[^\\s]+)"
+      format: "Notion: {{url}}"
+
+    # 4. spec/plan/tasks 파일 링크
+    - type: spec_files
+      auto_link: true
+      format: |
+        - Spec: [.specify/spec.md](.specify/spec.md)
+        - Plan: [.specify/plan.md](.specify/plan.md)
+        - Tasks: [.specify/tasks.md](.specify/tasks.md)
+
+# ✅ 체크리스트 섹션 자동 체크
+checklist_validation:
+  items:
+    - name: "코딩 컨벤션 준수"
+      validation:
+        command: yarn type-check
+        auto_check_on_success: true
+
+    - name: "테스트 통과"
+      validation:
+        command: yarn test
+        auto_check_on_success: true
+
+    - name: "문서 업데이트"
+      validation:
+        type: git_diff
+        patterns: ["*.md", "docs/**"]
+        auto_check_if_changed: true
+
+    - name: "성능 영향도 검토"
+      validation:
+        type: optional  # 항상 체크 안함, 수동 확인 필요
+        note: "성능에 영향을 주는 변경이 있다면 수동으로 체크하세요"
+
+# PR 생성 기본 옵션
+pr_options:
+  # 기본 베이스 브랜치
+  default_base_branch: main
+
+  # PR 제목 자동 생성
+  title_generation:
+    # 커밋이 1개면 커밋 메시지 사용
+    single_commit: use_commit_message
+
+    # 커밋이 여러 개면 자동 요약
+    multiple_commits:
+      format: "{{primary_type}}({{scope}}): {{summary}}"
+      # primary_type: 가장 많은 커밋 타입
+      # scope: 공통 스코프 또는 파일 경로에서 추출
+      # summary: GPT가 커밋들을 요약
+
+  # 자동 라벨 추가 (GitHub labels)
+  auto_labels:
+    feat: [feature, enhancement]
+    fix: [bug, fix]
+    refactor: [refactor, code-quality]
+    docs: [documentation]
+    test: [testing]
+    perf: [performance]
+    breaking: [breaking-change]
+
+  # 리뷰어 자동 할당 (optional)
+  auto_reviewers:
+    enabled: false  # 기본값 false, /pr --auto-assign으로 활성화
+    rules:
+      - path_pattern: "src/features/**"
+        reviewers: []  # 팀원 GitHub username
+      - path_pattern: "src/shared/**"
+        reviewers: []
+
+# Footer 추가
+footer:
+  enabled: true
+  template: |
+
+    ---
+    🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+    Co-Authored-By: Claude <noreply@anthropic.com>

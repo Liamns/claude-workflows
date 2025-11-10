@@ -14,13 +14,19 @@ source "$SCRIPT_DIR/validation-utils.sh"
 # 설정 파일 로드
 CONFIG_FILE="${CONFIG_FILE:-$SCRIPT_DIR/validation-config.sh}"
 if [[ -f "$CONFIG_FILE" ]]; then
+    # shellcheck source=.claude/lib/validation-config.sh
     source "$CONFIG_FILE"
 else
     # 기본값 (설정 파일 없을 때 호환성 유지)
+    # shellcheck disable=SC2034  # Used by sourced modules
     readonly VALIDATION_DOC_THRESHOLD_PASS=90
+    # shellcheck disable=SC2034
     readonly VALIDATION_DOC_THRESHOLD_WARNING=70
+    # shellcheck disable=SC2034
     readonly VALIDATION_CONSISTENCY_THRESHOLD_PASS=90
+    # shellcheck disable=SC2034
     readonly VALIDATION_CONSISTENCY_THRESHOLD_WARNING=70
+    # shellcheck disable=SC2034
     readonly VALIDATION_REPORT_RETENTION_DAYS=30
 fi
 

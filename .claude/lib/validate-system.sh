@@ -38,13 +38,13 @@ QUIET=false
 REPORT_DIR=".claude/cache/validation-reports"
 LOG_FILE=""
 
-# 전역 변수
-OVERALL_STATUS="PASS"
-CONSISTENCY_SCORE=0
-START_TIME=$(date +%s)
-DOC_VALIDATION_RESULTS="{}"
-MIG_VALIDATION_RESULTS="{}"
-CROSSREF_VALIDATION_RESULTS="{}"
+# 전역 변수 (네임스페이스: __VS_ = Validate System)
+__VS___VS_OVERALL_STATUS="PASS"
+__VS___VS_CONSISTENCY_SCORE=0
+__VS___VS_START_TIME=$(date +%s)
+__VS_DOC_RESULTS="{}"
+__VS_MIG_RESULTS="{}"
+__VS_CROSSREF_RESULTS="{}"
 
 # 사용법 표시
 usage() {
@@ -159,7 +159,7 @@ run_documentation_validation() {
 
         # JSON 부분만 추출 (마지막 줄)
         local json_result=$(echo "$doc_results" | tail -1)
-        DOC_VALIDATION_RESULTS="$json_result"
+        __VS_DOC_RESULTS="$json_result"
 
         # 결과 파싱
         local total=$(parse_json_field "$json_result" "total" "0")
@@ -193,7 +193,7 @@ run_migration_validation() {
 
         # JSON 부분만 추출 (마지막 줄)
         local json_result=$(echo "$mig_results" | tail -1)
-        MIG_VALIDATION_RESULTS="$json_result"
+        __VS_MIG_RESULTS="$json_result"
 
         # 결과 파싱
         local total=$(parse_json_field "$json_result" "total" "0")
@@ -226,7 +226,7 @@ run_crossref_validation() {
 
         # JSON 부분만 추출 (마지막 줄)
         local json_result=$(echo "$crossref_results" | tail -1)
-        CROSSREF_VALIDATION_RESULTS="$json_result"
+        __VS_CROSSREF_RESULTS="$json_result"
 
         # 결과 파싱
         local total=$(parse_json_field "$json_result" "totalLinks" "0")
@@ -257,12 +257,12 @@ generate_report() {
         source "$SCRIPT_DIR/report-generator.sh"
 
         # 검증 결과 수집 (전역 변수에서)
-        local doc_results="${DOC_VALIDATION_RESULTS:-{}}"
-        local mig_results="${MIG_VALIDATION_RESULTS:-{}}"
-        local crossref_results="${CROSSREF_VALIDATION_RESULTS:-{}}"
+        local doc_results="${__VS_DOC_RESULTS:-{}}"
+        local mig_results="${__VS_MIG_RESULTS:-{}}"
+        local crossref_results="${__VS_CROSSREF_RESULTS:-{}}"
 
         # 보고서 생성 (계산된 전체 상태 및 일관성 점수 전달)
-        save_report_to_file "$doc_results" "$mig_results" "$crossref_results" "$REPORT_DIR" "$OVERALL_STATUS" "$CONSISTENCY_SCORE"
+        save_report_to_file "$doc_results" "$mig_results" "$crossref_results" "$REPORT_DIR" "$__VS_OVERALL_STATUS" "$__VS_CONSISTENCY_SCORE"
 
         return 0
     else
@@ -285,16 +285,16 @@ print_summary() {
 
     # 실행 시간 계산
     local end_time=$(date +%s)
-    local duration=$((end_time - START_TIME))
+    local duration=$((end_time - __VS_START_TIME))
 
-    echo "  전체 상태: $OVERALL_STATUS"
-    echo "  일관성 점수: $CONSISTENCY_SCORE/100"
+    echo "  전체 상태: $__VS_OVERALL_STATUS"
+    echo "  일관성 점수: $__VS_CONSISTENCY_SCORE/100"
     echo "  실행 시간: ${duration}초"
     echo ""
 
-    if [[ "$OVERALL_STATUS" == "PASS" ]]; then
+    if [[ "$__VS_OVERALL_STATUS" == "PASS" ]]; then
         log_success "✅ 모든 검증 통과"
-    elif [[ "$OVERALL_STATUS" == "WARNING" ]]; then
+    elif [[ "$__VS_OVERALL_STATUS" == "WARNING" ]]; then
         log_warning "⚠️  일부 경고 발견"
     else
         log_error "❌ 검증 실패"
@@ -358,18 +358,18 @@ main() {
     set -e
 
     # 일관성 점수 계산 (문서 + 교차참조 평균)
-    local doc_avg=$(parse_json_field "$DOC_VALIDATION_RESULTS" "avgConsistency" "0")
-    local ref_validity=$(parse_json_field "$CROSSREF_VALIDATION_RESULTS" "validity" "100")
+    local doc_avg=$(parse_json_field "$__VS_DOC_RESULTS" "avgConsistency" "0")
+    local ref_validity=$(parse_json_field "$__VS_CROSSREF_RESULTS" "validity" "100")
 
-    CONSISTENCY_SCORE=$(( (doc_avg + ref_validity) / 2 ))
+    __VS_CONSISTENCY_SCORE=$(( (doc_avg + ref_validity) / 2 ))
 
     # 전체 상태 결정
     if [[ $doc_status -ne 0 ]] || [[ $mig_status -ne 0 ]] || [[ $ref_status -ne 0 ]]; then
         # 검증 실패가 있지만 일관성 점수가 높으면 WARNING
-        if [[ $CONSISTENCY_SCORE -ge $VALIDATION_CONSISTENCY_THRESHOLD_WARNING ]] && [[ $mig_status -eq 0 ]]; then
-            OVERALL_STATUS="WARNING"
+        if [[ $__VS_CONSISTENCY_SCORE -ge $VALIDATION_CONSISTENCY_THRESHOLD_WARNING ]] && [[ $mig_status -eq 0 ]]; then
+            __VS_OVERALL_STATUS="WARNING"
         else
-            OVERALL_STATUS="FAIL"
+            __VS_OVERALL_STATUS="FAIL"
         fi
     fi
 
@@ -382,9 +382,9 @@ main() {
     print_summary
 
     # 종료 코드 반환
-    if [[ "$OVERALL_STATUS" == "PASS" ]]; then
+    if [[ "$__VS_OVERALL_STATUS" == "PASS" ]]; then
         return 0
-    elif [[ "$OVERALL_STATUS" == "WARNING" ]]; then
+    elif [[ "$__VS_OVERALL_STATUS" == "WARNING" ]]; then
         return 2
     else
         return 1

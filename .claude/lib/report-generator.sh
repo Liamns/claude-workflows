@@ -16,6 +16,20 @@ if ! declare -f log_info > /dev/null 2>&1; then
     source "$SCRIPT_DIR/validation-utils.sh"
 fi
 
+# 설정 파일 로드 (이미 로드되지 않았다면)
+if [[ -z "${VALIDATION_DOC_THRESHOLD_PASS:-}" ]]; then
+    CONFIG_FILE="${CONFIG_FILE:-$SCRIPT_DIR/validation-config.sh}"
+    if [[ -f "$CONFIG_FILE" ]]; then
+        source "$CONFIG_FILE"
+    else
+        # 기본값
+        readonly VALIDATION_DOC_THRESHOLD_PASS=90
+        readonly VALIDATION_DOC_THRESHOLD_WARNING=70
+        readonly VALIDATION_CONSISTENCY_THRESHOLD_WARNING=70
+        readonly VALIDATION_REPORT_RETENTION_DAYS=30
+    fi
+fi
+
 # ============================================================
 # 보고서 생성 함수
 # ============================================================
@@ -98,7 +112,7 @@ generate_json_report() {
     # 전체 상태 결정 (전달받지 않은 경우만)
     if [[ -z "$passed_overall_status" ]]; then
         if [[ $doc_passed -lt $doc_total ]] || [[ $mig_passed -lt $mig_total ]] || [[ $ref_validity -lt 100 ]]; then
-            if [[ $consistency_score -ge 70 ]]; then
+            if [[ $consistency_score -ge $VALIDATION_CONSISTENCY_THRESHOLD_WARNING ]]; then
                 overall_status="WARNING"
             else
                 overall_status="FAIL"
@@ -200,7 +214,7 @@ generate_markdown_report() {
     # 전달받지 않은 경우만 계산
     if [[ -z "$passed_overall_status" ]]; then
         if [[ $doc_passed -lt $doc_total ]] || [[ $mig_passed -lt $mig_total ]] || [[ $ref_validity -lt 100 ]]; then
-            if [[ $consistency_score -ge 70 ]]; then
+            if [[ $consistency_score -ge $VALIDATION_CONSISTENCY_THRESHOLD_WARNING ]]; then
                 overall_status="WARNING"
             else
                 overall_status="FAIL"
@@ -302,9 +316,9 @@ generate_terminal_output() {
     echo "     - 통과: $doc_passed개"
     echo "     - 평균 일치율: $doc_avg%"
 
-    if [[ $doc_passed -eq $doc_total ]] && [[ $doc_avg -ge 90 ]]; then
+    if [[ $doc_passed -eq $doc_total ]] && [[ $doc_avg -ge $VALIDATION_DOC_THRESHOLD_PASS ]]; then
         log_success "     ✓ 모든 문서 검증 통과"
-    elif [[ $doc_avg -ge 70 ]]; then
+    elif [[ $doc_avg -ge $VALIDATION_DOC_THRESHOLD_WARNING ]]; then
         log_warning "     ⚠️  일부 문서 개선 필요"
     else
         log_error "     ✗ 문서 검증 실패"
@@ -383,9 +397,9 @@ save_report_to_file() {
         ln -sf "$(basename "$md_file")" "$report_dir/latest.md" 2>/dev/null || true
     fi
 
-    # 30일 이상 된 보고서 자동 삭제
-    find "$report_dir" -name "validation-*.json" -mtime +30 -delete 2>/dev/null || true
-    find "$report_dir" -name "validation-*.md" -mtime +30 -delete 2>/dev/null || true
+    # 보존 기간 이상 된 보고서 자동 삭제
+    find "$report_dir" -name "validation-*.json" -mtime "+$VALIDATION_REPORT_RETENTION_DAYS" -delete 2>/dev/null || true
+    find "$report_dir" -name "validation-*.md" -mtime "+$VALIDATION_REPORT_RETENTION_DAYS" -delete 2>/dev/null || true
 
     log_info "  보고서 저장 완료"
     log_info "    - JSON: $json_file"

@@ -11,6 +11,19 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # 공통 유틸리티 로드
 source "$SCRIPT_DIR/validation-utils.sh"
 
+# 설정 파일 로드
+CONFIG_FILE="${CONFIG_FILE:-$SCRIPT_DIR/validation-config.sh}"
+if [[ -f "$CONFIG_FILE" ]]; then
+    source "$CONFIG_FILE"
+else
+    # 기본값 (설정 파일 없을 때 호환성 유지)
+    readonly VALIDATION_DOC_THRESHOLD_PASS=90
+    readonly VALIDATION_DOC_THRESHOLD_WARNING=70
+    readonly VALIDATION_CONSISTENCY_THRESHOLD_PASS=90
+    readonly VALIDATION_CONSISTENCY_THRESHOLD_WARNING=70
+    readonly VALIDATION_REPORT_RETENTION_DAYS=30
+fi
+
 # 기본 설정
 VALIDATION_MODE="all"  # all, docs-only, migration-only, crossref-only
 DRY_RUN=false
@@ -159,8 +172,8 @@ run_documentation_validation() {
 
         log_info "  검증 완료: $passed/$total 통과 (평균 일치율: $avg%)"
 
-        # 90% 이상이면 성공
-        if [[ $avg -ge 90 ]] && [[ $passed -eq $total ]]; then
+        # 일치율 임계값 이상이면 성공
+        if [[ $avg -ge $VALIDATION_DOC_THRESHOLD_PASS ]] && [[ $passed -eq $total ]]; then
             return 0
         else
             return 1
@@ -384,7 +397,7 @@ main() {
     # 전체 상태 결정
     if [[ $doc_status -ne 0 ]] || [[ $mig_status -ne 0 ]] || [[ $ref_status -ne 0 ]]; then
         # 검증 실패가 있지만 일관성 점수가 높으면 WARNING
-        if [[ $CONSISTENCY_SCORE -ge 70 ]] && [[ $mig_status -eq 0 ]]; then
+        if [[ $CONSISTENCY_SCORE -ge $VALIDATION_CONSISTENCY_THRESHOLD_WARNING ]] && [[ $mig_status -eq 0 ]]; then
             OVERALL_STATUS="WARNING"
         else
             OVERALL_STATUS="FAIL"

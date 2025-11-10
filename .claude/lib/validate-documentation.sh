@@ -16,6 +16,22 @@ if ! declare -f log_info > /dev/null 2>&1; then
     source "$SCRIPT_DIR/validation-utils.sh"
 fi
 
+# 설정 파일 로드 (이미 로드되지 않았다면)
+if [[ -z "${VALIDATION_DOC_THRESHOLD_PASS:-}" ]]; then
+    CONFIG_FILE="${CONFIG_FILE:-$SCRIPT_DIR/validation-config.sh}"
+    if [[ -f "$CONFIG_FILE" ]]; then
+        source "$CONFIG_FILE"
+    else
+        # 기본값
+        readonly VALIDATION_DOC_THRESHOLD_PASS=90
+        readonly VALIDATION_DOC_THRESHOLD_WARNING=70
+        readonly VALIDATION_SCORE_FILE_EXISTS=10
+        readonly VALIDATION_SCORE_STEP_EXISTS=30
+        readonly VALIDATION_SCORE_CODE_EXISTS=30
+        readonly VALIDATION_SCORE_BALANCE=30
+    fi
+fi
+
 # ============================================================
 # 핵심 검증 함수
 # ============================================================
@@ -55,11 +71,11 @@ validate_all_documentation() {
             consistency=0
         fi
 
-        # 결과 분류 (90% 이상이면 통과)
-        if [[ $consistency -ge 90 ]]; then
+        # 결과 분류
+        if [[ $consistency -ge $VALIDATION_DOC_THRESHOLD_PASS ]]; then
             log_success "    ✓ $cmd_name - $consistency%"
             ((passed++))
-        elif [[ $consistency -ge 70 ]]; then
+        elif [[ $consistency -ge $VALIDATION_DOC_THRESHOLD_WARNING ]]; then
             log_warning "    ⚠️  $cmd_name - $consistency% (경고)"
         else
             log_error "    ✗ $cmd_name - $consistency% (불일치)"
@@ -199,27 +215,27 @@ calculate_consistency() {
     local step_count=$(echo "$steps" | jq 'length' 2>/dev/null || echo "0")
     local code_count=$(echo "$code_blocks" | jq 'length' 2>/dev/null || echo "0")
 
-    # 기본 점수: 파일 존재 (10점)
-    local score=10
+    # 기본 점수: 파일 존재
+    local score=$VALIDATION_SCORE_FILE_EXISTS
 
-    # Step 존재 여부 (30점)
+    # Step 존재 여부
     if [[ $step_count -gt 0 ]]; then
-        score=$((score + 30))
+        score=$((score + VALIDATION_SCORE_STEP_EXISTS))
     fi
 
-    # 코드 블록 존재 여부 (30점)
+    # 코드 블록 존재 여부
     if [[ $code_count -gt 0 ]]; then
-        score=$((score + 30))
+        score=$((score + VALIDATION_SCORE_CODE_EXISTS))
     fi
 
-    # Step과 코드 블록 균형 (30점)
+    # Step과 코드 블록 균형
     if [[ $step_count -gt 0 ]] && [[ $code_count -gt 0 ]]; then
         # Step과 코드 블록 비율이 합리적이면 추가 점수
         local ratio=$((code_count * 100 / step_count))
         if [[ $ratio -ge 50 ]] && [[ $ratio -le 200 ]]; then
-            score=$((score + 30))
+            score=$((score + VALIDATION_SCORE_BALANCE))
         else
-            score=$((score + 15))
+            score=$((score + VALIDATION_SCORE_BALANCE / 2))
         fi
     fi
 

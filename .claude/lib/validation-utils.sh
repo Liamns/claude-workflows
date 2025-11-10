@@ -123,10 +123,30 @@ create_temp_dir() {
 
 cleanup_temp_dir() {
     local temp_dir="$1"
-    if [[ -n "$temp_dir" ]] && [[ -d "$temp_dir" ]]; then
-        rm -rf "$temp_dir"
-        log_info "임시 디렉토리 정리: $temp_dir"
+
+    # 안전성 검사
+    if [[ -z "$temp_dir" ]]; then
+        log_warning "cleanup_temp_dir: 빈 경로"
+        return 1
     fi
+
+    # 보안: /tmp, /var/tmp, /var/folders (macOS) 하위만 허용
+    case "$temp_dir" in
+        /tmp/*|/var/tmp/*|/var/folders/*)
+            if [[ -d "$temp_dir" ]]; then
+                rm -rf "$temp_dir"
+                log_info "임시 디렉토리 정리: $temp_dir"
+                return 0
+            else
+                log_warning "디렉토리 없음: $temp_dir"
+                return 1
+            fi
+            ;;
+        *)
+            log_error "cleanup_temp_dir: 안전하지 않은 경로: $temp_dir"
+            return 1
+            ;;
+    esac
 }
 
 # 버전 검증 (install.sh에서 재사용)
@@ -216,6 +236,16 @@ show_progress() {
     if [[ $current -eq $total ]]; then
         echo ""  # 줄바꿈
     fi
+}
+
+# Trap 설정 - 여러 시그널 처리 (EXIT, INT, TERM)
+
+setup_cleanup_trap() {
+    local cleanup_cmd="$1"
+
+    # 단순하고 안전한 trap 설정 (기존 trap은 덮어씀)
+    # shellcheck disable=SC2064
+    trap "$cleanup_cmd" EXIT INT TERM
 }
 
 # 사용 예시 (이 파일을 단독 실행하면 테스트)

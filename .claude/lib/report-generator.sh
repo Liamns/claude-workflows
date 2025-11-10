@@ -106,8 +106,15 @@ generate_json_report() {
         fi
     fi
 
-    # JSON 생성
-    cat > "$output_file" << EOF
+    # JSON 생성 (안전한 방식: 임시 파일 사용)
+    local temp_file
+    temp_file=$(mktemp) || {
+        log_error "임시 파일 생성 실패"
+        return 1
+    }
+
+    # 임시 파일에 먼저 작성
+    if ! cat > "$temp_file" << EOF
 {
   "id": "$report_id",
   "timestamp": "$timestamp",
@@ -132,6 +139,18 @@ generate_json_report() {
   }
 }
 EOF
+    then
+        log_error "JSON 작성 실패"
+        rm -f "$temp_file"
+        return 1
+    fi
+
+    # 최종 위치로 이동
+    if ! mv "$temp_file" "$output_file"; then
+        log_error "보고서 파일 저장 실패: $output_file"
+        rm -f "$temp_file"
+        return 1
+    fi
 
     log_success "  ✓ JSON 보고서 생성: $output_file"
 
@@ -199,8 +218,15 @@ generate_markdown_report() {
     local ref_emoji="✅"
     [[ $ref_broken -gt 0 ]] && ref_emoji="⚠️"
 
-    # 보고서 생성 (템플릿 기반)
-    cat "$template_file" | \
+    # 보고서 생성 (템플릿 기반, 안전한 방식: 임시 파일 사용)
+    local temp_file
+    temp_file=$(mktemp) || {
+        log_error "임시 파일 생성 실패"
+        return 1
+    }
+
+    # 임시 파일에 먼저 작성
+    if ! cat "$template_file" | \
         sed "s|{{TIMESTAMP}}|$timestamp|g" | \
         sed "s|{{REPORT_ID}}|$report_id|g" | \
         sed "s|{{OVERALL_STATUS}}|$overall_status|g" | \
@@ -235,7 +261,19 @@ generate_markdown_report() {
         sed "s/{{EXECUTION_TIME}}/2/g" | \
         sed "s/{{VALIDATION_MODE}}/all/g" | \
         sed "s/{{LOG_FILE_PATH}}//g" \
-        > "$output_file"
+        > "$temp_file"
+    then
+        log_error "Markdown 작성 실패"
+        rm -f "$temp_file"
+        return 1
+    fi
+
+    # 최종 위치로 이동
+    if ! mv "$temp_file" "$output_file"; then
+        log_error "보고서 파일 저장 실패: $output_file"
+        rm -f "$temp_file"
+        return 1
+    fi
 
     log_success "  ✓ Markdown 보고서 생성: $output_file"
 

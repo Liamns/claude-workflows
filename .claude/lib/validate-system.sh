@@ -330,28 +330,40 @@ main() {
     fi
 
     # 검증 실행 (각 검증의 실패를 기록하되 계속 진행)
+    # 에러 수집 모드: set -e를 비활성화하여 모든 검증을 실행
+    set +e
+
     local doc_status=0
     local mig_status=0
     local ref_status=0
 
     case "$VALIDATION_MODE" in
         "docs-only")
-            run_documentation_validation || doc_status=$?
+            run_documentation_validation
+            doc_status=$?
             ;;
         "migration-only")
-            run_migration_validation || mig_status=$?
+            run_migration_validation
+            mig_status=$?
             ;;
         "crossref-only")
-            run_crossref_validation || ref_status=$?
+            run_crossref_validation
+            ref_status=$?
             ;;
         "all")
-            run_documentation_validation || doc_status=$?
+            run_documentation_validation
+            doc_status=$?
             echo ""
-            run_migration_validation || mig_status=$?
+            run_migration_validation
+            mig_status=$?
             echo ""
-            run_crossref_validation || ref_status=$?
+            run_crossref_validation
+            ref_status=$?
             ;;
     esac
+
+    # 에러 수집 완료 후 set -e 재활성화
+    set -e
 
     # 일관성 점수 계산 (문서 + 교차참조 평균)
     local doc_avg=0

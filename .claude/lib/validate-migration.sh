@@ -65,8 +65,8 @@ validate_migration_scenario() {
         return 1
     fi
 
-    # 정리 트랩 설정
-    trap "cleanup_temp_dir $test_dir" RETURN
+    # 정리 트랩 설정 (EXIT, INT, TERM 시그널 처리)
+    setup_cleanup_trap "cleanup_temp_dir '$test_dir'"
 
     log_info "  임시 환경: $test_dir"
 
@@ -378,8 +378,8 @@ validate_fresh_install() {
         return 1
     fi
 
-    # 정리 트랩 설정
-    trap "cleanup_temp_dir $test_dir" RETURN
+    # 정리 트랩 설정 (EXIT, INT, TERM 시그널 처리)
+    setup_cleanup_trap "cleanup_temp_dir '$test_dir'"
 
     log_info "  임시 환경: $test_dir"
 
@@ -430,8 +430,8 @@ validate_rollback_scenario() {
         return 1
     fi
 
-    # 정리 트랩 설정
-    trap "cleanup_temp_dir $test_dir" RETURN
+    # 정리 트랩 설정 (EXIT, INT, TERM 시그널 처리)
+    setup_cleanup_trap "cleanup_temp_dir '$test_dir'"
 
     log_info "  임시 환경: $test_dir"
 

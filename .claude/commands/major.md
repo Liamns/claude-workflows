@@ -519,6 +519,32 @@ plan.md를 기반으로 실행 가능한 task breakdown을 생성합니다.
 
 이제 위의 프로세스를 실제로 실행하세요.
 
+---
+
+**🚨 중요: 반드시 읽고 따르세요 🚨**
+
+이 섹션은 **실행 명령어**입니다. 다음 규칙을 **반드시** 준수하세요:
+
+1. **Step 0-14를 순차적으로 실행**하세요. 단 하나의 Step도 건너뛸 수 없습니다.
+2. **각 Step 완료 시 명시적으로 보고**하세요: "✅ Step X 완료"
+3. **AskUserQuestion 도구를 반드시 사용**하세요 (Step 2, 3, 4, 7)
+4. **Write 도구로 7개 파일을 반드시 생성**하세요:
+   - spec.md (Step 6)
+   - research.md (Step 8)
+   - data-model.md (Step 9)
+   - contracts/openapi.yaml (Step 10, API 있을 때만)
+   - quickstart.md (Step 11)
+   - plan.md (Step 12)
+   - tasks.md (Step 13)
+5. **각 문서는 이전에 생성된 문서를 참조**해야 합니다:
+   - Read 도구로 이전 문서를 읽어서 내용 추출
+   - 변수만 사용하지 말고 실제 파일 내용을 참조
+6. **파일 생성 후 검증**하세요: 파일이 실제로 생성되었는지 확인
+
+**이 규칙을 위반하면 워크플로우가 실패합니다.**
+
+---
+
 ### Step 0: 사전 조건 확인
 
 **Bash 도구로 디렉토리 확인**:
@@ -539,6 +565,8 @@ Bash:
 워크플로우를 중단하고 사용자에게 /start 실행을 요청하세요.
 
 **EXISTS 인 경우**: 다음 단계 계속 진행
+
+✅ **Step 0 완료** - 사전 조건 확인 완료
 
 ### Step 1: Feature 브랜치 및 디렉토리 생성
 
@@ -562,7 +590,11 @@ Bash:
 
 생성된 디렉토리를 `{featureDir}` 변수에 저장: `.specify/specs/{nextNumber}-{featureName}`
 
+✅ **Step 1 완료** - Feature 브랜치 및 디렉토리 생성 완료
+
 ### Step 2: 핵심 질문 (필수)
+
+**🔴 필수**: 이 단계에서는 **반드시 AskUserQuestion 도구를 사용**해야 합니다.
 
 **AskUserQuestion 도구 사용 - Block 1 (필수 질문)**:
 ```
@@ -603,6 +635,13 @@ multiSelect: false
 ```
 
 답변을 `{goal}`, `{userScenarios}`, `{businessObjectives}` 변수에 저장하세요.
+
+**검증**: 다음 변수가 모두 채워졌는지 확인하세요:
+- `{goal}` - 비어있으면 안됨
+- `{userScenarios}` - 비어있으면 안됨
+- `{businessObjectives}` - 비어있으면 안됨
+
+✅ **Step 2 완료** - 핵심 질문 완료 및 답변 수집
 
 ### Step 3: 선택적 컨텍스트 수집
 
@@ -772,6 +811,17 @@ Write:
 """
 ```
 
+**파일 생성 검증**:
+```
+Read:
+- file_path: "{featureDir}/spec.md"
+- limit: 10
+```
+
+파일이 정상적으로 생성되었는지 확인하세요. 생성되지 않았다면 다시 Write 도구를 사용하세요.
+
+✅ **Step 6 완료** - spec.md 생성 완료
+
 ### Step 7: Clarification (최대 5개 질문)
 
 spec.md를 분석하여 Open Questions가 있는지 확인:
@@ -806,6 +856,22 @@ Edit:
 
 ### Step 8: research.md 생성
 
+**🔴 중요**: 먼저 spec.md를 읽어서 내용을 참조하세요.
+
+**Read 도구로 spec.md 읽기**:
+```
+Read:
+- file_path: "{featureDir}/spec.md"
+```
+
+spec.md에서 다음 정보를 추출하세요:
+- Functional Requirements (FR-001, FR-002, ...)
+- Key Entities (Entity 이름과 속성)
+- Success Criteria
+- Assumptions & Constraints
+
+이 정보를 `{specFunctionalRequirements}`, `{specKeyEntities}`, `{specSuccessCriteria}` 변수에 저장하세요.
+
 **Write 도구로 research.md 생성**:
 ```
 Write:
@@ -813,14 +879,21 @@ Write:
 - content: """
 # Research: {featureName}
 
+> 이 문서는 spec.md의 요구사항을 기반으로 작성되었습니다.
+> 참조: [spec.md](./spec.md)
+
+## Requirements Summary (from spec.md)
+
+{specFunctionalRequirements를 요약}
+
 ## Existing Solutions Analysis
 
 ### Similar Implementations
 {existingPatterns이 있으면 분석, 없으면:}
-{프로젝트 내에서 Grep으로 유사 패턴 검색}
+{specKeyEntities와 specFunctionalRequirements를 기반으로 프로젝트 내에서 Grep으로 유사 패턴 검색}
 
 Grep:
-- pattern: "{관련 키워드}"
+- pattern: "{specKeyEntities 또는 specFunctionalRequirements에서 추출한 키워드}"
 - output_mode: "files_with_matches"
 - head_limit: 5
 
@@ -845,6 +918,17 @@ Grep:
 {complexity가 높으면 추가 리스크 식별}
 """
 ```
+
+**파일 생성 검증**:
+```
+Read:
+- file_path: "{featureDir}/research.md"
+- limit: 10
+```
+
+파일이 정상적으로 생성되었는지 확인하세요. 생성되지 않았다면 다시 Write 도구를 사용하세요.
+
+✅ **Step 8 완료** - research.md 생성 완료 (spec.md를 참조하여 작성함)
 
 ### Step 9: data-model.md 생성
 
@@ -1003,12 +1087,37 @@ components:
 
 ### Step 11: quickstart.md 생성
 
+**🔴 중요**: 먼저 spec.md와 data-model.md를 읽어서 내용을 참조하세요.
+
+**Read 도구로 spec.md 읽기**:
+```
+Read:
+- file_path: "{featureDir}/spec.md"
+```
+
+**Read 도구로 data-model.md 읽기**:
+```
+Read:
+- file_path: "{featureDir}/data-model.md"
+```
+
+다음 정보를 추출하세요:
+- spec.md의 User Scenarios (Given-When-Then)
+- spec.md의 Success Criteria
+- data-model.md의 Entities (실제 Entity 이름들)
+- data-model.md의 API Types (Request/Response 구조)
+
+이 정보를 `{specUserScenarios}`, `{specSuccessCriteria}`, `{dataModelEntities}`, `{dataModelApiTypes}` 변수에 저장하세요.
+
 **Write 도구로 quickstart.md 생성**:
 ```
 Write:
 - file_path: "{featureDir}/quickstart.md"
 - content: """
 # Quickstart: {featureName}
+
+> 이 문서는 spec.md의 시나리오와 data-model.md의 구조를 기반으로 작성되었습니다.
+> 참조: [spec.md](./spec.md), [data-model.md](./data-model.md)
 
 ## Prerequisites
 - [ ] Node.js 18+ installed
@@ -1017,6 +1126,11 @@ Write:
 {apiDetails가 있으면:}
 - [ ] API endpoint accessible at {API URL}
 - [ ] API credentials configured
+
+## Data Model Overview (from data-model.md)
+
+이 기능은 다음 Entities를 사용합니다:
+{dataModelEntities를 나열}
 
 ## Setup Steps
 
@@ -1041,15 +1155,16 @@ yarn dev
 4. **Navigate to feature**:
 Open http://localhost:5173/{feature-route}
 
-## Verification
+## Verification (from spec.md User Scenarios)
 
-{userScenarios를 바탕으로 검증 단계 생성}
-1. {시나리오 1의 Given 조건 설정}
-2. {시나리오 1의 When 행동 수행}
-3. {시나리오 1의 Then 결과 확인}
+{specUserScenarios의 각 시나리오에 대해:}
+### Scenario: {시나리오 이름}
+1. **Given**: {전제조건}
+2. **When**: {사용자 행동}
+3. **Then**: {기대 결과}
 
 Expected result:
-✅ {성공 기준}
+✅ {specSuccessCriteria}
 
 ## Troubleshooting
 
@@ -1260,6 +1375,17 @@ Remaining: {Total}
 ⚠️ API contract needs clarification. Update contracts/openapi.yaml before T013.
 """
 ```
+
+**파일 생성 검증**:
+```
+Read:
+- file_path: "{featureDir}/tasks.md"
+- limit: 10
+```
+
+파일이 정상적으로 생성되었는지 확인하세요. 생성되지 않았다면 다시 Write 도구를 사용하세요.
+
+✅ **Step 13 완료** - tasks.md 생성 완료 (spec.md의 User Stories 참조)
 
 ### Step 14: 완료 보고
 

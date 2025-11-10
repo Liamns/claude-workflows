@@ -15,3 +15,11 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Validation cache and reports (auto-generated)
+.claude/cache/validation-reports/*.json
+.claude/cache/validation-reports/*.md
+.claude/cache/validation-output.txt
+
+# Keep directory structure
+!.claude/cache/validation-reports/.gitkeep

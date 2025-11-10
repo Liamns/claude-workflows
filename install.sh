@@ -73,6 +73,140 @@ cleanup() {
     fi
 }
 
+# Health check - validates current installation
+health_check() {
+    echo ""
+    echo -e "${BLUE}====================================${NC}"
+    echo -e "${BLUE} Claude Workflow Health Check${NC}"
+    echo -e "${BLUE}====================================${NC}"
+    echo ""
+
+    # Detect version
+    local version=$(detect_installation)
+    echo -e "Installed Version: ${GREEN}$version${NC}"
+    echo -e "Latest Version: ${GREEN}$TARGET_VERSION${NC}"
+
+    # File counts
+    echo ""
+    echo "File Counts:"
+    local commands_count=$(find "$TARGET_DIR/.claude/commands" -type f -name '*.md' 2>/dev/null | wc -l | tr -d ' ')
+    local agents_count=$(find "$TARGET_DIR/.claude/agents" -maxdepth 1 -type f -name '*.md' ! -path '*/_deprecated/*' 2>/dev/null | wc -l | tr -d ' ')
+    local skills_count=$(find "$TARGET_DIR/.claude/skills" -maxdepth 1 -type d ! -name 'skills' 2>/dev/null | wc -l | tr -d ' ')
+
+    echo "  Commands: $commands_count (expected: 9)"
+    echo "  Agents: $agents_count (expected: 6)"
+    echo "  Skills: $skills_count (expected: 15)"
+
+    # Check for deprecated files
+    echo ""
+    echo "Deprecated Files Check:"
+    local deprecated_found=0
+
+    if [ -f "$TARGET_DIR/.claude/commands/major-specify.md" ]; then
+        echo -e "  ${YELLOW}⚠${NC} Found: major-specify.md (should be removed)"
+        ((deprecated_found++))
+    fi
+
+    if [ -f "$TARGET_DIR/.claude/commands/major-clarify.md" ]; then
+        echo -e "  ${YELLOW}⚠${NC} Found: major-clarify.md (should be removed)"
+        ((deprecated_found++))
+    fi
+
+    if [ -f "$TARGET_DIR/.claude/agents/architect.md" ]; then
+        echo -e "  ${YELLOW}⚠${NC} Found: old agents (should be removed)"
+        ((deprecated_found++))
+    fi
+
+    if [ -d "$TARGET_DIR/.claude/commands/_backup" ]; then
+        echo -e "  ${YELLOW}⚠${NC} Found: commands/_backup/ (should be removed)"
+        ((deprecated_found++))
+    fi
+
+    if [ -d "$TARGET_DIR/.claude/agents/_deprecated" ]; then
+        echo -e "  ${YELLOW}⚠${NC} Found: agents/_deprecated/ (should be removed)"
+        ((deprecated_found++))
+    fi
+
+    if [ $deprecated_found -eq 0 ]; then
+        echo -e "  ${GREEN}✓${NC} No deprecated files found"
+    else
+        echo ""
+        echo -e "  ${YELLOW}Run 'bash install.sh --cleanup' to remove deprecated files${NC}"
+    fi
+
+    echo ""
+    echo -e "${BLUE}====================================${NC}"
+    echo ""
+}
+
+# Cleanup deprecated files
+cleanup_deprecated_files() {
+    echo ""
+    print_info "Cleaning up deprecated files..."
+    echo ""
+
+    local cleaned=0
+
+    # v1.0 commands
+    local old_commands=(
+        "major-specify.md"
+        "major-clarify.md"
+        "major-plan.md"
+        "major-tasks.md"
+        "major-implement.md"
+    )
+
+    for file in "${old_commands[@]}"; do
+        if [ -f "$TARGET_DIR/.claude/commands/$file" ]; then
+            rm -f "$TARGET_DIR/.claude/commands/$file"
+            print_success "Removed: commands/$file"
+            ((cleaned++))
+        fi
+    done
+
+    # v1.0 agents
+    local old_agents=(
+        "architect.md"
+        "fsd-architect.md"
+        "code-reviewer.md"
+        "security-scanner.md"
+        "impact-analyzer.md"
+        "quick-fixer.md"
+        "test-guardian.md"
+        "smart-committer.md"
+        "changelog-writer.md"
+    )
+
+    for agent in "${old_agents[@]}"; do
+        if [ -f "$TARGET_DIR/.claude/agents/$agent" ]; then
+            rm -f "$TARGET_DIR/.claude/agents/$agent"
+            print_success "Removed: agents/$agent"
+            ((cleaned++))
+        fi
+    done
+
+    # _backup and _deprecated directories
+    if [ -d "$TARGET_DIR/.claude/commands/_backup" ]; then
+        rm -rf "$TARGET_DIR/.claude/commands/_backup"
+        print_success "Removed: commands/_backup/"
+        ((cleaned++))
+    fi
+
+    if [ -d "$TARGET_DIR/.claude/agents/_deprecated" ]; then
+        rm -rf "$TARGET_DIR/.claude/agents/_deprecated"
+        print_success "Removed: agents/_deprecated/"
+        ((cleaned++))
+    fi
+
+    echo ""
+    if [ $cleaned -eq 0 ]; then
+        print_info "No deprecated files found"
+    else
+        print_success "Cleanup complete: $cleaned item(s) removed"
+    fi
+    echo ""
+}
+
 # Trap cleanup on exit
 trap cleanup EXIT
 
@@ -129,8 +263,11 @@ create_temp_dir() {
 
 # Detect existing installation and version
 detect_installation() {
+    # v2.5+ explicit version file (highest priority)
+    if [ -f "$TARGET_DIR/.claude/.version" ]; then
+        cat "$TARGET_DIR/.claude/.version"
     # v2.0+ location
-    if [ -f "$TARGET_DIR/.claude/workflow-gates.json" ]; then
+    elif [ -f "$TARGET_DIR/.claude/workflow-gates.json" ]; then
         # Extract version using grep (compatible with systems without jq)
         local version=$(grep -o '"version"[[:space:]]*:[[:space:]]*"[^"]*"' "$TARGET_DIR/.claude/workflow-gates.json" | cut -d'"' -f4)
         echo "$version"
@@ -194,6 +331,35 @@ create_backup() {
 
     print_success "Backup created"
     echo "$backup_dir"
+}
+
+# Cleanup before migration - removes deprecated files before installing new ones
+cleanup_before_migration() {
+    local version="$1"
+
+    # Only cleanup if upgrading from v1.0 or if old files exist
+    if [[ "$version" =~ ^1\. ]] || [ -f "$TARGET_DIR/.claude/commands/major-specify.md" ]; then
+        print_info "Cleaning up v1.0 deprecated files before migration..."
+
+        # Remove v1.0 commands (5 files)
+        rm -f "$TARGET_DIR/.claude/commands/major-specify.md" 2>/dev/null || true
+        rm -f "$TARGET_DIR/.claude/commands/major-clarify.md" 2>/dev/null || true
+        rm -f "$TARGET_DIR/.claude/commands/major-plan.md" 2>/dev/null || true
+        rm -f "$TARGET_DIR/.claude/commands/major-tasks.md" 2>/dev/null || true
+        rm -f "$TARGET_DIR/.claude/commands/major-implement.md" 2>/dev/null || true
+
+        # Remove v1.0 agents (9 files)
+        local old_agents=("architect.md" "fsd-architect.md" "code-reviewer.md" "security-scanner.md" "impact-analyzer.md" "quick-fixer.md" "test-guardian.md" "smart-committer.md" "changelog-writer.md")
+        for agent in "${old_agents[@]}"; do
+            rm -f "$TARGET_DIR/.claude/agents/$agent" 2>/dev/null || true
+        done
+
+        # Remove _backup and _deprecated directories
+        rm -rf "$TARGET_DIR/.claude/commands/_backup" 2>/dev/null || true
+        rm -rf "$TARGET_DIR/.claude/agents/_deprecated" 2>/dev/null || true
+
+        print_success "Deprecated files cleaned up before migration"
+    fi
 }
 
 # Run migration scripts based on detected version
@@ -301,6 +467,72 @@ verify_installation() {
     fi
 }
 
+# Create version tracking file
+create_version_file() {
+    print_info "Creating version tracking file..."
+    echo "$TARGET_VERSION" > "$TARGET_DIR/.claude/.version"
+    log_to_file "Version file created: $TARGET_VERSION"
+    print_success "Version file created: v$TARGET_VERSION"
+}
+
+# Validate installation - enhanced verification with deprecation checks
+validate_installation() {
+    print_info "Validating installation..."
+    local errors=0
+
+    # Check version
+    local installed_version
+    if [ -f "$TARGET_DIR/.claude/.version" ]; then
+        installed_version=$(cat "$TARGET_DIR/.claude/.version")
+    else
+        installed_version=$(grep -o '"version".*"[^"]*"' "$TARGET_DIR/.claude/workflow-gates.json" | cut -d'"' -f4)
+    fi
+
+    if [ "$installed_version" != "$TARGET_VERSION" ]; then
+        print_error "Version mismatch: expected $TARGET_VERSION, got $installed_version"
+        ((errors++))
+    else
+        print_success "Version: $installed_version"
+    fi
+
+    # Check required files
+    local required_files=(
+        ".claude/commands/dashboard.md"
+        ".claude/commands/major.md"
+        ".claude/lib/metrics-collector.sh"
+        ".claude/docs/PROJECT-CONTEXT.md"
+    )
+
+    for file in "${required_files[@]}"; do
+        if [ ! -f "$TARGET_DIR/$file" ]; then
+            print_error "Required file missing: $file"
+            ((errors++))
+        fi
+    done
+
+    # Check deprecated files don't exist
+    local deprecated_files=(
+        ".claude/commands/major-specify.md"
+        ".claude/agents/architect.md"
+    )
+
+    for file in "${deprecated_files[@]}"; do
+        if [ -f "$TARGET_DIR/$file" ]; then
+            print_warning "Deprecated file still exists: $file"
+            ((errors++))
+        fi
+    done
+
+    echo ""
+    if [ $errors -eq 0 ]; then
+        print_success "Installation validated successfully"
+        return 0
+    else
+        print_error "Validation found $errors issue(s)"
+        return 1
+    fi
+}
+
 # Main installation
 install_workflows() {
     print_header
@@ -376,6 +608,12 @@ install_workflows() {
             fi
         fi
         echo ""
+
+        # Cleanup deprecated files before installing new ones
+        if [ "$NEEDS_MIGRATION" = true ]; then
+            cleanup_before_migration "$EXISTING_VERSION"
+            echo ""
+        fi
     else
         print_info "Fresh installation - no existing version detected"
         echo ""
@@ -514,16 +752,16 @@ install_workflows() {
     fi
 
     # Copy documentation (excluding deprecated and backup)
-    if [ -d "$TEMP_DIR/docs" ]; then
+    if [ -d "$TEMP_DIR/.claude/docs" ]; then
         print_info "Installing Documentation..."
         if [ "$DRY_RUN" = false ]; then
-            cp -r "$TEMP_DIR/docs" "$TARGET_DIR/.claude/"
+            cp -r "$TEMP_DIR/.claude/docs" "$TARGET_DIR/.claude/"
             # Remove deprecated and backup directories if they exist
             rm -rf "$TARGET_DIR/.claude/docs/deprecated" "$TARGET_DIR/.claude/docs/.backup" 2>/dev/null || true
         fi
-        print_success "Documentation installed (SUB-AGENTS-GUIDE, SKILLS-GUIDE, MODEL-OPTIMIZATION-GUIDE 등)"
+        print_success "Documentation installed (PROJECT-CONTEXT, SUB-AGENTS-GUIDE, SKILLS-GUIDE, REUSABILITY-GUIDE, MODEL-OPTIMIZATION-GUIDE, ARCHITECTURE-GUIDE)"
     else
-        print_warning "docs/ directory not found in repository"
+        print_warning ".claude/docs/ directory not found in repository"
     fi
 
     # Copy architectures system (v2.2.0, excluding deprecated and backup)
@@ -604,6 +842,12 @@ install_workflows() {
     print_success "File installation complete!"
     echo ""
 
+    # Create version tracking file
+    if [ "$DRY_RUN" = false ]; then
+        create_version_file
+        echo ""
+    fi
+
     # Run migrations if needed
     if [ "$NEEDS_MIGRATION" = true ] && [ "$EXISTING_VERSION" != "none" ]; then
         if ! run_migrations "$EXISTING_VERSION"; then
@@ -628,6 +872,13 @@ install_workflows() {
                 print_info "Backup location: $BACKUP_DIR"
             fi
             exit 1
+        fi
+
+        # Enhanced validation (checks for deprecated files)
+        echo ""
+        if ! validate_installation; then
+            print_warning "Validation found issues (but installation is functional)"
+            log_to_file "Validation completed with warnings"
         fi
     fi
 
@@ -767,6 +1018,24 @@ parse_arguments() {
                 ;;
             -v|--version)
                 show_version
+                exit 0
+                ;;
+            --health-check)
+                # Set default target directory if not specified
+                if [ -z "$TARGET_DIR" ]; then
+                    TARGET_DIR="."
+                fi
+                TARGET_DIR=$(validate_target_dir "$TARGET_DIR")
+                health_check
+                exit 0
+                ;;
+            --cleanup)
+                # Set default target directory if not specified
+                if [ -z "$TARGET_DIR" ]; then
+                    TARGET_DIR="."
+                fi
+                TARGET_DIR=$(validate_target_dir "$TARGET_DIR")
+                cleanup_deprecated_files
                 exit 0
                 ;;
             --dry-run)

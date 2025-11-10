@@ -122,6 +122,13 @@ main() {
     backup_and_remove_files "$BACKUP_DIR" "${DEPRECATED_AGENTS[@]}"
     echo ""
 
+    # _backup 및 _deprecated 디렉토리 정리
+    log_info "백업 및 deprecated 디렉토리 정리 중..."
+    rm -rf ".claude/commands/_backup" 2>/dev/null || true
+    rm -rf ".claude/agents/_deprecated" 2>/dev/null || true
+    log_success "디렉토리 정리 완료"
+    echo ""
+
     # workflow-gates.json 백업 (형식 변경 가능성)
     if [ -f ".claude/workflow-gates.json" ]; then
         log_info "workflow-gates.json 백업 중..."

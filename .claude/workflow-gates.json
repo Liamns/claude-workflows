@@ -4,7 +4,7 @@
   "description": "워크플로우별 품질 게이트 설정",
   "workflows": {
     "major": {
-      "name": "Major (Spec-Kit)",
+      "name": "Major (Unified Workflow)",
       "description": "신규 기능 추가, 아키텍처 변경, API 엔드포인트 추가",
       "triggers": [
         "2일 이상 소요 예상",

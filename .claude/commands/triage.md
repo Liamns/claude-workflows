@@ -219,7 +219,7 @@ AskUserQuestion 도구를 사용하여 워크플로우 선택:
 • 복잡도: 12점 (높음)
 • 요인: API 통합, 새 기능 추가, 테스트 필요
 → Major 워크플로우 (60% 토큰 절약)
-→ spec-kit 프로세스 시작
+→ /major 실행
 ```
 
 ### 예시 4: 애매한 경우
@@ -257,8 +257,8 @@ AskUserQuestion 도구를 사용하여 워크플로우 선택:
 - 타입 체크 및 관련 테스트 실행
 
 ### Major 선택 시
-- spec-kit 프로세스 시작
-- `/speckit.specify` → `/speckit.plan` → `/speckit.tasks` → `/speckit.implement`
+- /major 워크플로우 시작 (통합 프로세스)
+- spec.md → plan.md → tasks.md 자동 생성
 - 전체 품질 게이트 적용
 
 ## 학습 및 개선
@@ -412,7 +412,7 @@ multiSelect: false
   1. label: "추천된 {recommendedWorkflow} 워크플로우로 진행"
      description: "AI가 분석한 최적의 워크플로우로 자동 진행합니다."
   2. label: "Major 워크플로우 강제 실행"
-     description: "신규 기능 개발 프로세스 (Spec-Kit 사용)"
+     description: "신규 기능 개발 프로세스 (통합 워크플로우)"
   3. label: "Minor 워크플로우 강제 실행"
      description: "버그 수정 및 개선 프로세스"
   4. label: "Micro 워크플로우 강제 실행"

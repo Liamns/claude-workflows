@@ -1,0 +1,2 @@
+# This file ensures the validation-reports directory structure is preserved in git
+# Auto-generated validation reports (*.json, *.md) are excluded via .gitignore

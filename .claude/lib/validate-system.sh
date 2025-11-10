@@ -156,19 +156,9 @@ run_documentation_validation() {
         DOC_VALIDATION_RESULTS="$json_result"
 
         # 결과 파싱
-        local total=$(echo "$json_result" | grep -o '"total":[0-9]*' | cut -d':' -f2)
-        local passed=$(echo "$json_result" | grep -o '"passed":[0-9]*' | cut -d':' -f2)
-        local avg=$(echo "$json_result" | grep -o '"avgConsistency":[0-9]*' | cut -d':' -f2)
-
-        if [[ -z "$total" ]]; then
-            total=0
-        fi
-        if [[ -z "$passed" ]]; then
-            passed=0
-        fi
-        if [[ -z "$avg" ]]; then
-            avg=0
-        fi
+        local total=$(parse_json_field "$json_result" "total" "0")
+        local passed=$(parse_json_field "$json_result" "passed" "0")
+        local avg=$(parse_json_field "$json_result" "avgConsistency" "0")
 
         log_info "  검증 완료: $passed/$total 통과 (평균 일치율: $avg%)"
 
@@ -200,15 +190,8 @@ run_migration_validation() {
         MIG_VALIDATION_RESULTS="$json_result"
 
         # 결과 파싱
-        local total=$(echo "$json_result" | grep -o '"total":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "0")
-        local passed=$(echo "$json_result" | grep -o '"passed":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "0")
-
-        if [[ -z "$total" ]]; then
-            total=0
-        fi
-        if [[ -z "$passed" ]]; then
-            passed=0
-        fi
+        local total=$(parse_json_field "$json_result" "total" "0")
+        local passed=$(parse_json_field "$json_result" "passed" "0")
 
         log_info "  검증 완료: $passed/$total 시나리오 통과"
 
@@ -240,20 +223,10 @@ run_crossref_validation() {
         CROSSREF_VALIDATION_RESULTS="$json_result"
 
         # 결과 파싱
-        local total=$(echo "$json_result" | grep -o '"totalLinks":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "0")
-        local valid=$(echo "$json_result" | grep -o '"validLinks":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "0")
-        local broken=$(echo "$json_result" | grep -o '"brokenLinks":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "0")
-        local validity=$(echo "$json_result" | grep -o '"validity":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "100")
-
-        if [[ -z "$total" ]]; then
-            total=0
-        fi
-        if [[ -z "$valid" ]]; then
-            valid=0
-        fi
-        if [[ -z "$broken" ]]; then
-            broken=0
-        fi
+        local total=$(parse_json_field "$json_result" "totalLinks" "0")
+        local valid=$(parse_json_field "$json_result" "validLinks" "0")
+        local broken=$(parse_json_field "$json_result" "brokenLinks" "0")
+        local validity=$(parse_json_field "$json_result" "validity" "100")
 
         log_info "  검증 완료: $valid/$total 유효 (유효율: $validity%)"
 
@@ -379,18 +352,8 @@ main() {
     set -e
 
     # 일관성 점수 계산 (문서 + 교차참조 평균)
-    local doc_avg=0
-    local ref_validity=100
-
-    if [[ -n "$DOC_VALIDATION_RESULTS" ]] && [[ "$DOC_VALIDATION_RESULTS" != "{}" ]]; then
-        doc_avg=$(echo "$DOC_VALIDATION_RESULTS" | grep -o '"avgConsistency":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "0")
-        [[ -z "$doc_avg" ]] || [[ "$doc_avg" =~ [^0-9] ]] && doc_avg=0
-    fi
-
-    if [[ -n "$CROSSREF_VALIDATION_RESULTS" ]] && [[ "$CROSSREF_VALIDATION_RESULTS" != "{}" ]]; then
-        ref_validity=$(echo "$CROSSREF_VALIDATION_RESULTS" | grep -o '"validity":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "100")
-        [[ -z "$ref_validity" ]] || [[ "$ref_validity" =~ [^0-9] ]] && ref_validity=100
-    fi
+    local doc_avg=$(parse_json_field "$DOC_VALIDATION_RESULTS" "avgConsistency" "0")
+    local ref_validity=$(parse_json_field "$CROSSREF_VALIDATION_RESULTS" "validity" "100")
 
     CONSISTENCY_SCORE=$(( (doc_avg + ref_validity) / 2 ))
 

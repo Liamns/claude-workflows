@@ -195,17 +195,17 @@ generate_markdown_report() {
     local report_id="report-$(date +%Y%m%d-%H%M%S)"
 
     # 결과 파싱
-    local doc_total=$(echo "$doc_results" | grep -o '"total":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "0")
-    local doc_passed=$(echo "$doc_results" | grep -o '"passed":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "0")
-    local doc_avg=$(echo "$doc_results" | grep -o '"avgConsistency":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "0")
+    local doc_total=$(parse_json_field "$doc_results" "total" "0")
+    local doc_passed=$(parse_json_field "$doc_results" "passed" "0")
+    local doc_avg=$(parse_json_field "$doc_results" "avgConsistency" "0")
 
-    local mig_total=$(echo "$mig_results" | grep -o '"total":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "0")
-    local mig_passed=$(echo "$mig_results" | grep -o '"passed":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "0")
+    local mig_total=$(parse_json_field "$mig_results" "total" "0")
+    local mig_passed=$(parse_json_field "$mig_results" "passed" "0")
 
-    local ref_total=$(echo "$crossref_results" | grep -o '"totalLinks":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "0")
-    local ref_valid=$(echo "$crossref_results" | grep -o '"validLinks":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "0")
-    local ref_broken=$(echo "$crossref_results" | grep -o '"brokenLinks":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "0")
-    local ref_validity=$(echo "$crossref_results" | grep -o '"validity":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "100")
+    local ref_total=$(parse_json_field "$crossref_results" "totalLinks" "0")
+    local ref_valid=$(parse_json_field "$crossref_results" "validLinks" "0")
+    local ref_broken=$(parse_json_field "$crossref_results" "brokenLinks" "0")
+    local ref_validity=$(parse_json_field "$crossref_results" "validity" "100")
 
     # 전체 상태 및 일관성 점수 (전달받은 값이 있으면 사용, 없으면 계산)
     local consistency_score="${passed_consistency_score:-$(( (doc_avg + ref_validity) / 2 ))}"
@@ -307,9 +307,9 @@ generate_terminal_output() {
     echo ""
 
     # 문서 검증 결과
-    local doc_total=$(echo "$doc_results" | grep -o '"total":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "0")
-    local doc_passed=$(echo "$doc_results" | grep -o '"passed":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "0")
-    local doc_avg=$(echo "$doc_results" | grep -o '"avgConsistency":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "0")
+    local doc_total=$(parse_json_field "$doc_results" "total" "0")
+    local doc_passed=$(parse_json_field "$doc_results" "passed" "0")
+    local doc_avg=$(parse_json_field "$doc_results" "avgConsistency" "0")
 
     echo "  📄 문서 검증:"
     echo "     - 전체: $doc_total개"

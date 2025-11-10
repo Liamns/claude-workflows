@@ -204,6 +204,56 @@ count_files_in_dir() {
     return 0
 }
 
+# JSON 파싱 유틸리티
+
+parse_json_field() {
+    local json_string="$1"
+    local field_name="$2"
+    local default_value="${3:-}"
+    local field_type="${4:-number}"  # number 또는 string
+
+    if [[ -z "$json_string" ]] || [[ "$json_string" == "{}" ]]; then
+        echo "$default_value"
+        return 0
+    fi
+
+    # jq 사용 가능 시 (더 정확함)
+    if command -v jq > /dev/null 2>&1; then
+        local result
+        if [[ "$field_type" == "string" ]]; then
+            result=$(echo "$json_string" | jq -r ".$field_name // \"$default_value\"" 2>/dev/null)
+        else
+            result=$(echo "$json_string" | jq -r ".$field_name // $default_value" 2>/dev/null)
+        fi
+
+        if [[ -n "$result" ]] && [[ "$result" != "null" ]]; then
+            echo "$result"
+            return 0
+        fi
+    fi
+
+    # jq 없을 때 fallback (grep + cut)
+    if [[ "$field_type" == "string" ]]; then
+        # 문자열 필드: "field":"value" 형태
+        local result=$(echo "$json_string" | grep -o "\"$field_name\"[[:space:]]*:[[:space:]]*\"[^\"]*\"" | cut -d'"' -f4 2>/dev/null)
+        if [[ -n "$result" ]]; then
+            echo "$result"
+            return 0
+        fi
+    else
+        # 숫자 필드: "field":123 형태
+        local result=$(echo "$json_string" | grep -o "\"$field_name\"[[:space:]]*:[[:space:]]*[0-9]*" | grep -o '[0-9]*$' 2>/dev/null)
+        if [[ -n "$result" ]]; then
+            echo "$result"
+            return 0
+        fi
+    fi
+
+    # 모두 실패하면 기본값 반환
+    echo "$default_value"
+    return 0
+}
+
 # 보고서 타임스탬프 생성
 
 generate_timestamp() {

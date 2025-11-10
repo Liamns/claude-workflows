@@ -39,9 +39,9 @@ REPORT_DIR=".claude/cache/validation-reports"
 LOG_FILE=""
 
 # 전역 변수 (네임스페이스: __VS_ = Validate System)
-__VS___VS_OVERALL_STATUS="PASS"
-__VS___VS_CONSISTENCY_SCORE=0
-__VS___VS_START_TIME=$(date +%s)
+__VS_OVERALL_STATUS="PASS"
+__VS_CONSISTENCY_SCORE=0
+__VS_START_TIME=0  # Initialized in main()
 __VS_DOC_RESULTS="{}"
 __VS_MIG_RESULTS="{}"
 __VS_CROSSREF_RESULTS="{}"
@@ -306,6 +306,9 @@ print_summary() {
 
 # 메인 함수
 main() {
+    # 시작 시간 기록
+    __VS_START_TIME=$(date +%s)
+
     # 인자 파싱
     parse_arguments "$@"
 

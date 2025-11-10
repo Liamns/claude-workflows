@@ -4,7 +4,7 @@
 
 ## 실행 순서
 
-### 1단계: 프로젝트 타입 선택
+### Step 1: 프로젝트 타입 선택
 
 "프로젝트 타입을 선택하세요:"
 1. Frontend (React, Vue, Angular, Next.js...)
@@ -13,7 +13,7 @@
 4. Mobile (React Native, Flutter, Ionic...)
 5. Custom (직접 정의)
 
-### 2단계: 아키텍처 패턴 선택
+### Step 2: 아키텍처 패턴 선택
 
 선택한 프로젝트 타입에 따라 적절한 아키텍처를 제안:
 
@@ -41,7 +41,7 @@
 3. **Microservices** - 분산 서비스 아키텍처 [추천: 대규모 시스템]
 4. **Custom** - Frontend + Backend 개별 선택
 
-### 3단계: .specify 디렉토리 구조 생성
+### Step 3: .specify 디렉토리 구조 생성
 
 ```
 .specify/
@@ -66,7 +66,7 @@
 └── specs/
 ```
 
-### 4단계: architecture.json 생성
+### Step 4: architecture.json 생성
 
 선택에 따라 `.specify/config/architecture.json` 생성:
 
@@ -88,7 +88,7 @@
 }
 ```
 
-### 5단계: 아키텍처별 디렉토리 구조 생성
+### Step 5: 아키텍처별 디렉토리 구조 생성
 
 선택된 아키텍처에 따라 기본 디렉토리 구조 생성:
 
@@ -107,7 +107,7 @@ mkdir -p src/{domain,application,infrastructure,presentation}
 mkdir -p src/components/{atoms,molecules,organisms,templates,pages}
 ```
 
-### 6단계: Constitution 생성
+### Step 6: Constitution 생성
 
 아키텍처와 독립적으로 프로젝트 원칙을 설정:
 
@@ -122,7 +122,7 @@ mkdir -p src/components/{atoms,molecules,organisms,templates,pages}
 - [ ] **Accessibility-First** - 접근성 우선
 - [ ] **Mobile-First** - 모바일 우선
 
-### 7단계: 아키텍처별 템플릿 설치
+### Step 7: 아키텍처별 템플릿 설치
 
 선택된 아키텍처의 템플릿을 복사:
 
@@ -134,7 +134,7 @@ cp -r architectures/frontend/fsd/templates/* .specify/templates/architecture/
 cp -r architectures/backend/clean/templates/* .specify/templates/architecture/
 ```
 
-### 8단계: workflow-gates.json 업데이트
+### Step 8: workflow-gates.json 업데이트
 
 아키텍처에 맞는 품질 게이트 활성화:
 
@@ -147,7 +147,7 @@ cp -r architectures/backend/clean/templates/* .specify/templates/architecture/
 }
 ```
 
-### 9단계: 아키텍처 가이드 생성
+### Step 9: 아키텍처 가이드 생성
 
 `.specify/docs/architecture-guide.md` 생성:
 
@@ -170,7 +170,7 @@ cp -r architectures/backend/clean/templates/* .specify/templates/architecture/
 [피해야 할 패턴]
 ```
 
-### 10단계: 완료 보고
+### Step 10: 완료 보고
 
 ```
 ✅ 프로젝트 초기화 완료!

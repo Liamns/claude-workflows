@@ -321,6 +321,212 @@ on_error() {
 }
 ```
 
+## Validation System (v2.6.0+)
+
+### Architecture
+
+The validation system ensures consistency between documentation and code, validates migration scenarios, and maintains system integrity.
+
+```
+┌─────────────────────────────────────────────────────┐
+│              Validation System                      │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│  ┌──────────────────┐    ┌──────────────────┐     │
+│  │  Documentation   │    │    Migration     │     │
+│  │   Validation     │    │   Validation     │     │
+│  │                  │    │                  │     │
+│  │ • File existence │    │ • v1.0 → v2.6   │     │
+│  │ • Cross-refs     │    │ • v2.4 → v2.6   │     │
+│  │ • Consistency    │    │ • v2.5 → v2.6   │     │
+│  └──────────────────┘    │ • Fresh install │     │
+│           │              │ • Rollback test │     │
+│           │              └──────────────────┘     │
+│           │                       │               │
+│           └───────────┬───────────┘               │
+│                       │                           │
+│              ┌────────▼─────────┐                 │
+│              │  Report Generator│                 │
+│              │                  │                 │
+│              │ • JSON format    │                 │
+│              │ • Markdown report│                 │
+│              │ • Exit codes     │                 │
+│              └──────────────────┘                 │
+│                                                     │
+├─────────────────────────────────────────────────────┤
+│  Pre-commit Hook Integration                        │
+│  • Auto-triggers on .claude/ changes                │
+│  • Blocks commits on critical failures              │
+│  • Warns on non-critical issues                     │
+└─────────────────────────────────────────────────────┘
+```
+
+### Validation Modules
+
+#### 1. Documentation Validation
+
+```bash
+# .claude/lib/validate-documentation.sh
+validate_docs() {
+  check_file_existence()    # All referenced files exist
+  validate_links()          # Internal links valid
+  check_consistency()       # Docs match code structure
+  verify_examples()         # Code examples syntactically valid
+}
+```
+
+#### 2. Migration Validation
+
+```bash
+# .claude/lib/validate-migration.sh
+scenarios = [
+  "v1.0 → v2.6 (Legacy upgrade)",
+  "v2.4 → v2.6 (Recent upgrade)",
+  "v2.5 → v2.6 (Incremental)",
+  "Fresh install (New users)",
+  "Rollback (Failure recovery)"
+]
+
+validate_scenario(from_version, to_version) {
+  1. Setup test environment
+  2. Simulate migration
+  3. Verify critical files
+  4. Check deprecated cleanup
+  5. Test rollback capability
+}
+```
+
+#### 3. Cross-reference Validation
+
+```bash
+# .claude/lib/validate-crossref.sh
+validate_crossrefs() {
+  scan_markdown_links()     # [text](path) syntax
+  verify_skill_refs()       # Skills referenced exist
+  check_agent_refs()        # Agents referenced exist
+  validate_command_refs()   # Command paths valid
+}
+```
+
+### Pre-commit Hook Flow
+
+```
+Git commit attempt
+        │
+        ▼
+   .claude/ changed?
+        │
+    Yes │ No → Allow commit
+        ▼
+Run validate-system.sh --docs-only
+        │
+        ├─ Exit 0 → Allow commit ✅
+        ├─ Exit 2 → Warn + Allow commit ⚠️
+        └─ Exit 1 → Block commit ❌
+                │
+                ▼
+        Show validation report
+        Suggest fixes
+```
+
+### Validation Report Format
+
+```markdown
+═══════════════════════════════════════
+📋 Validation Report
+═══════════════════════════════════════
+
+⏰ Timestamp: 2025-01-10T14:30:00Z
+📊 Status: PASSED
+
+📝 Documentation Validation
+  ✅ All files exist (42/42)
+  ✅ Cross-references valid (127/127)
+  ✅ Examples syntactically correct
+
+🔄 Migration Validation
+  ✅ v1.0 → v2.6 scenario
+  ✅ v2.4 → v2.6 scenario
+  ✅ v2.5 → v2.6 scenario
+  ✅ Fresh install scenario
+  ✅ Rollback scenario
+
+⚠️ Warnings (2)
+  • .claude/commands/old.md referenced but deprecated
+  • Consider updating example in README.md
+
+═══════════════════════════════════════
+💾 Full report: .claude/cache/validation-reports/20250110-143000.json
+```
+
+### Integration Points
+
+#### Install Script Integration
+
+```bash
+# install.sh
+main() {
+  backup_existing_files()
+  perform_migration()
+
+  # Validation integrated (v2.6.0+)
+  if [ -f ".claude/lib/validate-system.sh" ]; then
+    run_validation || {
+      rollback_from_backup()
+      exit 1
+    }
+  fi
+
+  cleanup_backup()
+}
+```
+
+#### CI/CD Integration
+
+```yaml
+# .github/workflows/validate.yml
+- name: Run validation
+  run: |
+    bash .claude/lib/validate-system.sh
+    exit_code=$?
+    if [ $exit_code -eq 1 ]; then
+      echo "❌ Validation failed"
+      exit 1
+    elif [ $exit_code -eq 2 ]; then
+      echo "⚠️ Validation warnings"
+      exit 0
+    fi
+```
+
+### Rollback Safety (v2.6.0)
+
+```bash
+# Automatic rollback on migration failure
+rollback_from_backup() {
+  local BACKUP_DIR=$1
+
+  # Priority: Critical files first
+  restore_file "workflow-gates.json"
+  restore_file "config/"
+  restore_file "cache/"
+
+  # Then: Command files
+  restore_file "commands/"
+
+  # Finally: Documentation
+  restore_file "docs/"
+}
+```
+
+### Performance Characteristics
+
+| Operation | Time | Cached |
+|-----------|------|--------|
+| Documentation validation | 2-3s | 0.5s |
+| Migration validation | 10-15s | N/A |
+| Cross-reference check | 1-2s | 0.3s |
+| Full validation suite | 15-20s | 1-2s |
+
 ## Extensibility
 
 ### Adding New Workflows

@@ -41,7 +41,7 @@ Comprehensive code review for any scope - files, directories, or git changes. Le
 
 ## Process Flow
 
-### Stage 1: Initialize & Context Loading
+### Step 1: Initialize & Context Loading
 
 ```typescript
 // 1.1 Parse review scope
@@ -80,7 +80,7 @@ ${useContext7 ? '🔗 Context7: Enabled' : ''}
 `);
 ```
 
-### Stage 2: Core Review Execution
+### Step 2: Core Review Execution
 
 #### 2.1 Constitution Compliance Check
 
@@ -175,7 +175,7 @@ specializedResults.bugs = await runBugPatternDetector(scope, {
 });
 ```
 
-### Stage 3: Advanced Analysis (--adv flag)
+### Step 3: Advanced Analysis (--adv flag)
 
 ```typescript
 if (isAdvanced) {
@@ -220,7 +220,7 @@ if (isAdvanced) {
 }
 ```
 
-### Stage 4: Report Generation
+### Step 4: Report Generation
 
 #### 4.1 Summary Format (Default)
 

@@ -17,19 +17,19 @@ Git 변경사항을 자동으로 분석하여 Conventional Commits 형식의 커
 
 ## 프로세스
 
-### 1️⃣ 변경사항 분석
+### Step 1: 변경사항 분석
 ```bash
 git status  # 변경된 파일 목록 확인
 git diff    # 상세 변경 내용 분석
 ```
 
-### 2️⃣ smart-committer Agent 활성화
+### Step 2: smart-committer Agent 활성화
 복잡한 변경사항 분석을 위해 전문 Agent를 활성화합니다:
 - 다중 파일 변경 시 카테고리별 분류
 - 변경 유형 자동 판단 (feat/fix/refactor 등)
 - Breaking Changes 감지
 
-### 3️⃣ 커밋 메시지 생성
+### Step 3: 커밋 메시지 생성
 
 #### Conventional Commits 형식
 ```
@@ -61,7 +61,7 @@ src/shared/ui/...     → style(ui): ...
 src/entities/user/... → refactor(user): ...
 ```
 
-### 4️⃣ 선택적 검증 (commit-guard)
+### Step 4: 선택적 검증 (commit-guard)
 
 ```markdown
 📋 커밋 전 검증을 실행하시겠습니까?
@@ -79,7 +79,7 @@ src/entities/user/... → refactor(user): ...
 - **린트**: `yarn lint` (선택사항)
 - **민감 정보 검사**: .env, API 키 등 확인
 
-### 5️⃣ 커밋 메시지 확인 및 수정
+### Step 5: 커밋 메시지 확인 및 수정
 
 ```markdown
 📝 생성된 커밋 메시지:
@@ -97,7 +97,7 @@ feat(order): 운송 신청 폼에 차량 선택 기능 추가
 [C] 취소
 ```
 
-### 6️⃣ 커밋 실행
+### Step 6: 커밋 실행
 
 ```bash
 git add .  # 또는 선택적 스테이징
@@ -261,6 +261,56 @@ rules:
 → /pr-review
 ```
 
+## ✅ Pre-commit Validation Hook
+
+### 자동 Validation
+`.claude/` 디렉토리의 변경사항이 있을 때 자동으로 검증합니다.
+
+```bash
+# Hook 설치 (한 번만)
+bash .claude/hooks/install-hooks.sh
+
+# 이후 커밋 시 자동 실행
+git add .
+git commit -m "feat: new feature"
+
+# Hook 동작:
+# 1. .claude/ 변경사항 감지
+# 2. 문서 검증 실행 (빠른 모드)
+# 3. Exit code 0: 커밋 허용
+# 4. Exit code 2: 경고 표시하지만 커밋 허용
+# 5. Exit code 1: 커밋 차단
+```
+
+### Hook 출력 예시
+```
+🔍 Validating .claude/ changes...
+✓ Documentation validation passed (95% consistency)
+✓ Cross-reference check passed
+
+Commit allowed.
+```
+
+### Validation 실패 시
+```
+✗ Documentation validation failed (65% consistency)
+⚠️ See report: .claude/cache/validation-reports/latest.md
+
+❌ Commit blocked. Please fix validation issues.
+
+Run manual validation:
+  bash .claude/lib/validate-system.sh --docs-only
+```
+
+### Hook 제거
+```bash
+# 기존 hook 백업 확인
+ls -la .git/hooks/pre-commit.backup.*
+
+# Hook 제거
+rm .git/hooks/pre-commit
+```
+
 ---
 
-💡 **팁**: 자주 커밋하고 작은 단위로 나누면 더 명확한 히스토리를 유지할 수 있습니다.
+💡 **팁**: 자주 커밋하고 작은 단위로 나누면 더 명확한 히스토리를 유지할 수 있습니다. Pre-commit hook은 문서 품질을 자동으로 보장합니다.

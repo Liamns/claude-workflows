@@ -422,6 +422,14 @@ multiSelect: false
 
 ### Step 6: 선택된 워크플로우 실행
 
+**🚨 중요**: Major 워크플로우는 다단계 프로세스입니다:
+1. 사용자에게 핵심 질문 3개를 반드시 물어봅니다
+2. 선택적 컨텍스트를 수집합니다
+3. spec.md, research.md, data-model.md, plan.md, tasks.md 등 7개 계획 문서를 생성합니다
+4. 각 문서는 이전에 생성된 문서를 참조합니다
+
+**절대 이 단계들을 건너뛰지 마세요!**
+
 사용자가 선택한 워크플로우에 따라 SlashCommand 도구를 사용하여 해당 워크플로우를 실행하세요:
 
 **Option 1을 선택한 경우:**
@@ -433,6 +441,13 @@ SlashCommand: /{recommendedWorkflow를 소문자로} "{사용자 요청}"
 ```
 SlashCommand: /major "{사용자 요청}"
 ```
+
+**Major 워크플로우 실행 후 확인사항:**
+- AskUserQuestion으로 질문을 했는가?
+- spec.md 파일이 생성되었는가?
+- 나머지 계획 문서들이 생성되었는가?
+
+하나라도 누락되었다면 워크플로우가 잘못 실행된 것입니다.
 
 **Option 3을 선택한 경우:**
 ```

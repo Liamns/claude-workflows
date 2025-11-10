@@ -18,7 +18,7 @@ GitHub Pull Request를 자동으로 분석하고 코드 리뷰를 수행합니�
 
 ## 프로세스
 
-### 1️⃣ PR 정보 조회
+### Step 1: PR 정보 조회
 ```bash
 # PR 기본 정보
 gh pr view {PR번호} --json title,body,author,state,files
@@ -30,7 +30,7 @@ gh pr diff {PR번호}
 gh pr view {PR번호} --json commits
 ```
 
-### 2️⃣ code-reviewer Agent 활성화
+### Step 2: code-reviewer Agent 활성화
 
 전문 리뷰 Agent가 다음 항목을 분석합니다:
 - 🔒 보안 취약점
@@ -40,7 +40,7 @@ gh pr view {PR번호} --json commits
 - 🧪 테스트 커버리지
 - 📝 코드 품질
 
-### 3️⃣ 리뷰 카테고리
+### Step 3: 리뷰 카테고리
 
 #### 🔒 보안 검사
 ```typescript
@@ -74,7 +74,7 @@ const fsdChecks = [
 ];
 ```
 
-### 4️⃣ 분석 결과 출력
+### Step 4: 분석 결과 출력
 
 ## 출력 형식
 

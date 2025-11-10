@@ -7,7 +7,95 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.6.0] - 2025-01-10
+
 ### Added 🆕
+- **✅ 강화된 Validation 시스템** - 4가지 마이그레이션 시나리오 완전 검증
+  - v1.0 → v2.6 마이그레이션 검증
+  - v2.4 → v2.6 마이그레이션 검증
+  - v2.5 → v2.6 마이그레이션 검증 (신규)
+  - 신규 설치 시나리오 검증 (신규)
+  - 롤백 시나리오 자동 테스트 (신규)
+- **🔄 자동 롤백 기능** - 마이그레이션 실패 시 이전 상태로 안전하게 복구
+  - `rollback_from_backup()` 함수 추가
+  - Critical 파일 우선 복원 (workflow-gates.json, config/, cache/)
+  - 마이그레이션 실패 시 자동 호출
+- **📋 Pre-commit Hook 통합** - .claude/ 변경사항 자동 검증
+  - `.claude/hooks/pre-commit` - Git 커밋 전 자동 validation
+  - `.claude/hooks/install-hooks.sh` - Hook 설치 스크립트
+  - Exit code 기반 커밋 차단/허용 (0=pass, 1=fail, 2=warning)
+- **🔍 통합 Validation** - install.sh에 validation 자동 실행
+  - 설치/업그레이드 완료 후 자동 validation
+  - `--quiet` 모드로 빠른 검증
+  - Validation 리포트 자동 생성
+
+### Enhanced ✨
+- **validate-migration.sh** - 마이그레이션 검증 강화
+  - `validate_fresh_install()` - 신규 설치 시나리오 검증
+  - `validate_rollback_scenario()` - 롤백 메커니즘 검증
+  - 5개 시나리오 검증 (v1.0→v2.6, v2.4→v2.6, v2.5→v2.6, 신규 설치, 롤백)
+- **install.sh** - 설치 프로세스 개선
+  - 롤백 함수 통합
+  - Validation 시스템 자동 실행
+  - 더 명확한 에러 메시지와 복구 안내
+- **Critical 파일 목록 확장** - validation 시스템 필수 파일 추가
+  - `.claude/lib/validate-system.sh`
+  - `.claude/hooks/pre-commit`
+
+### Changed 🔄
+- **버전 체계** - 2.5.0 → 2.6.0
+  - `INSTALLER_VERSION` 및 `TARGET_VERSION` 업데이트
+  - 모든 마이그레이션 스크립트 버전 업데이트
+- **README.md** - v2.6.0 기능 반영
+  - 새로운 기능 섹션 추가
+  - Validation 시스템 사용법 상세 설명
+  - 마이그레이션 시나리오 업데이트
+- **commit.md** - Pre-commit hook 안내 추가
+  - Hook 설치 방법
+  - 동작 방식 설명
+  - Validation 실패 시 대응 방법
+
+### Documentation 📚
+- **Validation 시스템 가이드** 추가 (README.md)
+  - 자동 검증 명령어
+  - Pre-commit hook 설정
+  - Validation 리포트 위치 및 형식
+- **마이그레이션 가이드** 업데이트
+  - 4가지 시나리오 상세 설명
+  - 자동 롤백 메커니즘 설명
+  - 백업 및 복구 절차
+- **커밋 워크플로우** 업데이트
+  - Pre-commit validation 통합
+  - Hook 관리 방법
+
+### Fixed 🐛
+- **마이그레이션 안정성** - 실패 시 자동 롤백으로 데이터 손실 방지
+- **문서-코드 일관성** - Validation 시스템으로 문서 품질 자동 보장
+- **설치 검증** - 모든 설치 시나리오에서 파일 무결성 검증
+
+### Infrastructure 🏗️
+- `.claude/hooks/` - Git hook 디렉토리
+- `.claude/cache/validation-reports/` - Validation 리포트 저장소
+- `.claude/.backup/` - 마이그레이션 백업 디렉토리
+
+### Breaking Changes 💥
+- **None** - v2.5.0과 완전히 호환됩니다
+
+### Migration Guide 📖
+```bash
+# v2.5 → v2.6 자동 업그레이드 (권장)
+bash install.sh
+
+# Pre-commit hook 설치 (선택사항)
+bash .claude/hooks/install-hooks.sh
+
+# Validation 실행
+bash .claude/lib/validate-system.sh
+```
+
+---
+
+### Added 🆕 (from Unreleased)
 - **/pr**: Git 변경사항을 분석하여 GitHub PR을 자동으로 생성하고 템플릿을 자동 완성
   - 커밋 히스토리 자동 분석 및 타입별 그룹화
   - Breaking changes 자동 감지

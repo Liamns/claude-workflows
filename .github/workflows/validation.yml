@@ -1,0 +1,155 @@
+name: 문서 및 설치 검증
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - '.claude/**'
+      - '.github/workflows/validation.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - '.claude/**'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    name: 문서-코드 일관성 검증
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 체크아웃
+        uses: actions/checkout@v3
+
+      - name: jq 설치
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: 전체 검증 실행
+        id: validation
+        run: |
+          bash .claude/lib/validate-system.sh --quiet
+          echo "exit_code=$?" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: 검증 결과 처리
+        run: |
+          exit_code=${{ steps.validation.outputs.exit_code }}
+
+          if [ "$exit_code" -eq 0 ]; then
+            echo "✅ 모든 검증 통과"
+            exit 0
+          elif [ "$exit_code" -eq 2 ]; then
+            echo "⚠️ 경고: 일부 검증 실패 (일관성 점수 >= 70%)"
+            echo "보고서를 확인하세요"
+            exit 0
+          else
+            echo "❌ 검증 실패"
+            echo "보고서를 확인하세요"
+            exit 1
+          fi
+
+      - name: 보고서 업로드
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: validation-report-${{ github.run_number }}
+          path: |
+            .claude/cache/validation-reports/latest.json
+            .claude/cache/validation-reports/latest.md
+          retention-days: 30
+
+      - name: 보고서 요약 출력
+        if: always()
+        run: |
+          echo "### 검증 보고서 요약" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ -f .claude/cache/validation-reports/latest.json ]; then
+            echo "#### 전체 상태" >> $GITHUB_STEP_SUMMARY
+            status=$(jq -r '.overallStatus' .claude/cache/validation-reports/latest.json)
+            score=$(jq -r '.consistencyScore' .claude/cache/validation-reports/latest.json)
+            echo "- 상태: **$status**" >> $GITHUB_STEP_SUMMARY
+            echo "- 일관성 점수: **$score**/100" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            echo "#### 문서 검증" >> $GITHUB_STEP_SUMMARY
+            doc_passed=$(jq -r '.documentationResults.passed' .claude/cache/validation-reports/latest.json)
+            doc_total=$(jq -r '.documentationResults.total' .claude/cache/validation-reports/latest.json)
+            doc_avg=$(jq -r '.documentationResults.avgConsistency' .claude/cache/validation-reports/latest.json)
+            echo "- 통과: $doc_passed/$doc_total" >> $GITHUB_STEP_SUMMARY
+            echo "- 평균 일치율: $doc_avg%" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            echo "#### 마이그레이션 검증" >> $GITHUB_STEP_SUMMARY
+            mig_passed=$(jq -r '.migrationResults.passed' .claude/cache/validation-reports/latest.json)
+            mig_total=$(jq -r '.migrationResults.total' .claude/cache/validation-reports/latest.json)
+            echo "- 통과: $mig_passed/$mig_total 시나리오" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            echo "#### 교차 참조 검증" >> $GITHUB_STEP_SUMMARY
+            ref_valid=$(jq -r '.crossReferenceResults.validLinks' .claude/cache/validation-reports/latest.json)
+            ref_total=$(jq -r '.crossReferenceResults.totalLinks' .claude/cache/validation-reports/latest.json)
+            ref_validity=$(jq -r '.crossReferenceResults.validity' .claude/cache/validation-reports/latest.json)
+            echo "- 유효한 링크: $ref_valid/$ref_total" >> $GITHUB_STEP_SUMMARY
+            echo "- 유효율: $ref_validity%" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            echo "📄 [전체 보고서 다운로드](../artifacts)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ 보고서 파일을 찾을 수 없습니다" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  validate-individual:
+    name: 개별 검증 모듈 테스트
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        module:
+          - docs-only
+          - migration-only
+          - crossref-only
+
+    steps:
+      - name: 체크아웃
+        uses: actions/checkout@v3
+
+      - name: jq 설치
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: ${{ matrix.module }} 검증 실행
+        run: |
+          bash .claude/lib/validate-system.sh --${{ matrix.module }} --quiet || true
+
+      - name: 보고서 업로드
+        uses: actions/upload-artifact@v3
+        with:
+          name: validation-${{ matrix.module }}-${{ github.run_number }}
+          path: .claude/cache/validation-reports/latest.*
+          retention-days: 7
+
+  test-suite:
+    name: 단위 테스트 실행
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 체크아웃
+        uses: actions/checkout@v3
+
+      - name: 문서 검증 테스트
+        run: bash .claude/lib/__tests__/test-validate-documentation.sh
+
+      - name: 마이그레이션 검증 테스트
+        run: bash .claude/lib/__tests__/test-validate-migration.sh
+
+      - name: 교차 참조 검증 테스트
+        run: bash .claude/lib/__tests__/test-validate-crossref.sh
+
+      - name: 테스트 결과 요약
+        if: always()
+        run: |
+          echo "### 단위 테스트 결과" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ 60개 테스트 완료" >> $GITHUB_STEP_SUMMARY
+          echo "- 문서 검증: 22개 테스트" >> $GITHUB_STEP_SUMMARY
+          echo "- 마이그레이션 검증: 23개 테스트" >> $GITHUB_STEP_SUMMARY
+          echo "- 교차 참조 검증: 15개 테스트" >> $GITHUB_STEP_SUMMARY

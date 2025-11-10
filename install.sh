@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Claude Code Workflows Installer
-# Version: 2.5.0 - Real-time Metrics Dashboard
+# Version: 2.6.0 - Enhanced Validation & Migration System
 
 set -e
 
@@ -13,8 +13,8 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Version Configuration
-INSTALLER_VERSION="2.5.0"
-TARGET_VERSION="2.5.0"
+INSTALLER_VERSION="2.6.0"
+TARGET_VERSION="2.6.0"
 
 # Repository Configuration
 REPO_URL="https://github.com/Liamns/claude-workflows"
@@ -42,7 +42,7 @@ print_header() {
     echo -e "${BLUE}╔════════════════════════════════════════╗${NC}"
     echo -e "${BLUE}║   Claude Code Workflows Installer     ║${NC}"
     echo -e "${BLUE}║   Version ${INSTALLER_VERSION}                        ║${NC}"
-    echo -e "${BLUE}║   Real-time Metrics Dashboard         ║${NC}"
+    echo -e "${BLUE}║   Enhanced Validation & Migration     ║${NC}"
     echo -e "${BLUE}╚════════════════════════════════════════╝${NC}"
     echo ""
 }
@@ -381,6 +381,8 @@ run_migrations() {
                 print_success "v1.0 → v2.4.0 migration completed"
             else
                 print_error "v1.0 → v2.4.0 migration failed"
+                print_warning "Rolling back to backup..."
+                rollback_from_backup
                 return 1
             fi
         else
@@ -397,6 +399,8 @@ run_migrations() {
                 print_success "v2.4 → v2.5.0 migration completed"
             else
                 print_error "v2.4 → v2.5.0 migration failed"
+                print_warning "Rolling back to backup..."
+                rollback_from_backup
                 return 1
             fi
         else
@@ -405,6 +409,35 @@ run_migrations() {
         echo ""
     fi
 
+    return 0
+}
+
+# Rollback from backup
+rollback_from_backup() {
+    if [ -z "$BACKUP_DIR" ] || [ ! -d "$BACKUP_DIR" ]; then
+        print_error "No backup found to rollback"
+        return 1
+    fi
+
+    print_info "Rolling back from backup: $BACKUP_DIR"
+
+    # Restore critical files
+    if [ -f "$BACKUP_DIR/workflow-gates.json" ]; then
+        cp "$BACKUP_DIR/workflow-gates.json" "$TARGET_DIR/.claude/" 2>/dev/null || true
+        print_success "Restored workflow-gates.json"
+    fi
+
+    if [ -d "$BACKUP_DIR/config" ]; then
+        cp -r "$BACKUP_DIR/config" "$TARGET_DIR/.claude/" 2>/dev/null || true
+        print_success "Restored config/"
+    fi
+
+    if [ -d "$BACKUP_DIR/cache" ]; then
+        cp -r "$BACKUP_DIR/cache" "$TARGET_DIR/.claude/" 2>/dev/null || true
+        print_success "Restored cache/"
+    fi
+
+    print_success "Rollback completed"
     return 0
 }
 
@@ -890,6 +923,24 @@ install_workflows() {
         if ! validate_installation; then
             print_warning "Validation found issues (but installation is functional)"
             log_to_file "Validation completed with warnings"
+        fi
+
+        # Run validation system if available (v2.5+)
+        if [ -f "$TARGET_DIR/.claude/lib/validate-system.sh" ] && [ "$EXISTING_VERSION" != "none" ]; then
+            echo ""
+            print_info "Running validation system..."
+            if bash "$TARGET_DIR/.claude/lib/validate-system.sh" --docs-only --quiet; then
+                print_success "Validation system check passed"
+            else
+                local validation_exit=$?
+                if [ $validation_exit -eq 2 ]; then
+                    print_warning "Validation system found warnings (continuing)"
+                else
+                    print_error "Validation system check failed"
+                    print_warning "You can check the report at: $TARGET_DIR/.claude/cache/validation-reports/latest.md"
+                    print_info "Installation is complete, but some validation issues were found"
+                fi
+            fi
         fi
     fi
 

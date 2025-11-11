@@ -452,8 +452,8 @@ cache_top_files() {
 if command -v jq &> /dev/null; then
     cache_init &> /dev/null
 else
-    echo "⚠️  Warning: jq not found. Cache system requires jq for JSON processing." >&2
-    echo "   Install: brew install jq (macOS) or apt-get install jq (Linux)" >&2
+    echo "⚠️  경고: jq를 찾을 수 없습니다. 캐시 시스템은 JSON 처리를 위해 jq가 필요합니다." >&2
+    echo "   설치: brew install jq (macOS) 또는 apt-get install jq (Linux)" >&2
 fi
 
 # ════════════════════════════════════════════════════════════════════════════

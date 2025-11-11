@@ -1,6 +1,6 @@
 # 🤖 Claude Workflows
 
-[![Version](https://img.shields.io/badge/version-2.7.0-blue.svg)](https://github.com/Liamns/claude-workflows)
+[![Version](https://img.shields.io/badge/version-2.7.2-blue.svg)](https://github.com/Liamns/claude-workflows)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-purple.svg)](https://claude.ai/code)
 [![Validation](https://img.shields.io/badge/validation-automated-success.svg)](https://github.com/Liamns/claude-workflows)
@@ -9,7 +9,15 @@
 
 **📖 새로운 Claude 세션?** → [프로젝트 컨텍스트 문서](.claude/docs/PROJECT-CONTEXT.md) (5분이면 전체 파악)
 
-## 🆕 v2.7.0 주요 기능
+## 🆕 v2.7.2 주요 기능
+
+### Installation Stability Hotfix (v2.7.2)
+- **🔧 Checksum 검증 최적화** - 불필요한 파일 검증 제거
+  - 로컬 설정 파일 제외 (`.claude/settings.local.json`, `*.local.json`)
+  - 설치 시 생성되는 파일 제외 (`.claude/hooks/*`)
+  - 프로젝트별 문서 제외 (`.specify/memory/*`)
+  - 체크섬 파일 수: 105 → 100개 (5개 제외)
+- **✅ 설치 안정성 향상** - 404 에러 완전 제거, 설치 속도 개선
 
 ### FSD Custom Architecture (v2.7.0)
 - **🏗️ Domain-Centric Features** - 하나의 feature = 하나의 도메인 (백엔드 서비스처럼)
@@ -24,7 +32,7 @@
 
 ### 핵심 개선사항
 - **🔒 SHA256 체크섬 기반 파일 무결성 검증** - 설치 시 자동 파일 검증 및 복구
-  - 190개 파일의 SHA256 체크섬 자동 검증
+  - 100개 핵심 파일의 SHA256 체크섬 자동 검증
   - 불일치 파일 자동 재다운로드
   - 복구 실패 시 안전한 롤백
   - .gitignore 자동 관리 (백업/캐시 제외)
@@ -63,7 +71,7 @@ bash .claude/lib/validate-system.sh
 
 설치 시 자동으로 실행되는 고급 검증 시스템:
 
-- **✅ 파일 무결성 검증**: 190개 파일의 SHA256 체크섬 자동 검증
+- **✅ 파일 무결성 검증**: 100개 핵심 파일의 SHA256 체크섬 자동 검증
 - **🔄 자동 복구**: 불일치 파일 자동 재다운로드
 - **🛡️ 안전한 롤백**: 복구 실패 시 이전 버전으로 자동 복원
 - **📝 .gitignore 관리**: 백업/캐시 파일 자동 제외

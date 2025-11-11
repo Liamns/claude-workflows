@@ -1,24 +1,32 @@
-# FSD 레이어 규칙
+# FSD 레이어 규칙 (Team Custom: Domain-Centric)
 
 Feature-Sliced Design 아키텍처의 레이어별 상세 규칙입니다.
 
-## 레이어 계층 구조
+**팀 철학**: "One feature = one domain (like a backend service)"
+
+## 레이어 계층 구조 (Team Custom)
 
 ```
 ┌─────────────┐
-│   Pages     │  라우트 핸들링, 페이지 조합
+│   Pages     │  라우트 핸들링, 페이지 특화 로직 (v2.1 Pages First)
 ├─────────────┤
-│   Widgets   │  독립 UI 블록, Features/Entities 조합
+│  Features   │  도메인 중심 사용자 인터랙션 (Domain-Centric)
 ├─────────────┤
-│  Features   │  사용자 액션, 비즈니스 로직
+│  Entities   │  순수 도메인 모델 (Optional)
 ├─────────────┤
-│  Entities   │  비즈니스 엔티티, 순수 표현
-├─────────────┤
-│   Shared    │  재사용 UI, 유틸리티
+│   Shared    │  범용 유틸리티 (도메인 지식 없음)
 └─────────────┘
+
+Type-only: Features ⇄ Features (import type only)
 ```
 
-**의존성 방향**: 위에서 아래로만 (Pages → Widgets → Features → Entities → Shared)
+**의존성 방향**:
+- 기본: Pages → Features → Entities (optional) → Shared
+- 예외: Features ⇄ Features (type-only imports)
+
+**제거된 레이어**:
+- ~~Widgets~~: Team Custom에서 제거 (features/pages로 병합)
+- ~~Processes~~: FSD v2에서 deprecated
 
 ## 1. Shared Layer
 
@@ -104,9 +112,11 @@ export function VehicleCard({ data }: { data: Vehicle }) {
 }
 ```
 
-## 3. Features Layer
+## 3. Features Layer (Team Custom: Domain-Centric)
 
-**목적**: 하나의 완결된 사용자 액션 구현
+**목적**: 도메인 중심 사용자 인터랙션 (백엔드 서비스와 유사)
+
+**Team Principle**: One feature = one domain with multiple related actions
 
 **허용**:
 - ✅ React 훅 (useState, useEffect, custom hooks)
@@ -114,12 +124,14 @@ export function VehicleCard({ data }: { data: Vehicle }) {
 - ✅ API 호출 (api/ 디렉토리)
 - ✅ 도메인 데이터 props
 - ✅ Entities import
+- ✅ Type-only imports from other features (`import type { Type } from '@/features/other'`)
+- ✅ Shared logic within domain (validation, schemas, types)
 
 **금지**:
 - ❌ 이벤트 핸들러 props (onSubmit, onChange 등)
 - ❌ UI 설정 props (color, size, variant 등)
-- ❌ Widgets import (상위 레이어)
 - ❌ Pages import (상위 레이어)
+- ❌ Runtime imports from other features (type-only만 허용)
 
 **Props 규칙**:
 ```typescript
@@ -138,125 +150,138 @@ interface Props {
 }
 ```
 
-**구조**:
+**구조 (Domain-Centric)**:
 ```typescript
-// features/dispatch/model/useDispatchForm.ts
-export function useDispatchForm() {
-  const [formData, setFormData] = useState({});
+// features/order/model/types.ts (모든 order 관련 타입)
+export interface OrderCreateData { /* ... */ }
+export interface OrderUpdateData { /* ... */ }
+export interface Order { /* ... */ }
 
-  const handleSubmit = async () => {
+// features/order/model/orderSchemas.ts (공유 스키마)
+export const orderCreateSchema = z.object({ /* ... */ });
+export const orderUpdateSchema = z.object({ /* ... */ });
+
+// features/order/model/orderValidation.ts (공유 검증)
+export function validateOrderData(data: unknown): boolean { /* ... */ }
+
+// features/order/model/useOrderCreate.ts
+export function useOrderCreate() {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleCreate = async (data: OrderCreateData) => {
     // 비즈니스 로직
   };
 
-  return { formData, handleSubmit };
+  return { handleCreate, isLoading };
 }
 
-// features/dispatch/ui/DispatchForm.tsx
-export function DispatchForm({ userId }: { userId: string }) {
-  const { formData, handleSubmit } = useDispatchForm();
+// features/order/ui/OrderCreateForm.tsx
+export function OrderCreateForm({ userId }: { userId: string }) {
+  const { handleCreate, isLoading } = useOrderCreate();
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={(e) => { e.preventDefault(); /* ... */ }}>
       {/* UI */}
     </form>
   );
 }
+
+// features/order/api/createOrder.ts
+export async function createOrder(data: OrderCreateData): Promise<Order> {
+  // API 호출
+}
 ```
 
-## 4. Widgets Layer
+**Domain Grouping Example**:
+```
+features/order/
+├── api/
+│   ├── createOrder.ts
+│   ├── updateOrder.ts
+│   └── cancelOrder.ts
+├── model/
+│   ├── types.ts              # 모든 order 관련 타입
+│   ├── orderSchemas.ts        # 공유 스키마
+│   ├── orderValidation.ts     # 공유 검증
+│   ├── useOrderCreate.ts
+│   ├── useOrderUpdate.ts
+│   └── useOrderCancel.ts
+└── ui/
+    ├── OrderCreateForm.tsx
+    ├── OrderUpdateForm.tsx
+    └── OrderCancelButton.tsx
+```
 
-**목적**: 독립적인 UI 블록, Features/Entities 조합
+## 4. Pages Layer (Team Custom: v2.1 Pages First)
+
+**목적**: 라우트 핸들링 및 페이지 특화 로직
+
+**Team Principle**: 페이지 특화 로직은 pages에 유지 (2+ 페이지에서 재사용되지 않으면 features로 추출하지 않음)
 
 **허용**:
 - ✅ Features import 및 조합
 - ✅ Entities import 및 조합
-- ✅ 최소한의 레이아웃 로직
-- ✅ 도메인 데이터 props (또는 props 없음)
-
-**금지**:
-- ❌ 복잡한 비즈니스 로직 (Features로 분리)
-- ❌ 직접 API 호출 (Features에서 처리)
-- ❌ Pages import
-
-**예시**:
-```typescript
-// widgets/header/ui/Header.tsx
-import { UserMenu } from '@/features/user-menu';
-import { Notifications } from '@/features/notifications';
-import { Logo } from '@/entities/branding';
-
-export function Header() {
-  const user = useUserStore((state) => state.user);
-
-  return (
-    <header>
-      <Logo />
-      {user && (
-        <>
-          <Notifications userId={user.id} />
-          <UserMenu user={user} />
-        </>
-      )}
-    </header>
-  );
-}
-```
-
-## 5. Pages Layer
-
-**목적**: 라우트 핸들링 및 페이지 레벨 조합
-
-**허용**:
-- ✅ Widgets import 및 조합
-- ✅ Features import 및 조합
 - ✅ 라우트 파라미터 전달
 - ✅ 페이지 레벨 인증 체크
 - ✅ 플랫폼별 분기
+- ✅ 페이지 특화 로직 (api, model, ui segments)
+- ✅ 페이지 내부에서만 사용되는 컴포넌트
 
 **금지**:
-- ❌ 직접 API 호출 (Features에서 처리)
-- ❌ 복잡한 비즈니스 로직 (Features로 분리)
+- ❌ 불필요한 feature 추출 (1개 페이지에서만 사용되는 로직은 pages에 유지)
 
 **예시**:
 ```typescript
-// pages/dashboard/ui/DashboardPage.tsx
-import { Header } from '@/widgets/header';
-import { Dashboard } from '@/widgets/dashboard';
+// pages/order-list/ui/OrderListPage.tsx
+import { Header } from '@/features/header';  // 재사용 feature
+import { OrderList } from '@/features/order';  // 재사용 feature
+import { useOrderListData } from '../model/useOrderListData';  // 페이지 특화 로직
 
-export function DashboardPage() {
-  const user = useUserStore((state) => state.user);
+export function OrderListPage() {
+  const { orders, filters, setFilters } = useOrderListData();
 
-  if (!user) {
-    return <Navigate to="/sign-in" />;
-  }
+  // 페이지 특화 로직: 필터링, 정렬 등
+  // 다른 페이지에서 재사용되지 않으면 여기에 유지
 
   return (
     <div>
       <Header />
-      <Dashboard userId={user.id} />
+      {/* 필터 UI (페이지 특화) */}
+      <OrderList data={orders} />
     </div>
   );
 }
+
+// pages/order-list/model/useOrderListData.ts (페이지 특화 로직)
+export function useOrderListData() {
+  // 이 페이지에서만 사용되는 로직
+  const [filters, setFilters] = useState({});
+  const [orders, setOrders] = useState([]);
+
+  // 필터링, 정렬 로직
+
+  return { orders, filters, setFilters };
+}
 ```
 
-## 의존성 방향 검증
+**Pages First 판단 기준**:
+- **1개 페이지에서만 사용**: pages에 유지
+- **2+ 페이지에서 재사용**: features로 추출
+- **페이지 특화 로직**: 인증 체크, 라우트 파라미터, 페이지별 필터 등
+
+## 의존성 방향 검증 (Team Custom)
 
 **허용되는 import**:
 ```typescript
 // Pages
-import { Widget } from '@/widgets/header';  // ✅
-import { Feature } from '@/features/sign-up';  // ✅
-import { Entity } from '@/entities/user';  // ✅
-import { Button } from '@/shared/ui';  // ✅
-
-// Widgets
-import { Feature } from '@/features/sign-up';  // ✅
-import { Entity } from '@/entities/user';  // ✅
+import { Feature } from '@/features/order';  // ✅
+import { Entity } from '@/entities/vehicle';  // ✅
 import { Button } from '@/shared/ui';  // ✅
 
 // Features
-import { Entity } from '@/entities/user';  // ✅
+import { Entity } from '@/entities/vehicle';  // ✅
 import { Button } from '@/shared/ui';  // ✅
+import type { OrderType } from '@/features/order';  // ✅ Type-only import from other feature
 
 // Entities
 import { formatDate } from '@/shared/lib';  // ✅
@@ -265,16 +290,26 @@ import { formatDate } from '@/shared/lib';  // ✅
 **금지되는 import**:
 ```typescript
 // Entities
-import { Feature } from '@/features/sign-up';  // ❌ 상위 레이어
+import { Feature } from '@/features/order';  // ❌ 상위 레이어
 
 // Features
-import { Widget } from '@/widgets/header';  // ❌ 상위 레이어
-
-// Widgets
 import { Page } from '@/pages/dashboard';  // ❌ 상위 레이어
+import { OrderList } from '@/features/order';  // ❌ Runtime import from other feature (type-only만 허용)
+
+// Shared
+import { Order } from '@/entities/order';  // ❌ 상위 레이어
 ```
 
-## 레이어 규칙 검증 명령어
+**Type-Only Import 규칙** (Team Custom 예외):
+```typescript
+// ✅ 허용: Feature 간 타입 참조
+import type { OrderType, OrderStatus } from '@/features/order';
+
+// ❌ 금지: Feature 간 런타임 import
+import { OrderList, useOrderCreate } from '@/features/order';
+```
+
+## 레이어 규칙 검증 명령어 (Team Custom)
 
 ```bash
 # Entity에서 훅 사용 검색
@@ -283,9 +318,31 @@ grep -r "useState\|useEffect" src/entities/
 # Entity에서 Feature import 검색
 grep -r "from.*features" src/entities/
 
-# Feature에서 Widget import 검색
-grep -r "from.*widgets" src/features/
+# Feature에서 Pages import 검색 (상위 레이어)
+grep -r "from.*pages" src/features/
+
+# Feature 간 런타임 import 검색 (type-only만 허용)
+grep -r "from '@/features/" src/features/ | grep -v "import type"
 
 # Features Props에서 이벤트 핸들러 검색
 grep -r "on[A-Z].*:.*=>" src/features/*/ui/*.tsx
+
+# Shared에서 상위 레이어 import 검색
+grep -r "from.*\(entities\|features\|pages\)" src/shared/
+
+# Type-only import 규칙 검증
+# Feature 간 타입 참조는 "import type" 사용해야 함
+grep -r "from '@/features/" src/features/ | grep -v "import type" | grep "features"
 ```
+
+## 팀 커스텀 규칙 요약
+
+1. **Widgets 레이어 제거**: features 또는 pages로 병합
+2. **Domain-Centric Features**: 하나의 feature = 하나의 도메인 (관련 액션들 그룹화)
+3. **Type-Only Imports**: Feature 간 타입 참조는 `import type` 사용
+4. **Pages First**: 페이지 특화 로직은 pages에 유지 (2+ 페이지 재사용 시 features로 추출)
+5. **Optional Entities**: Simple projects can merge entity types into features
+
+**참고 문서**:
+- `architectures/frontend/fsd/config.json`: 팀 커스텀 FSD 설정
+- `architectures/frontend/fsd/fsd-architecture.mdc`: 팀 커스텀 FSD 아키텍처 전체 문서

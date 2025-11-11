@@ -261,5 +261,176 @@ get_failed_files() {
 }
 
 # ════════════════════════════════════════════════════════════════════════════
+# T021: GitHub Raw URL 생성
+# ════════════════════════════════════════════════════════════════════════════
+
+# GitHub 저장소의 파일에 대한 raw URL을 생성합니다.
+#
+# @param $1 file_path (파일 경로, 예: .claude/lib/test.sh)
+# @param $2 repo_url (GitHub 저장소 URL, 예: https://github.com/owner/repo)
+# @param $3 branch (브랜치 이름, 기본값: main)
+# @return stdout에 raw URL 출력
+#
+# @example
+#   url=$(generate_github_raw_url ".claude/lib/test.sh" "https://github.com/Liamns/claude-workflows" "main")
+#   # Returns: https://raw.githubusercontent.com/Liamns/claude-workflows/main/.claude/lib/test.sh
+generate_github_raw_url() {
+    local file_path="$1"
+    local repo_url="$2"
+    local branch="${3:-main}"
+
+    # 파라미터 검증
+    if [[ -z "$file_path" ]]; then
+        echo "ERROR: File path is required" >&2
+        return 1
+    fi
+
+    if [[ -z "$repo_url" ]]; then
+        echo "ERROR: Repository URL is required" >&2
+        return 1
+    fi
+
+    # Extract owner/repo from URL
+    # URL format: https://github.com/owner/repo or https://github.com/owner/repo.git
+    local owner_repo
+    owner_repo=$(echo "$repo_url" | sed -E 's|https?://github.com/||; s|\.git$||')
+
+    if [[ -z "$owner_repo" ]]; then
+        echo "ERROR: Invalid GitHub URL: $repo_url" >&2
+        return 1
+    fi
+
+    # Construct raw URL
+    echo "https://raw.githubusercontent.com/$owner_repo/$branch/$file_path"
+    return 0
+}
+
+# ════════════════════════════════════════════════════════════════════════════
+# T022: 실패 파일 재다운로드
+# ════════════════════════════════════════════════════════════════════════════
+
+# 검증 실패한 파일들을 GitHub에서 재다운로드하여 복구합니다.
+#
+# @param $1 repo_url (GitHub 저장소 URL)
+# @param $2 branch (브랜치 이름, 기본값: main)
+# @return 0 모든 파일 복구 성공, 1 일부 파일 복구 실패
+#
+# @example
+#   # First run verify_installation_with_checksum
+#   if ! verify_installation_with_checksum; then
+#       # Retry failed files
+#       retry_failed_files "https://github.com/Liamns/claude-workflows" "main"
+#   fi
+retry_failed_files() {
+    local repo_url="$1"
+    local branch="${2:-main}"
+
+    # 파라미터 검증
+    if [[ -z "$repo_url" ]]; then
+        echo "ERROR: Repository URL is required" >&2
+        return 1
+    fi
+
+    # 실패 파일 확인
+    local failed_count=${#FAILED_FILES[@]}
+    if [[ $failed_count -eq 0 ]]; then
+        echo "ℹ️  복구할 파일이 없습니다 (모든 파일 검증 통과)"
+        return 0
+    fi
+
+    echo ""
+    echo "════════════════════════════════════════════════════════════════"
+    echo "파일 자동 복구 (${failed_count}개 파일)"
+    echo "════════════════════════════════════════════════════════════════"
+    echo ""
+
+    # 복구 통계
+    local recovered_count=0
+    local still_failed_count=0
+    local still_failed_files=()
+
+    # 각 실패 파일 복구 시도
+    for file_path in "${FAILED_FILES[@]}"; do
+        echo "복구 시도: $file_path"
+
+        # GitHub raw URL 생성
+        local file_url
+        if ! file_url=$(generate_github_raw_url "$file_path" "$repo_url" "$branch"); then
+            echo "  ✗ URL 생성 실패"
+            still_failed_files+=("$file_path")
+            ((still_failed_count++))
+            continue
+        fi
+
+        # 파일 다운로드 (3회 재시도, 30초 타임아웃)
+        if download_file_with_retry "$file_url" "$file_path" 3 30; then
+            # 체크섬 재검증
+            local expected_checksum=""
+            local manifest_data
+            if manifest_data=$(parse_checksum_manifest "$CHECKSUM_MANIFEST"); then
+                # Find checksum for this file
+                while IFS='=' read -r manifest_file manifest_checksum; do
+                    if [[ "$manifest_file" == "$file_path" ]]; then
+                        expected_checksum="$manifest_checksum"
+                        break
+                    fi
+                done <<< "$manifest_data"
+            fi
+
+            if [[ -n "$expected_checksum" ]]; then
+                local actual_checksum
+                if actual_checksum=$(calculate_sha256 "$file_path" 2>/dev/null); then
+                    if [[ "$actual_checksum" == "$expected_checksum" ]]; then
+                        echo "  ✓ 복구 성공 및 검증 통과"
+                        ((recovered_count++))
+                    else
+                        echo "  ✗ 복구 후 체크섬 불일치"
+                        still_failed_files+=("$file_path")
+                        ((still_failed_count++))
+                    fi
+                else
+                    echo "  ✗ 체크섬 계산 실패"
+                    still_failed_files+=("$file_path")
+                    ((still_failed_count++))
+                fi
+            else
+                echo "  ⚠️  매니페스트에서 체크섬을 찾을 수 없음"
+                still_failed_files+=("$file_path")
+                ((still_failed_count++))
+            fi
+        else
+            echo "  ✗ 다운로드 실패"
+            still_failed_files+=("$file_path")
+            ((still_failed_count++))
+        fi
+    done
+
+    # 결과 요약
+    echo ""
+    echo "────────────────────────────────────────────────────────────────"
+    echo "복구 결과: $recovered_count/$failed_count 성공"
+
+    if [[ $still_failed_count -gt 0 ]]; then
+        echo "⚠️  복구 실패: $still_failed_count개"
+        echo ""
+        echo "복구 실패 파일 목록:"
+        for file in "${still_failed_files[@]}"; do
+            echo "  - $file"
+        done
+        echo ""
+        echo "다음을 확인하세요:"
+        echo "  1. 인터넷 연결 상태"
+        echo "  2. GitHub 저장소 접근 권한"
+        echo "  3. 파일이 저장소에 존재하는지 확인: $repo_url/tree/$branch"
+        echo "════════════════════════════════════════════════════════════════"
+        return 1
+    else
+        echo "✅ 모든 파일 복구 성공"
+        echo "════════════════════════════════════════════════════════════════"
+        return 0
+    fi
+}
+
+# ════════════════════════════════════════════════════════════════════════════
 # END OF FILE
 # ════════════════════════════════════════════════════════════════════════════

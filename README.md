@@ -1,6 +1,6 @@
 # 🤖 Claude Workflows
 
-[![Version](https://img.shields.io/badge/version-2.6.0-blue.svg)](https://github.com/Liamns/claude-workflows)
+[![Version](https://img.shields.io/badge/version-2.7.0-blue.svg)](https://github.com/Liamns/claude-workflows)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-purple.svg)](https://claude.ai/code)
 [![Validation](https://img.shields.io/badge/validation-automated-success.svg)](https://github.com/Liamns/claude-workflows)
@@ -9,7 +9,18 @@
 
 **📖 새로운 Claude 세션?** → [프로젝트 컨텍스트 문서](.claude/docs/PROJECT-CONTEXT.md) (5분이면 전체 파악)
 
-## 🆕 v2.6.0 주요 기능
+## 🆕 v2.7.0 주요 기능
+
+### FSD Custom Architecture (v2.7.0)
+- **🏗️ Domain-Centric Features** - 하나의 feature = 하나의 도메인 (백엔드 서비스처럼)
+  - config.json v2.1.0-team-custom
+  - Widgets 레이어 제거 → Features/Pages로 병합
+  - Type-only imports 지원 (feature 간 타입 참조)
+  - Pages First 원칙 적용 (페이지 특화 로직은 pages에 유지)
+- **📐 4 Core Layers** - app → pages → features → entities (optional) → shared
+- **📖 자세한 가이드** - [FSD Architecture Guide](architectures/frontend/fsd/fsd-architecture.mdc)
+
+### 이전 기능 (v2.6.0)
 
 ### 핵심 개선사항
 - **🔒 SHA256 체크섬 기반 파일 무결성 검증** - 설치 시 자동 파일 검증 및 복구
@@ -80,7 +91,7 @@ bash .claude/lib/generate-checksums.sh -o .claude/.checksums.json --verbose
 
 # 출력 예시
 # ✓ Checksum manifest generated: .claude/.checksums.json
-#   Version: 2.6.0
+#   Version: 2.7.0
 #   Files: 190
 #   Generated at: 2025-01-11T10:00:00Z
 ```

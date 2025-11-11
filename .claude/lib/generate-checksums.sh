@@ -30,7 +30,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.."; pwd)"
 
 # 버전 정보 (install.sh와 동기화)
-VERSION="2.7.0"
+VERSION="2.7.1"
 
 # 기본 출력 파일 (설정하지 않으면 stdout)
 OUTPUT_FILE=""
@@ -40,6 +40,10 @@ VERBOSE=false
 EXCLUDE_DIRS=(
     ".claude/.backup"
     ".claude/cache"
+    ".claude/commands/_backup"
+    ".claude/agents/_deprecated"
+    ".claude/lib/__tests__"
+    ".specify/specs"
     ".specify/temp"
     ".git"
 )
@@ -175,26 +179,46 @@ cd "$PROJECT_ROOT"
 
 log_verbose "Scanning files in .claude/ and .specify/..."
 
-# find 명령 구성
-FIND_EXCLUDE_ARGS=()
-
-# 제외 디렉토리 추가
-for dir in "${EXCLUDE_DIRS[@]}"; do
-    FIND_EXCLUDE_ARGS+=(-path "./$dir" -prune -o)
-done
-
-# 제외 파일 추가
-for pattern in "${EXCLUDE_FILES[@]}"; do
-    FIND_EXCLUDE_ARGS+=(-name "$pattern" -prune -o)
-done
-
-# 파일 목록 수집
-FILES=()
+# 파일 수집 - find로 모두 찾은 후 grep으로 필터링
+log_verbose "Collecting all files..."
+ALL_FILES=()
 while IFS= read -r -d '' file; do
-    # 상대 경로로 변환
     rel_path="${file#./}"
-    FILES+=("$rel_path")
-done < <(find .claude/ .specify/ "${FIND_EXCLUDE_ARGS[@]}" -type f -print0 | sort -z)
+    ALL_FILES+=("$rel_path")
+done < <(find .claude/ .specify/ -type f -print0 | sort -z)
+
+log_verbose "Found ${#ALL_FILES[@]} total files, applying exclusions..."
+
+# 제외 패턴 적용
+FILES=()
+for file in "${ALL_FILES[@]}"; do
+    skip=false
+
+    # 제외 디렉토리 체크
+    for dir in "${EXCLUDE_DIRS[@]}"; do
+        if [[ "$file" == "$dir"* || "$file" == "./$dir"* ]]; then
+            log_verbose "Excluding (dir): $file"
+            skip=true
+            break
+        fi
+    done
+
+    # 제외 파일 패턴 체크
+    if [ "$skip" = false ]; then
+        for pattern in "${EXCLUDE_FILES[@]}"; do
+            if [[ "$file" == *"$pattern"* ]]; then
+                log_verbose "Excluding (pattern): $file"
+                skip=true
+                break
+            fi
+        done
+    fi
+
+    # 추가
+    if [ "$skip" = false ]; then
+        FILES+=("$file")
+    fi
+done
 
 log_verbose "Found ${#FILES[@]} files"
 

@@ -7,6 +7,58 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.7.2] - 2025-01-12
+
+### Fixed
+- **Checksum Verification** - 설치 중 불필요한 파일 검증 제거
+  - `.claude/settings.local.json` 제외 (사용자별 로컬 설정)
+  - `.claude/hooks/*` 제외 (설치 시 생성/수정되는 파일)
+  - `.specify/memory/*` 제외 (프로젝트별 컨텍스트 문서)
+  - `*.local.json` 패턴 제외 (모든 로컬 설정 파일)
+
+### Changed
+- **generate-checksums.sh** - 제외 패턴 강화
+  - EXCLUDE_DIRS에 `.claude/hooks`, `.specify/memory` 추가
+  - EXCLUDE_FILES에 `*.local.json` 패턴 추가
+  - Glob 패턴 매칭 로직 개선 (리터럴 매칭 폴백 지원)
+  - 체크섬 매니페스트 파일 수: 105 → 100 (5개 제외)
+
+### Impact
+- ✅ 신규 설치 시 404 에러 완전 제거
+- ✅ 설치 속도 개선 (불필요한 복구 시도 제거)
+- ✅ 프로젝트별/사용자별 파일 보존
+- ✅ 기존 프로젝트 업그레이드 안정성 향상
+
+### Migration from 2.7.1
+자동 업그레이드 - 특별한 조치 불필요
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/Liamns/claude-workflows/main/install.sh)
+```
+
+### Migration from 2.7.0
+자동 업그레이드 - `.claude/.version` 파일이 자동으로 업데이트됩니다
+
+## [2.7.1] - 2025-01-12
+
+### Fixed
+- **Checksum Generation** - 개발 전용 파일 제외 로직 수정
+  - EXCLUDE_DIRS 패턴이 제대로 적용되지 않던 문제 해결
+  - 파일 수집 로직 개선 (find + bash loop 방식)
+  - 체크섬 매니페스트 파일 수: 200 → 105 (95개 제외)
+
+### Changed
+- **EXCLUDE_DIRS 확장**
+  - `.claude/.backup` - 백업 파일
+  - `.claude/cache` - 캐시 파일 (27개)
+  - `.claude/commands/_backup` - 커맨드 백업
+  - `.claude/agents/_deprecated` - 레거시 에이전트 (9개)
+  - `.claude/lib/__tests__` - 테스트 파일 (9개)
+  - `.specify/specs` - 개발 스펙 문서 (27개)
+
+### Impact
+- ✅ 개발 전용 파일 88개 제외로 설치 안정성 향상
+- ✅ 404 에러 대폭 감소
+
 ## [2.7.0] - 2025-01-11
 
 ### Added

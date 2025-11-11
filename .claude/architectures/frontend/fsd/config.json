@@ -1,0 +1,208 @@
+{
+  "name": "Feature-Sliced Design (Team Custom)",
+  "type": "frontend",
+  "version": "2.1.0-team-custom",
+  "description": "Domain-centric FSD architecture based on v2.1 with team adaptations",
+  "basedOn": "FSD v2.1",
+  "teamPhilosophy": "One feature = one domain (like a backend service)",
+
+  "structure": {
+    "directories": {
+      "app": "Application initialization and providers",
+      "pages": "Routes + page-specific logic (v2.1 Pages First)",
+      "features": "Domain-centric reusable interactions (like backend services)",
+      "entities": "Pure domain models (optional, can merge into features)",
+      "shared": "Generic utilities (NO domain logic)"
+    },
+    "removed": {
+      "processes": "Deprecated in FSD v2",
+      "widgets": "Team Custom: merged into features/pages for simplicity"
+    },
+    "namingConventions": {
+      "component": "PascalCase",
+      "slice": "kebab-case",
+      "segment": "camelCase",
+      "teamDomainCentric": {
+        "feature": "{domain}",
+        "uiComponent": "{Domain}{Action}Form.tsx",
+        "hook": "use{Domain}{Action}.ts",
+        "apiFunction": "{action}{Domain}.ts"
+      }
+    },
+    "fileExtensions": {
+      "component": ["tsx", "jsx", "vue"],
+      "style": ["css", "scss", "sass", "less"],
+      "test": ["test.ts", "test.tsx", "spec.ts", "spec.tsx"],
+      "story": ["stories.tsx", "stories.jsx"]
+    }
+  },
+
+  "layers": {
+    "order": ["app", "pages", "features", "entities", "shared"],
+    "rules": {
+      "app": {
+        "canImport": ["pages", "features", "entities", "shared"],
+        "description": "초기화 로직과 프로바이더 (httpClient, stores, providers)"
+      },
+      "pages": {
+        "canImport": ["features", "entities", "shared"],
+        "description": "라우트 + 페이지 특화 로직 (v2.1 Pages First 원칙)",
+        "teamPrinciple": "페이지 특화 로직은 pages에 유지 (불필요한 feature 추출 금지)",
+        "canHaveSegments": ["api", "model", "ui"]
+      },
+      "features": {
+        "canImport": ["entities", "shared"],
+        "typeOnlyImports": ["features"],
+        "description": "도메인 중심 사용자 인터랙션 (백엔드 서비스와 유사)",
+        "teamPrinciple": "One feature = one domain with multiple related actions",
+        "exampleMerge": "order-register + order-payment → features/order"
+      },
+      "entities": {
+        "canImport": ["shared"],
+        "description": "순수 도메인 모델 (읽기 전용, 인터랙션 없음)",
+        "optional": true,
+        "teamNote": "Simple projects can merge entity types into features"
+      },
+      "shared": {
+        "canImport": [],
+        "description": "범용 유틸리티 (도메인 지식 없음)",
+        "mustBeGeneric": true
+      }
+    }
+  },
+
+  "segments": {
+    "standard": ["ui", "model", "lib", "api", "config"],
+    "descriptions": {
+      "ui": "UI components and their styles",
+      "model": "Business logic, state management, hooks, types",
+      "lib": "Domain-specific utilities and helpers",
+      "api": "Backend interaction logic (API calls)",
+      "config": "Configuration and constants"
+    },
+    "featureStructure": {
+      "recommended": {
+        "api": ["createOrder.ts", "updateOrder.ts", "cancelOrder.ts"],
+        "model": [
+          "types.ts",
+          "useOrderCreate.ts",
+          "useOrderUpdate.ts",
+          "orderValidation.ts",
+          "orderSchemas.ts"
+        ],
+        "lib": ["orderUtils.ts"],
+        "ui": ["OrderCreateForm.tsx", "OrderUpdateForm.tsx", "OrderCancelButton.tsx"]
+      }
+    }
+  },
+
+  "dependencies": {
+    "allowed": {
+      "features": ["entities", "shared"],
+      "entities": ["shared"],
+      "shared": [],
+      "pages": ["features", "entities", "shared"]
+    },
+    "typeOnlyAllowed": {
+      "features": ["features"],
+      "description": "Type-only imports between features allowed with 'import type' syntax"
+    },
+    "forbidden": {
+      "entities": ["features", "pages", "app"],
+      "shared": ["entities", "features", "pages", "app"],
+      "featuresRuntime": ["features"]
+    },
+    "circular": false,
+    "teamException": "Type-only imports between features are pragmatically allowed"
+  },
+
+  "qualityRules": {
+    "entityPurity": {
+      "description": "Entities must not have external dependencies except shared",
+      "severity": "error",
+      "checks": [
+        "NO useState, useEffect, or other React hooks",
+        "NO API calls (GET only if needed)",
+        "NO event handler props",
+        "NO mutations (POST/PUT/DELETE)"
+      ]
+    },
+    "publicApi": {
+      "description": "Each slice must have an explicit public API (index.ts file)",
+      "severity": "error"
+    },
+    "sliceIsolation": {
+      "description": "Slices within the same layer cannot import each other (except type-only)",
+      "severity": "error",
+      "teamException": "Type-only imports allowed with 'import type' syntax"
+    },
+    "crossImport": {
+      "description": "Use only public API imports between slices",
+      "severity": "warning"
+    },
+    "domainCentricFeature": {
+      "description": "Features should represent domains (like backend services), not single actions",
+      "severity": "warning",
+      "teamPrinciple": "Related actions grouped together within domain feature"
+    },
+    "pagesFirstPrinciple": {
+      "description": "Keep page-specific logic in pages, don't extract unless reused on 2+ pages",
+      "severity": "info",
+      "basedOn": "FSD v2.1 Pages First principle"
+    },
+    "typeOnlyFeatureImports": {
+      "description": "Feature-to-feature imports must use 'import type' syntax only",
+      "severity": "error",
+      "pattern": "import type { Type } from '@/features/other-feature'"
+    },
+    "sharedMustBeGeneric": {
+      "description": "Shared layer must contain only generic utilities, NO domain-specific code",
+      "severity": "error",
+      "examples": {
+        "good": ["formatDate", "Button", "validatePhone"],
+        "bad": ["calculateFreightRate", "OrderStatusBadge"]
+      }
+    }
+  },
+
+  "teamAdaptations": {
+    "philosophy": "Domain-Centric Approach",
+    "principles": [
+      "One feature = one domain (like backend service class)",
+      "Related actions grouped together (auth: sign-in + sign-up + find-password)",
+      "Shared logic within domain (validation, schemas, types)",
+      "Type-only imports between features allowed",
+      "Tightly coupled features should be merged",
+      "Pages First: keep page-specific logic in pages"
+    ],
+    "layerSimplifications": {
+      "removed": ["widgets", "processes"],
+      "reason": "Simplified to 4 core layers + optional entities"
+    },
+    "decisionGuide": {
+      "genericUtil": "shared/",
+      "pureDomainModel": "entities/ (optional)",
+      "reusedOn2PlusPages": "features/{domain}/",
+      "usedOn1Page": "pages/{page}/"
+    },
+    "mergingStrategy": {
+      "when": "Features share significant types/logic OR actions are sequential in user flow",
+      "examples": {
+        "merged": "order-register + order-payment → features/order",
+        "separate": "auth (sign-in + sign-up) AND payment (process + refund) → features/auth + features/payment"
+      }
+    }
+  },
+
+  "templates": {
+    "feature": "architectures/frontend/fsd/templates/feature.template",
+    "entity": "architectures/frontend/fsd/templates/entity.template",
+    "page": "architectures/frontend/fsd/templates/page.template"
+  },
+
+  "references": {
+    "fsdOfficial": "https://feature-sliced.design/",
+    "fsdV2.1Release": "https://github.com/feature-sliced/documentation/discussions/756",
+    "teamCustomDoc": "architectures/frontend/fsd/fsd-architecture.mdc"
+  }
+}

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft-07/schema#",
-  "version": "2.6.0",
+  "version": "2.5.0",
   "description": "워크플로우별 품질 게이트 설정",
   "workflows": {
     "major": {

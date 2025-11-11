@@ -16,10 +16,17 @@ Thumbs.db
 # Logs
 *.log
 
-# Validation cache and reports (auto-generated)
-.claude/cache/validation-reports/*.json
-.claude/cache/validation-reports/*.md
-.claude/cache/validation-output.txt
+# Development-only directories (auto-generated at runtime)
+.claude/cache/
+.claude/.backup/
+.claude/command/.backup/
+.claude/lib/__tests__/
+
+# Development specs and documentation
+.specify/specs/
+
+# Development TODO
+todos.md
 
 # Keep directory structure
 !.claude/cache/validation-reports/.gitkeep

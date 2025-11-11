@@ -1,0 +1,401 @@
+# FSD Architecture Rules (Team Custom)
+
+**Version**: Team Custom (Based on FSD v2.1)
+**Last Updated**: 2025-11-11
+
+이 문서는 FSD 2.1을 기반으로 한 **팀 커스텀 아키텍처 규칙**을 정의합니다.
+
+---
+
+## Team Philosophy: Domain-Centric Approach
+
+### 핵심 원칙
+
+> **"One Feature = One Domain (like a backend Service class)"**
+
+**Official FSD**: "one feature = one action" (reusable across pages)
+**Team Custom**: "one feature = one domain with multiple related actions"
+
+### Why Domain-Centric?
+
+1. **Backend Alignment**: Frontend features = Backend services (`AuthService` → `features/auth`)
+2. **Shared Logic**: Related actions naturally share validation, types, utilities
+3. **Single Source of Truth**: One domain = one location
+4. **Practical Dependencies**: Real domains have dependencies (order ↔ payment)
+
+### Example
+
+```typescript
+// ✅ Team Approach (Domain-Centric)
+features/auth/
+├── api/
+│   ├── signIn.ts
+│   ├── signUp.ts
+│   └── findPassword.ts
+├── model/
+│   ├── useSignIn.ts
+│   ├── useSignUp.ts
+│   ├── authValidation.ts     // ✅ Shared logic within domain
+│   └── authSchemas.ts         // ✅ Shared schemas
+└── ui/
+    ├── SignInForm.tsx
+    └── SignUpForm.tsx
+
+// ❌ FSD Strict (Action-Centric) - 공통 로직 위치 문제
+features/sign-in/              // 검증 로직 어디에?
+features/sign-up/              // 스키마 어디에?
+// → entities? shared? 어색한 추상화 강제됨
+```
+
+---
+
+## Layer Hierarchy
+
+```
+src/
+├── app/          # Global setup (providers, httpClient, stores)
+├── pages/        # Routes + page-specific logic (v2.1 "Pages First")
+├── features/     # Domain-centric reusable interactions (Team: like backend services)
+├── entities/     # Pure domain models (optional, can merge into features)
+└── shared/       # Generic utilities (NO domain logic)
+
+// Widgets layer: NOT USED (merged into features/pages)
+```
+
+**Dependency Flow**: `app → pages → features → entities → shared` (higher → lower only)
+
+---
+
+## Layer-Specific Rules
+
+### 1. Shared Layer
+
+**Purpose**: Generic utils, NO domain knowledge
+
+**Rules**:
+- NO business logic or domain-specific code
+- Generic UI components (Button, Modal, Input)
+- Utility functions (formatDate, validatePhone)
+- Can accept event handlers and styling props
+
+```typescript
+// ✅ GOOD
+shared/ui/Button.tsx
+shared/lib/formatPhone.ts
+
+// ❌ BAD: Domain-specific
+shared/lib/calculateFreightRate.ts  // → features/order/lib/
+shared/ui/OrderStatusBadge.tsx      // → entities/order/ui/
+```
+
+---
+
+### 2. Entities Layer (Optional)
+
+**Purpose**: Pure domain models (read-only, NO interactions)
+
+**Rules**:
+- Components accept ONLY domain data props (NO event handlers)
+- NO user interactions (buttons, forms)
+- NO mutations (POST/PUT/DELETE) - GET only
+- NO state management
+
+**When to Skip**: Simple projects can merge entity types into features
+
+```typescript
+// ✅ GOOD: Pure domain model
+entities/company/model/types.ts
+entities/company/api/fetchCompany.ts  // GET only
+
+// ❌ BAD
+entities/company/api/updateCompany.ts  // Mutations → features or pages
+interface CompanyCardProps {
+  company: Company;
+  onEdit: () => void;  // ❌ Event handlers → features or pages
+}
+```
+
+---
+
+### 3. Features Layer (Team: Domain-Centric)
+
+**Purpose**: Domain-centric user interactions (like backend service classes)
+
+**Team Principle**: One feature = One domain (not one action)
+
+**Rules**:
+- Feature = backend service class (e.g., `OrderService` → `features/order`)
+- Related actions grouped together (sign-in + sign-up + find-password = `features/auth`)
+- Shared logic naturally lives within feature (validation, schemas, types)
+- Type-only imports from other features ALLOWED (see [Inter-Feature Dependencies](#inter-feature-dependencies))
+
+**Standard Structure**:
+
+```
+features/{domain}/
+├── index.ts
+├── api/
+│   ├── {action1}.ts              # e.g., signIn.ts, createOrder.ts
+│   ├── {action2}.ts              # e.g., signUp.ts, updateOrder.ts
+│   └── {action3}.ts              # e.g., findPassword.ts, cancelOrder.ts
+├── model/
+│   ├── types.ts                   # All domain types
+│   ├── use{Action1}.ts           # e.g., useSignIn.ts, useOrderCreate.ts
+│   ├── use{Action2}.ts
+│   ├── {domain}Validation.ts     # ✅ Shared validation
+│   └── {domain}Schemas.ts        # ✅ Shared Zod schemas
+├── lib/
+│   └── {domain}Utils.ts          # Domain-specific utilities
+└── ui/
+    ├── {Action1}Form.tsx         # e.g., SignInForm.tsx, OrderCreateForm.tsx
+    ├── {Action2}Form.tsx
+    └── {shared}Component.tsx     # Shared UI within domain
+```
+
+**Naming Conventions**:
+
+```typescript
+// UI components
+{Domain}{Action}Form.tsx     // SignInForm, OrderCreateForm
+{Domain}{Action}Button.tsx   // OrderCancelButton, PaymentConfirmButton
+
+// Hooks
+use{Domain}{Action}.ts       // useSignIn, useOrderCreate
+
+// API functions
+{action}{Domain}.ts          // signIn.ts, createOrder.ts
+```
+
+---
+
+### 4. Pages Layer (v2.1 "Pages First")
+
+**Purpose**: Routes + page-specific logic
+
+**FSD v2.1 Principle**: Keep page-specific logic IN pages, not features
+
+**Rules**:
+- Page-specific = stays in pages (don't extract unless reused on 2+ pages)
+- Can have api/, model/, ui/ subdirectories
+- Keep thin: orchestrate features, don't implement heavy logic
+
+**Standard Structure**:
+
+```
+pages/{page-name}/
+├── index.ts
+├── api/                           # Page-specific API
+│   └── updatePageData.ts
+├── model/                         # Page-specific hooks
+│   ├── types.ts
+│   ├── usePageData.ts
+│   └── usePageAction.ts
+└── ui/
+    ├── {Page}.tsx                 # Main page component
+    ├── {Page}Section.tsx          # Page-specific sections
+    └── {Page}Modal.tsx            # Page-specific modals
+```
+
+**Decision**: Pages vs Features?
+
+```typescript
+// Use PAGES if:
+- Logic specific to one page
+- Component used only in one route
+- Mutation is page-specific action
+
+// Use FEATURES if:
+- Logic reused on 2+ pages
+- Component appears in multiple routes
+- Domain actions shared across pages
+```
+
+---
+
+## Inter-Feature Dependencies
+
+### The Problem
+
+**Official FSD**: "Features CANNOT import other features"
+**Reality**: Domains have natural dependencies (order ↔ payment)
+
+**Real example from our project**:
+
+```typescript
+// order-payment needs order-register types
+features/order-payment/model/useDetailedFreightRate.ts
+import type { FreightRateResponse } from '../../order-register/DispatchInfo';
+```
+
+### Team Solutions
+
+#### Solution 1: Merge Tightly Coupled Features (Recommended)
+
+```typescript
+// ❌ BEFORE: Separate features with cross-imports
+features/order-register/          // order ← payment (types)
+features/order-payment/           // payment → order (types)
+
+// ✅ AFTER: Merged into one domain
+features/order/
+├── api/
+│   ├── createOrder.ts           # Order registration
+│   ├── calculateFreight.ts      # Freight calculation
+│   ├── processPayment.ts        # Payment processing
+│   └── confirmOrder.ts          # Order confirmation
+├── model/
+│   ├── types.ts                 # ✅ All shared types
+│   ├── useOrderCreate.ts
+│   ├── useOrderPayment.ts
+│   └── orderValidation.ts       # ✅ Shared validation
+└── ui/
+    ├── OrderRegisterForm/
+    ├── OrderPaymentForm/
+    └── OrderConfirmButton/
+```
+
+**When to merge**:
+- Features share significant types/logic
+- Actions are sequential in user flow (register → pay → confirm)
+- Mirrors backend service (e.g., `OrderService` handles order + payment)
+
+#### Solution 2: Type-Only Imports (Pragmatic Exception)
+
+```typescript
+// ✅ ALLOWED: Type-only imports
+features/payment/model/types.ts
+import type { Order } from '@/features/order';  // ✅ Type-only
+
+export interface Payment {
+  orderId: Order['id'];
+  amount: number;
+}
+
+// ❌ NOT ALLOWED: Runtime imports
+features/payment/model/usePayment.ts
+import { useOrder } from '@/features/order';  // ❌ Runtime dependency
+```
+
+**Rules**:
+- Use `import type` syntax
+- Only types/interfaces, not functions/hooks
+- Document dependency relationship
+- Keep minimal
+
+#### Solution 3: Extract to Entities (Pure Domain Data Only)
+
+```typescript
+// entities/order/model/types.ts
+export interface Order {
+  id: string;
+  totalAmount: number;
+}
+
+// Both features import from entity
+features/order/  → import { Order } from '@/entities/order'
+features/payment/ → import { Order } from '@/entities/order'
+```
+
+**When to use**:
+- Type is pure domain model (no feature-specific logic)
+- Used by 3+ features
+- Represents core business concept
+
+---
+
+## Decision Guide
+
+### Quick Decision Matrix
+
+| Question | Shared | Entity | Feature | Page |
+|----------|--------|--------|---------|------|
+| **What is it?** | Generic util | Domain model | Domain actions | Route/page |
+| **Reusability?** | Everywhere | Across features | 2+ pages | Single page |
+| **Has interactions?** | No | ❌ No | ✅ Yes | ✅ Yes |
+| **Has mutations?** | No | ❌ No | ✅ Yes | ✅ Yes |
+| **Domain-specific?** | ❌ No | ✅ Yes | ✅ Yes | ✅ Yes |
+
+### Decision Flow
+
+```
+New Code?
+├─ Generic util (formatDate, Button) → shared/
+├─ Pure domain model (Company type) → entities/ (optional)
+├─ Used on 2+ pages? → features/{domain}/
+└─ Used on 1 page? → pages/{page}/
+```
+
+### Common Scenarios
+
+| Case | Solution |
+|------|----------|
+| Auth (sign-in + sign-up + find-pw) | `features/auth/` (domain-centric) |
+| Order + Payment (tightly coupled) | `features/order/` (merge) |
+| Address search (reused 3+ pages) | `features/address-search/` |
+| Company info page (single page) | `pages/dashboard/company-info/` |
+| Format phone number | `shared/lib/formatPhone.ts` |
+
+---
+
+## Review Checklist
+
+### Layer Placement
+
+- [ ] Generic util → shared/
+- [ ] Pure domain model → entities/ (optional)
+- [ ] Domain actions (2+ pages or related actions) → features/
+- [ ] Page-specific logic → pages/
+
+### Feature Structure (Team: Domain-Centric)
+
+- [ ] Feature represents domain (like backend service)
+- [ ] Related actions grouped together
+- [ ] Shared logic within domain (validation, schemas, types)
+- [ ] Naming: `{Domain}{Action}Form.tsx`, `use{Domain}{Action}.ts`
+
+### Dependencies
+
+- [ ] NO runtime imports between features
+- [ ] Type-only imports use `import type` syntax
+- [ ] Tightly coupled features are merged
+- [ ] All imports from lower layers only
+
+### Entity Purity (if using entities)
+
+- [ ] Entity components accept ONLY domain data props
+- [ ] NO buttons or interactions in entities
+- [ ] Entity API calls are GET only
+- [ ] NO state management in entities
+
+---
+
+## Team Adaptations Summary
+
+Official FSD 2.1 기반 + 팀 커스텀:
+
+1. **Domain-Centric Features**: One feature = one domain (backend service 개념)
+2. **Shared Logic Within Domain**: Validation, schemas, utilities는 feature 내부에서 자연스럽게 공유
+3. **Pragmatic Dependencies**: Type-only imports 허용, 강결합은 merge
+4. **Simplified Layers**: 4 core layers (app, pages, features, shared) + optional entities
+5. **Pages First**: Single-page logic는 pages에 유지 (불필요한 feature 추출 금지)
+
+**Team Mantra**: "One feature = one domain (like a backend service)"
+
+---
+
+## References
+
+- **FSD Official**: https://feature-sliced.design/
+- **FSD v2.1 Release**: https://github.com/feature-sliced/documentation/discussions/756
+- **FSD Tutorial**: https://feature-sliced.design/docs/get-started/tutorial
+
+**Key Official Principle Applied**:
+> "A crucial principle for using the Features layer effectively is: not everything needs to be a feature. A good indicator that something needs to be a feature is the fact that it is reused on several pages."
+
+**Team Extension**:
+> "Features can also group related actions within a domain, even if individual actions aren't reused, when they share significant logic and mirror backend service structure."
+
+---
+
+**Document Version**: 2.0.0
+**Based on**: FSD v2.1 + Team Domain-Centric Adaptations

@@ -30,7 +30,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.."; pwd)"
 
 # 버전 정보 (install.sh와 동기화)
-VERSION="2.7.1"
+VERSION="2.7.2"
 
 # 기본 출력 파일 (설정하지 않으면 stdout)
 OUTPUT_FILE=""
@@ -43,8 +43,10 @@ EXCLUDE_DIRS=(
     ".claude/commands/_backup"
     ".claude/agents/_deprecated"
     ".claude/lib/__tests__"
+    ".claude/hooks"
     ".specify/specs"
     ".specify/temp"
+    ".specify/memory"
     ".git"
 )
 
@@ -52,6 +54,7 @@ EXCLUDE_DIRS=(
 EXCLUDE_FILES=(
     "*.log"
     "*.tmp"
+    "*.local.json"
     ".DS_Store"
     "Thumbs.db"
 )
@@ -206,7 +209,8 @@ for file in "${ALL_FILES[@]}"; do
     # 제외 파일 패턴 체크
     if [ "$skip" = false ]; then
         for pattern in "${EXCLUDE_FILES[@]}"; do
-            if [[ "$file" == *"$pattern"* ]]; then
+            # Glob pattern matching (*.ext) and literal string matching
+            if [[ "$file" == $pattern ]] || [[ "$file" == *"$pattern" ]]; then
                 log_verbose "Excluding (pattern): $file"
                 skip=true
                 break

@@ -1,8 +1,8 @@
 {
-  "version": "2.7.1",
-  "generatedAt": "2025-11-11T23:00:33Z",
+  "version": "2.7.2",
+  "generatedAt": "2025-11-11T23:19:56Z",
   "files": {
-    ".claude/.checksums.json": "82b74de5af9c4d917c835f60d330dbc1addf5940b4bf9b92f79d26f352a5ddd2",
+    ".claude/.checksums.json": "cd550bdcfcc9abd80146ab538d794107dbf686e52dfd48cb350afea38ccc1379",
     ".claude/.version": "362148d7721ad4a1bb64981ff8d604ef7f4d22267ea8845042f54f90940f24fd",
     ".claude/agents/api-designer.md": "8d34ac2f5c3c7d9e25ffe46463b8efa3073a1f023f6226ef2f2d184b1a64c1b5",
     ".claude/agents/architect-unified.md": "509dd35487a5054f559f7ec6536f33a6015f09bfdcc113916718970d2c43f77f",
@@ -41,12 +41,10 @@
     ".claude/docs/REUSABILITY-GUIDE.md": "08d1ba1032b76a819e0ca71d87c1b68dba696bdc1cd092775e79b1f490a8a910",
     ".claude/docs/SKILLS-GUIDE.md": "572398a2abf4067a2dce822617edb0910f91fa085b16b7878643ef78b3d605f1",
     ".claude/docs/SUB-AGENTS-GUIDE.md": "876e0a7b428e450d8ef030f474e58cf7b056c4994b9017165bfb5502eda56e34",
-    ".claude/hooks/install-hooks.sh": "e61dca7b34dd1269cd2d1493744cf660fc16447863994b9ad7410fd7dab1c1c3",
-    ".claude/hooks/pre-commit": "27f3a319f7c709a07c77442221711911989157e66df63ca9cba6e1d093c79a71",
     ".claude/lib/cache-helper.sh": "3a7b241eaa1411caad09800251d33f130b30a12ce597abf7ce017f1306c9e124",
     ".claude/lib/checksum-helper.sh": "b2175e4bba40e2af44f6b98fce0ce5a816123980dbb8634de126dea611d6e59c",
     ".claude/lib/dashboard-generator.sh": "500e5e602ccdfac0a834d9de43a7fdaf38a2c56ede13a1f89d5bc9edea1aed25",
-    ".claude/lib/generate-checksums.sh": "b6bdb1f1bd3db642f076a23ee18d96b38c3c2b24826769425cb9944b7e928b7c",
+    ".claude/lib/generate-checksums.sh": "73b0e95b31a4549110c72250055a77ee68b35a791afb9adf09efd941a56097bc",
     ".claude/lib/git-stats-helper.sh": "e511e6ea75b9fc22a9752a8ecbc5563429c0be33a407715640d537bff3f03a61",
     ".claude/lib/gitignore-manager.sh": "61259fda4edad04214b61876f9914d7d9f8d148e90ee7598b80de1f1f70dd432",
     ".claude/lib/metrics-collector.sh": "445f081eb83eb7bef46d908d40d8e9e3fb81a50cb27ab670af820c1e581db236",
@@ -62,7 +60,6 @@
     ".claude/lib/validation-config.sh": "383db94fd94aaf286045b417d6ef0177dcff34076141c6c1fd64c6b56841374c",
     ".claude/lib/validation-utils.sh": "33cb6da14a8304db1e08dadef4612e729bad0360ffc1ccf467889a59fcc19d92",
     ".claude/lib/verify-with-checksum.sh": "502449c7b0f0235dee45a398162ae905761454e7fa94966a1d66643d5e2be224",
-    ".claude/settings.local.json": "cf534ab772a600036139928042d5b0a6ebc993a0bebbdfbbf4946bcb924a1d23",
     ".claude/skills/api-integration/examples/mutation-example.md": "b38e36ed8d9f12b72d3897aa525e01aca093b6e830cec3c85f64a08f9c3e2c42",
     ".claude/skills/api-integration/examples/query-example.md": "d146cadddc817ab0d69bb789fb7d75e3df05a97a6ba71f76693eaac2dceed95a",
     ".claude/skills/api-integration/reference/error-handling.md": "ebdd19fd54e558db90705e33cb70f18b2d519c80fec91dd8e5bb38a84faf3621",
@@ -104,8 +101,6 @@
     ".claude/templates/git/pr-template.md": "d30aebe2dda054d8baae2a6b6eb4c1d6c76ae293fca5cb13b9359d030c82147b",
     ".claude/templates/README.md": "e26c94927cb648aa8887113a780f5e297770924a218ec6f2b1ecb50b4ca6bc19",
     ".claude/templates/validation/report-template.md": "6c72a9d24f9f2866b139ce0593c76e18f07f6f81fbf90083f16b1978de83103c",
-    ".claude/workflow-gates.json": "c0537dda116c85454dc70ca210457e0531d7b495b3443e022b90610bdea7de00",
-    ".specify/memory/constitution.md": "9b7e69be8f87410e92b29d5fb0981cf1b961930485ede2904f9c5eff14847382",
-    ".specify/memory/PATHS.md": "2a4a216db719963c15bdcd7dc838e4f4b51c7a320d5cca18392e032a5705ba66"
+    ".claude/workflow-gates.json": "c0537dda116c85454dc70ca210457e0531d7b495b3443e022b90610bdea7de00"
   }
 }

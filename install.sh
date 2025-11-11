@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Claude Code Workflows Installer
-# Version: 2.7.1 - Hotfix: Checksum Exclusions
+# Version: 2.7.2 - Hotfix: Exclude Local & Generated Files
 
 set -e
 
@@ -13,8 +13,8 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Version Configuration
-INSTALLER_VERSION="2.7.1"
-TARGET_VERSION="2.7.1"
+INSTALLER_VERSION="2.7.2"
+TARGET_VERSION="2.7.2"
 
 # Repository Configuration
 REPO_URL="https://github.com/Liamns/claude-workflows"

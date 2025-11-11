@@ -52,7 +52,7 @@ download_checksum_manifest() {
 
     # 파라미터 검증
     if [[ -z "$repo_url" ]]; then
-        echo "ERROR: Repository URL is required" >&2
+        echo "오류: 저장소 URL이 필요합니다" >&2
         return 1
     fi
 
@@ -62,7 +62,7 @@ download_checksum_manifest() {
     owner_repo=$(echo "$repo_url" | sed -E 's|https?://github.com/||; s|\.git$||')
 
     if [[ -z "$owner_repo" ]]; then
-        echo "ERROR: Invalid GitHub URL: $repo_url" >&2
+        echo "오류: 잘못된 GitHub URL입니다: $repo_url" >&2
         return 1
     fi
 
@@ -100,7 +100,7 @@ parse_checksum_manifest() {
 
     # 파일 존재 확인
     if [[ ! -f "$manifest_file" ]]; then
-        echo "ERROR: Checksum manifest not found: $manifest_file" >&2
+        echo "오류: 체크섬 매니페스트를 찾을 수 없습니다: $manifest_file" >&2
         return 1
     fi
 
@@ -108,7 +108,7 @@ parse_checksum_manifest() {
     if command -v jq &> /dev/null; then
         # jq를 사용한 파싱 (권장)
         if ! jq empty "$manifest_file" 2>/dev/null; then
-            echo "ERROR: Invalid JSON format in manifest" >&2
+            echo "오류: 매니페스트의 JSON 형식이 잘못되었습니다" >&2
             return 1
         fi
 
@@ -124,7 +124,7 @@ parse_checksum_manifest() {
         version=$(grep -o '"version"[[:space:]]*:[[:space:]]*"[^"]*"' "$manifest_file" | cut -d'"' -f4)
 
         if [[ -z "$version" ]]; then
-            echo "ERROR: Cannot parse version from manifest" >&2
+            echo "오류: 매니페스트에서 버전을 파싱할 수 없습니다" >&2
             return 1
         fi
 
@@ -156,7 +156,7 @@ verify_installation_with_checksum() {
 
     # 매니페스트 확인
     if [[ ! -f "$CHECKSUM_MANIFEST" ]]; then
-        echo "ERROR: 체크섬 매니페스트를 찾을 수 없습니다: $CHECKSUM_MANIFEST" >&2
+        echo "오류: 체크섬 매니페스트를 찾을 수 없습니다: $CHECKSUM_MANIFEST" >&2
         echo "       먼저 download_checksum_manifest()를 실행하세요." >&2
         return 1
     fi
@@ -164,7 +164,7 @@ verify_installation_with_checksum() {
     # 매니페스트 파싱
     local manifest_data
     if ! manifest_data=$(parse_checksum_manifest "$CHECKSUM_MANIFEST"); then
-        echo "ERROR: 매니페스트 파싱 실패" >&2
+        echo "오류: 매니페스트 파싱 실패" >&2
         return 1
     fi
 
@@ -281,12 +281,12 @@ generate_github_raw_url() {
 
     # 파라미터 검증
     if [[ -z "$file_path" ]]; then
-        echo "ERROR: File path is required" >&2
+        echo "오류: 파일 경로가 필요합니다" >&2
         return 1
     fi
 
     if [[ -z "$repo_url" ]]; then
-        echo "ERROR: Repository URL is required" >&2
+        echo "오류: 저장소 URL이 필요합니다" >&2
         return 1
     fi
 
@@ -296,7 +296,7 @@ generate_github_raw_url() {
     owner_repo=$(echo "$repo_url" | sed -E 's|https?://github.com/||; s|\.git$||')
 
     if [[ -z "$owner_repo" ]]; then
-        echo "ERROR: Invalid GitHub URL: $repo_url" >&2
+        echo "오류: 잘못된 GitHub URL입니다: $repo_url" >&2
         return 1
     fi
 
@@ -327,7 +327,7 @@ retry_failed_files() {
 
     # 파라미터 검증
     if [[ -z "$repo_url" ]]; then
-        echo "ERROR: Repository URL is required" >&2
+        echo "오류: 저장소 URL이 필요합니다" >&2
         return 1
     fi
 

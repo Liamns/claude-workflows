@@ -69,7 +69,7 @@ add_to_gitignore() {
 
     # 패턴 필수
     if [[ -z "$pattern" ]]; then
-        echo "ERROR: Pattern is required" >&2
+        echo "오류: 패턴이 필요합니다" >&2
         return 1
     fi
 

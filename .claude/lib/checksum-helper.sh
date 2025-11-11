@@ -50,11 +50,11 @@ detect_sha256_tool() {
     fi
 
     # 사용 가능한 도구 없음
-    echo "ERROR: No SHA256 tool found (shasum, sha256sum, or openssl)" >&2
-    echo "Please install one of the following:" >&2
-    echo "  macOS: shasum (pre-installed)" >&2
-    echo "  Linux: apt-get install coreutils (for sha256sum)" >&2
-    echo "  Universal: openssl (usually pre-installed)" >&2
+    echo "오류: SHA256 도구를 찾을 수 없습니다 (shasum, sha256sum, openssl)" >&2
+    echo "다음 중 하나를 설치하세요:" >&2
+    echo "  macOS: shasum (기본 설치됨)" >&2
+    echo "  Linux: apt-get install coreutils (sha256sum 포함)" >&2
+    echo "  공통: openssl (대부분 기본 설치됨)" >&2
     return 1
 }
 
@@ -76,13 +76,13 @@ calculate_sha256() {
 
     # 파일 경로 필수
     if [[ -z "$file" ]]; then
-        echo "ERROR: File path is required" >&2
+        echo "오류: 파일 경로가 필요합니다" >&2
         return 1
     fi
 
     # 파일 존재 확인
     if [[ ! -f "$file" ]]; then
-        echo "ERROR: File not found: $file" >&2
+        echo "오류: 파일을 찾을 수 없습니다: $file" >&2
         return 1
     fi
 
@@ -108,14 +108,14 @@ calculate_sha256() {
             checksum=$(openssl dgst -sha256 "$file" 2>&1 | awk '{print $NF}')
             ;;
         *)
-            echo "ERROR: Unknown SHA256 tool: $tool" >&2
+            echo "오류: 알 수 없는 SHA256 도구입니다: $tool" >&2
             return 1
             ;;
     esac
 
     # 체크섬 검증 (64자 hex string)
     if [[ ! "$checksum" =~ ^[a-f0-9]{64}$ ]]; then
-        echo "ERROR: Invalid checksum format: $checksum" >&2
+        echo "오류: 잘못된 체크섬 형식입니다: $checksum" >&2
         return 1
     fi
 

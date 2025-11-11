@@ -43,10 +43,10 @@ detect_download_tool() {
     fi
 
     # 사용 가능한 도구 없음
-    echo "ERROR: No download tool found (curl or wget)" >&2
-    echo "Please install one of the following:" >&2
-    echo "  macOS: curl (pre-installed)" >&2
-    echo "  Linux: apt-get install curl  or  apt-get install wget" >&2
+    echo "오류: 다운로드 도구를 찾을 수 없습니다 (curl, wget)" >&2
+    echo "다음 중 하나를 설치하세요:" >&2
+    echo "  macOS: curl (기본 설치됨)" >&2
+    echo "  Linux: apt-get install curl  또는  apt-get install wget" >&2
     return 1
 }
 
@@ -76,12 +76,12 @@ download_file_with_retry() {
 
     # 파라미터 검증
     if [[ -z "$url" ]]; then
-        echo "ERROR: URL is required" >&2
+        echo "오류: URL이 필요합니다" >&2
         return 1
     fi
 
     if [[ -z "$dest" ]]; then
-        echo "ERROR: Destination path is required" >&2
+        echo "오류: 저장 경로가 필요합니다" >&2
         return 1
     fi
 
@@ -117,7 +117,7 @@ download_file_with_retry() {
                 exit_code=$?
                 ;;
             *)
-                echo "ERROR: Unknown download tool: $tool" >&2
+                echo "오류: 알 수 없는 다운로드 도구입니다: $tool" >&2
                 return 1
                 ;;
         esac
@@ -130,7 +130,7 @@ download_file_with_retry() {
             sleep "$backoff"
             backoff=$((backoff * 2))  # 지수 백오프: 1s → 2s → 4s
         else
-            echo "ERROR: $max_retries회 시도 후 다운로드 실패: $url" >&2
+            echo "오류: $max_retries회 시도 후 다운로드 실패: $url" >&2
             echo "       파일을 다운로드할 수 없습니다. 다음을 확인하세요:" >&2
             echo "       1. 인터넷 연결 상태" >&2
             echo "       2. URL 접근 가능 여부: $url" >&2

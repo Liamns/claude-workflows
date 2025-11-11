@@ -678,10 +678,10 @@ install_workflows() {
             print_error "Git error output:"
             echo "$git_output"
             echo ""
-            print_info "Please check:"
-            print_info "  - Internet connection"
-            print_info "  - Repository URL: $REPO_URL"
-            print_info "  - Git is installed: $(command -v git || echo 'NOT FOUND')"
+            print_info "다음을 확인하세요:"
+            print_info "  - 인터넷 연결 상태"
+            print_info "  - 저장소 URL: $REPO_URL"
+            print_info "  - Git 설치 여부: $(command -v git || echo '설치되지 않음')"
             exit 1
         fi
     fi
@@ -979,7 +979,7 @@ install_workflows() {
         # Handle verification failure
         if [ "$verification_passed" = false ]; then
             print_error "Installation verification failed"
-            print_info "Please check the log file: $LOG_FILE"
+            print_info "로그 파일을 확인하세요: $LOG_FILE"
             if [ -n "$BACKUP_DIR" ]; then
                 print_warning "You can find the backup at: $BACKUP_DIR"
                 print_info "Rolling back installation..."

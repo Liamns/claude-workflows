@@ -136,7 +136,7 @@ detect_sha256_tool() {
     elif command -v openssl &> /dev/null; then
         echo "openssl dgst -sha256"
     else
-        echo "ERROR: No SHA256 tool found (shasum, sha256sum, or openssl)" >&2
+        echo "오류: SHA256 도구를 찾을 수 없습니다 (shasum, sha256sum, openssl)" >&2
         exit 1
     fi
 }

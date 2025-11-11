@@ -7,6 +7,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.7.0] - 2025-01-11
+
+### Added
+- FSD 커스텀 아키텍처 공식 적용 (Domain-Centric Approach)
+  - Team Philosophy: "One feature = one domain (like a backend service)"
+  - config.json v2.1.0-team-custom
+  - Type-only imports 지원
+  - Pages First 원칙 적용
+
+### Changed
+- Widgets 레이어 제거 → Features/Pages로 병합
+- FSD 컴포넌트 생성 스킬 업데이트 (domain-centric 템플릿)
+- layer-rules.md, props-guidelines.md 팀 커스텀 규칙 반영
+- page-template.md Pages First 기반으로 재작성
+
+### Deprecated
+- widget-template.md → widget-template.md.deprecated
+
+### Migration Guide
+
+#### Widgets → Features/Pages 마이그레이션
+
+기존 Widgets 레이어를 사용하던 경우:
+
+**Option 1: Features로 이동 (재사용되는 경우)**
+```
+widgets/header/  → features/header/
+```
+
+**Option 2: Pages로 이동 (1개 페이지에서만 사용)**
+```
+widgets/order-filter/  → pages/order-list/ui/OrderFilter.tsx
+```
+
+**판단 기준:**
+- 2개 이상 페이지에서 재사용 → Features
+- 1개 페이지에서만 사용 → Pages (Pages First 원칙)
+
+#### Type-Only Imports 활용
+
+Feature 간 타입 참조가 필요한 경우:
+```typescript
+// ✅ 허용
+import type { OrderType } from '@/features/order';
+
+// ❌ 금지
+import { OrderList } from '@/features/order';
+```
+
+자세한 내용: `architectures/frontend/fsd/fsd-architecture.mdc`
+
+### Compatibility
+- Supports upgrade from 2.5.x, 2.6.x → 2.7.0
+- Legacy versions (2.4.x↓) show warning
+- No breaking changes for existing code
+
 ## [2.6.0] - 2025-01-10
 
 ### Added 🆕

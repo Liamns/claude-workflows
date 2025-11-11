@@ -1,6 +1,6 @@
 # 🤖 Claude Workflows
 
-[![Version](https://img.shields.io/badge/version-2.6.0-blue.svg)](https://github.com/Liamns/claude-workflows)
+[![Version](https://img.shields.io/badge/version-2.7.0-blue.svg)](https://github.com/Liamns/claude-workflows)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-purple.svg)](https://claude.ai/code)
 [![Validation](https://img.shields.io/badge/validation-automated-success.svg)](https://github.com/Liamns/claude-workflows)
@@ -9,9 +9,25 @@
 
 **📖 새로운 Claude 세션?** → [프로젝트 컨텍스트 문서](.claude/docs/PROJECT-CONTEXT.md) (5분이면 전체 파악)
 
-## 🆕 v2.6.0 주요 기능
+## 🆕 v2.7.0 주요 기능
+
+### FSD Custom Architecture (v2.7.0)
+- **🏗️ Domain-Centric Features** - 하나의 feature = 하나의 도메인 (백엔드 서비스처럼)
+  - config.json v2.1.0-team-custom
+  - Widgets 레이어 제거 → Features/Pages로 병합
+  - Type-only imports 지원 (feature 간 타입 참조)
+  - Pages First 원칙 적용 (페이지 특화 로직은 pages에 유지)
+- **📐 4 Core Layers** - app → pages → features → entities (optional) → shared
+- **📖 자세한 가이드** - [FSD Architecture Guide](architectures/frontend/fsd/fsd-architecture.mdc)
+
+### 이전 기능 (v2.6.0)
 
 ### 핵심 개선사항
+- **🔒 SHA256 체크섬 기반 파일 무결성 검증** - 설치 시 자동 파일 검증 및 복구
+  - 190개 파일의 SHA256 체크섬 자동 검증
+  - 불일치 파일 자동 재다운로드
+  - 복구 실패 시 안전한 롤백
+  - .gitignore 자동 관리 (백업/캐시 제외)
 - **✅ 강화된 Validation 시스템** - 4가지 마이그레이션 시나리오 완전 검증
   - v1.0 → v2.6 마이그레이션
   - v2.4/v2.5 → v2.6 업그레이드
@@ -40,6 +56,47 @@ bash install.sh --health-check
 # Validation 실행
 bash .claude/lib/validate-system.sh
 ```
+
+## 🔒 Installation Verification
+
+### SHA256 체크섬 기반 파일 무결성 검증
+
+설치 시 자동으로 실행되는 고급 검증 시스템:
+
+- **✅ 파일 무결성 검증**: 190개 파일의 SHA256 체크섬 자동 검증
+- **🔄 자동 복구**: 불일치 파일 자동 재다운로드
+- **🛡️ 안전한 롤백**: 복구 실패 시 이전 버전으로 자동 복원
+- **📝 .gitignore 관리**: 백업/캐시 파일 자동 제외
+
+### 수동 검증
+
+```bash
+# 체크섬 매니페스트 다운로드
+cd /path/to/project
+source .claude/lib/verify-with-checksum.sh
+download_checksum_manifest "https://github.com/Liamns/claude-workflows" "main"
+
+# 파일 무결성 검증
+verify_installation_with_checksum
+
+# 실패 파일 자동 복구
+retry_failed_files "https://github.com/Liamns/claude-workflows" "main"
+```
+
+### 체크섬 매니페스트 생성 (개발자용)
+
+```bash
+# 현재 프로젝트의 체크섬 생성
+bash .claude/lib/generate-checksums.sh -o .claude/.checksums.json --verbose
+
+# 출력 예시
+# ✓ Checksum manifest generated: .claude/.checksums.json
+#   Version: 2.7.0
+#   Files: 190
+#   Generated at: 2025-01-11T10:00:00Z
+```
+
+**자세한 내용**: [Installation Verification Guide](.specify/specs/003-install-verification-improvement/quickstart.md)
 
 ## 💡 핵심 기능
 

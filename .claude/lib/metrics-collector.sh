@@ -94,7 +94,7 @@ metrics_update() {
         jq "$path = $value" "$CURRENT_SESSION_FILE" > "$temp" && mv "$temp" "$CURRENT_SESSION_FILE"
     else
         # Fallback: manual JSON update (limited support)
-        echo "Warning: jq not installed. Metrics update may be limited." >&2
+        echo "경고: jq가 설치되지 않았습니다. 메트릭 업데이트가 제한될 수 있습니다." >&2
     fi
 }
 

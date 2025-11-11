@@ -1,14 +1,13 @@
-# Props 사용 가이드라인
+# Props 사용 가이드라인 (Team Custom)
 
 FSD 아키텍처에서 각 레이어별 Props 사용 규칙입니다.
 
-## 기본 원칙
+## 기본 원칙 (Team Custom)
 
 1. **Shared/UI**: 모든 종류의 props 허용 (이벤트 핸들러, 스타일 등)
-2. **Entities**: 도메인 데이터 props만
-3. **Features**: 도메인 데이터 props만 (이벤트 핸들러 금지)
-4. **Widgets**: 도메인 데이터 props 또는 props 없음
-5. **Pages**: 도메인 데이터 props 또는 props 없음
+2. **Entities** (Optional): 도메인 데이터 props만
+3. **Features** (Domain-Centric): 도메인 데이터 props만 (이벤트 핸들러 금지)
+4. **Pages** (Pages First): 도메인 데이터 props 또는 props 없음
 
 ## Shared/UI Props
 
@@ -215,48 +214,7 @@ test('DispatchForm이 onSubmit을 올바르게 호출', () => { ... });
 test('DispatchForm의 제출이 올바르게 동작', () => { ... });
 ```
 
-## Widgets Props
-
-**목적**: Features/Entities 조합
-
-**허용되는 Props**:
-```typescript
-interface HeaderProps {
-  // ✅ 도메인 데이터 (선택)
-  userId?: string;
-
-  // ✅ 또는 props 없음도 가능
-}
-```
-
-**예시**:
-```typescript
-// widgets/header/ui/Header.tsx
-export function Header({ userId }: HeaderProps) {
-  const user = useUserStore((state) => state.user);
-
-  return (
-    <header>
-      <Logo />
-      {user && <UserMenu user={user} />}
-    </header>
-  );
-}
-
-// 또는 props 없음
-export function Header() {
-  const user = useUserStore((state) => state.user);
-
-  return (
-    <header>
-      <Logo />
-      {user && <UserMenu user={user} />}
-    </header>
-  );
-}
-```
-
-## Pages Props
+## Pages Props (Team Custom: Pages First)
 
 **목적**: 라우트 핸들링
 
@@ -331,17 +289,14 @@ export function DispatchForm({ userId }: Props) {
 - [ ] 이벤트 핸들러 props 없음
 - [ ] 최소한의 스타일 props만 (className 정도)
 
-### Features 체크리스트
+### Features 체크리스트 (Domain-Centric)
 - [ ] 도메인 데이터 props만 사용
 - [ ] 이벤트 핸들러 props 없음
 - [ ] UI 설정 props 없음
 - [ ] 모든 핸들러는 내부에서 정의
+- [ ] 도메인별로 관련 액션들 그룹화
 
-### Widgets 체크리스트
-- [ ] 도메인 데이터 props 또는 props 없음
-- [ ] Features/Entities 조합에 집중
-
-### Pages 체크리스트
+### Pages 체크리스트 (Pages First)
 - [ ] 일반적으로 props 없음
 - [ ] 라우트 파라미터는 useParams로
 - [ ] 전역 상태는 store에서

@@ -11,6 +11,25 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # 공통 유틸리티 로드
 source "$SCRIPT_DIR/validation-utils.sh"
 
+# 설정 파일 로드
+CONFIG_FILE="${CONFIG_FILE:-$SCRIPT_DIR/validation-config.sh}"
+if [[ -f "$CONFIG_FILE" ]]; then
+    # shellcheck source=.claude/lib/validation-config.sh
+    source "$CONFIG_FILE"
+else
+    # 기본값 (설정 파일 없을 때 호환성 유지)
+    # shellcheck disable=SC2034  # Used by sourced modules
+    readonly VALIDATION_DOC_THRESHOLD_PASS=90
+    # shellcheck disable=SC2034
+    readonly VALIDATION_DOC_THRESHOLD_WARNING=70
+    # shellcheck disable=SC2034
+    readonly VALIDATION_CONSISTENCY_THRESHOLD_PASS=90
+    # shellcheck disable=SC2034
+    readonly VALIDATION_CONSISTENCY_THRESHOLD_WARNING=70
+    # shellcheck disable=SC2034
+    readonly VALIDATION_REPORT_RETENTION_DAYS=30
+fi
+
 # 기본 설정
 VALIDATION_MODE="all"  # all, docs-only, migration-only, crossref-only
 DRY_RUN=false
@@ -19,13 +38,13 @@ QUIET=false
 REPORT_DIR=".claude/cache/validation-reports"
 LOG_FILE=""
 
-# 전역 변수
-OVERALL_STATUS="PASS"
-CONSISTENCY_SCORE=0
-START_TIME=$(date +%s)
-DOC_VALIDATION_RESULTS="{}"
-MIG_VALIDATION_RESULTS="{}"
-CROSSREF_VALIDATION_RESULTS="{}"
+# 전역 변수 (네임스페이스: __VS_ = Validate System)
+__VS_OVERALL_STATUS="PASS"
+__VS_CONSISTENCY_SCORE=0
+__VS_START_TIME=0  # Initialized in main()
+__VS_DOC_RESULTS="{}"
+__VS_MIG_RESULTS="{}"
+__VS_CROSSREF_RESULTS="{}"
 
 # 사용법 표시
 usage() {
@@ -140,27 +159,17 @@ run_documentation_validation() {
 
         # JSON 부분만 추출 (마지막 줄)
         local json_result=$(echo "$doc_results" | tail -1)
-        DOC_VALIDATION_RESULTS="$json_result"
+        __VS_DOC_RESULTS="$json_result"
 
         # 결과 파싱
-        local total=$(echo "$json_result" | grep -o '"total":[0-9]*' | cut -d':' -f2)
-        local passed=$(echo "$json_result" | grep -o '"passed":[0-9]*' | cut -d':' -f2)
-        local avg=$(echo "$json_result" | grep -o '"avgConsistency":[0-9]*' | cut -d':' -f2)
-
-        if [[ -z "$total" ]]; then
-            total=0
-        fi
-        if [[ -z "$passed" ]]; then
-            passed=0
-        fi
-        if [[ -z "$avg" ]]; then
-            avg=0
-        fi
+        local total=$(parse_json_field "$json_result" "total" "0")
+        local passed=$(parse_json_field "$json_result" "passed" "0")
+        local avg=$(parse_json_field "$json_result" "avgConsistency" "0")
 
         log_info "  검증 완료: $passed/$total 통과 (평균 일치율: $avg%)"
 
-        # 90% 이상이면 성공
-        if [[ $avg -ge 90 ]] && [[ $passed -eq $total ]]; then
+        # 일치율 임계값 이상이면 성공
+        if [[ $avg -ge $VALIDATION_DOC_THRESHOLD_PASS ]] && [[ $passed -eq $total ]]; then
             return 0
         else
             return 1
@@ -184,18 +193,11 @@ run_migration_validation() {
 
         # JSON 부분만 추출 (마지막 줄)
         local json_result=$(echo "$mig_results" | tail -1)
-        MIG_VALIDATION_RESULTS="$json_result"
+        __VS_MIG_RESULTS="$json_result"
 
         # 결과 파싱
-        local total=$(echo "$json_result" | grep -o '"total":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "0")
-        local passed=$(echo "$json_result" | grep -o '"passed":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "0")
-
-        if [[ -z "$total" ]]; then
-            total=0
-        fi
-        if [[ -z "$passed" ]]; then
-            passed=0
-        fi
+        local total=$(parse_json_field "$json_result" "total" "0")
+        local passed=$(parse_json_field "$json_result" "passed" "0")
 
         log_info "  검증 완료: $passed/$total 시나리오 통과"
 
@@ -224,23 +226,13 @@ run_crossref_validation() {
 
         # JSON 부분만 추출 (마지막 줄)
         local json_result=$(echo "$crossref_results" | tail -1)
-        CROSSREF_VALIDATION_RESULTS="$json_result"
+        __VS_CROSSREF_RESULTS="$json_result"
 
         # 결과 파싱
-        local total=$(echo "$json_result" | grep -o '"totalLinks":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "0")
-        local valid=$(echo "$json_result" | grep -o '"validLinks":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "0")
-        local broken=$(echo "$json_result" | grep -o '"brokenLinks":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "0")
-        local validity=$(echo "$json_result" | grep -o '"validity":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "100")
-
-        if [[ -z "$total" ]]; then
-            total=0
-        fi
-        if [[ -z "$valid" ]]; then
-            valid=0
-        fi
-        if [[ -z "$broken" ]]; then
-            broken=0
-        fi
+        local total=$(parse_json_field "$json_result" "totalLinks" "0")
+        local valid=$(parse_json_field "$json_result" "validLinks" "0")
+        local broken=$(parse_json_field "$json_result" "brokenLinks" "0")
+        local validity=$(parse_json_field "$json_result" "validity" "100")
 
         log_info "  검증 완료: $valid/$total 유효 (유효율: $validity%)"
 
@@ -265,12 +257,12 @@ generate_report() {
         source "$SCRIPT_DIR/report-generator.sh"
 
         # 검증 결과 수집 (전역 변수에서)
-        local doc_results="${DOC_VALIDATION_RESULTS:-{}}"
-        local mig_results="${MIG_VALIDATION_RESULTS:-{}}"
-        local crossref_results="${CROSSREF_VALIDATION_RESULTS:-{}}"
+        local doc_results="${__VS_DOC_RESULTS:-{}}"
+        local mig_results="${__VS_MIG_RESULTS:-{}}"
+        local crossref_results="${__VS_CROSSREF_RESULTS:-{}}"
 
         # 보고서 생성 (계산된 전체 상태 및 일관성 점수 전달)
-        save_report_to_file "$doc_results" "$mig_results" "$crossref_results" "$REPORT_DIR" "$OVERALL_STATUS" "$CONSISTENCY_SCORE"
+        save_report_to_file "$doc_results" "$mig_results" "$crossref_results" "$REPORT_DIR" "$__VS_OVERALL_STATUS" "$__VS_CONSISTENCY_SCORE"
 
         return 0
     else
@@ -293,16 +285,16 @@ print_summary() {
 
     # 실행 시간 계산
     local end_time=$(date +%s)
-    local duration=$((end_time - START_TIME))
+    local duration=$((end_time - __VS_START_TIME))
 
-    echo "  전체 상태: $OVERALL_STATUS"
-    echo "  일관성 점수: $CONSISTENCY_SCORE/100"
+    echo "  전체 상태: $__VS_OVERALL_STATUS"
+    echo "  일관성 점수: $__VS_CONSISTENCY_SCORE/100"
     echo "  실행 시간: ${duration}초"
     echo ""
 
-    if [[ "$OVERALL_STATUS" == "PASS" ]]; then
+    if [[ "$__VS_OVERALL_STATUS" == "PASS" ]]; then
         log_success "✅ 모든 검증 통과"
-    elif [[ "$OVERALL_STATUS" == "WARNING" ]]; then
+    elif [[ "$__VS_OVERALL_STATUS" == "WARNING" ]]; then
         log_warning "⚠️  일부 경고 발견"
     else
         log_error "❌ 검증 실패"
@@ -314,6 +306,9 @@ print_summary() {
 
 # 메인 함수
 main() {
+    # 시작 시간 기록
+    __VS_START_TIME=$(date +%s)
+
     # 인자 파싱
     parse_arguments "$@"
 
@@ -330,52 +325,54 @@ main() {
     fi
 
     # 검증 실행 (각 검증의 실패를 기록하되 계속 진행)
+    # 에러 수집 모드: set -e를 비활성화하여 모든 검증을 실행
+    set +e
+
     local doc_status=0
     local mig_status=0
     local ref_status=0
 
     case "$VALIDATION_MODE" in
         "docs-only")
-            run_documentation_validation || doc_status=$?
+            run_documentation_validation
+            doc_status=$?
             ;;
         "migration-only")
-            run_migration_validation || mig_status=$?
+            run_migration_validation
+            mig_status=$?
             ;;
         "crossref-only")
-            run_crossref_validation || ref_status=$?
+            run_crossref_validation
+            ref_status=$?
             ;;
         "all")
-            run_documentation_validation || doc_status=$?
+            run_documentation_validation
+            doc_status=$?
             echo ""
-            run_migration_validation || mig_status=$?
+            run_migration_validation
+            mig_status=$?
             echo ""
-            run_crossref_validation || ref_status=$?
+            run_crossref_validation
+            ref_status=$?
             ;;
     esac
 
+    # 에러 수집 완료 후 set -e 재활성화
+    set -e
+
     # 일관성 점수 계산 (문서 + 교차참조 평균)
-    local doc_avg=0
-    local ref_validity=100
+    local doc_avg=$(parse_json_field "$__VS_DOC_RESULTS" "avgConsistency" "0")
+    local ref_validity=$(parse_json_field "$__VS_CROSSREF_RESULTS" "validity" "100")
 
-    if [[ -n "$DOC_VALIDATION_RESULTS" ]] && [[ "$DOC_VALIDATION_RESULTS" != "{}" ]]; then
-        doc_avg=$(echo "$DOC_VALIDATION_RESULTS" | grep -o '"avgConsistency":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "0")
-        [[ -z "$doc_avg" ]] || [[ "$doc_avg" =~ [^0-9] ]] && doc_avg=0
-    fi
-
-    if [[ -n "$CROSSREF_VALIDATION_RESULTS" ]] && [[ "$CROSSREF_VALIDATION_RESULTS" != "{}" ]]; then
-        ref_validity=$(echo "$CROSSREF_VALIDATION_RESULTS" | grep -o '"validity":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "100")
-        [[ -z "$ref_validity" ]] || [[ "$ref_validity" =~ [^0-9] ]] && ref_validity=100
-    fi
-
-    CONSISTENCY_SCORE=$(( (doc_avg + ref_validity) / 2 ))
+    __VS_CONSISTENCY_SCORE=$(( (doc_avg + ref_validity) / 2 ))
 
     # 전체 상태 결정
     if [[ $doc_status -ne 0 ]] || [[ $mig_status -ne 0 ]] || [[ $ref_status -ne 0 ]]; then
         # 검증 실패가 있지만 일관성 점수가 높으면 WARNING
-        if [[ $CONSISTENCY_SCORE -ge 70 ]] && [[ $mig_status -eq 0 ]]; then
-            OVERALL_STATUS="WARNING"
+        if [[ $__VS_CONSISTENCY_SCORE -ge $VALIDATION_CONSISTENCY_THRESHOLD_WARNING ]] && [[ $mig_status -eq 0 ]]; then
+            __VS_OVERALL_STATUS="WARNING"
         else
-            OVERALL_STATUS="FAIL"
+            __VS_OVERALL_STATUS="FAIL"
         fi
     fi
 
@@ -388,9 +385,9 @@ main() {
     print_summary
 
     # 종료 코드 반환
-    if [[ "$OVERALL_STATUS" == "PASS" ]]; then
+    if [[ "$__VS_OVERALL_STATUS" == "PASS" ]]; then
         return 0
-    elif [[ "$OVERALL_STATUS" == "WARNING" ]]; then
+    elif [[ "$__VS_OVERALL_STATUS" == "WARNING" ]]; then
         return 2
     else
         return 1

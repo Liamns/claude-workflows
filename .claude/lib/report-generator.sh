@@ -16,6 +16,25 @@ if ! declare -f log_info > /dev/null 2>&1; then
     source "$SCRIPT_DIR/validation-utils.sh"
 fi
 
+# 설정 파일 로드 (이미 로드되지 않았다면)
+if [[ -z "${VALIDATION_DOC_THRESHOLD_PASS:-}" ]]; then
+    CONFIG_FILE="${CONFIG_FILE:-$SCRIPT_DIR/validation-config.sh}"
+    if [[ -f "$CONFIG_FILE" ]]; then
+        # shellcheck source=.claude/lib/validation-config.sh
+        source "$CONFIG_FILE"
+    else
+        # 기본값
+        # shellcheck disable=SC2034  # Used by sourced modules
+        readonly VALIDATION_DOC_THRESHOLD_PASS=90
+        # shellcheck disable=SC2034
+        readonly VALIDATION_DOC_THRESHOLD_WARNING=70
+        # shellcheck disable=SC2034
+        readonly VALIDATION_CONSISTENCY_THRESHOLD_WARNING=70
+        # shellcheck disable=SC2034
+        readonly VALIDATION_REPORT_RETENTION_DAYS=30
+    fi
+fi
+
 # ============================================================
 # 보고서 생성 함수
 # ============================================================
@@ -98,7 +117,7 @@ generate_json_report() {
     # 전체 상태 결정 (전달받지 않은 경우만)
     if [[ -z "$passed_overall_status" ]]; then
         if [[ $doc_passed -lt $doc_total ]] || [[ $mig_passed -lt $mig_total ]] || [[ $ref_validity -lt 100 ]]; then
-            if [[ $consistency_score -ge 70 ]]; then
+            if [[ $consistency_score -ge $VALIDATION_CONSISTENCY_THRESHOLD_WARNING ]]; then
                 overall_status="WARNING"
             else
                 overall_status="FAIL"
@@ -106,8 +125,15 @@ generate_json_report() {
         fi
     fi
 
-    # JSON 생성
-    cat > "$output_file" << EOF
+    # JSON 생성 (안전한 방식: 임시 파일 사용)
+    local temp_file
+    temp_file=$(mktemp) || {
+        log_error "임시 파일 생성 실패"
+        return 1
+    }
+
+    # 임시 파일에 먼저 작성
+    if ! cat > "$temp_file" << EOF
 {
   "id": "$report_id",
   "timestamp": "$timestamp",
@@ -132,6 +158,18 @@ generate_json_report() {
   }
 }
 EOF
+    then
+        log_error "JSON 작성 실패"
+        rm -f "$temp_file"
+        return 1
+    fi
+
+    # 최종 위치로 이동
+    if ! mv "$temp_file" "$output_file"; then
+        log_error "보고서 파일 저장 실패: $output_file"
+        rm -f "$temp_file"
+        return 1
+    fi
 
     log_success "  ✓ JSON 보고서 생성: $output_file"
 
@@ -162,17 +200,17 @@ generate_markdown_report() {
     local report_id="report-$(date +%Y%m%d-%H%M%S)"
 
     # 결과 파싱
-    local doc_total=$(echo "$doc_results" | grep -o '"total":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "0")
-    local doc_passed=$(echo "$doc_results" | grep -o '"passed":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "0")
-    local doc_avg=$(echo "$doc_results" | grep -o '"avgConsistency":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "0")
+    local doc_total=$(parse_json_field "$doc_results" "total" "0")
+    local doc_passed=$(parse_json_field "$doc_results" "passed" "0")
+    local doc_avg=$(parse_json_field "$doc_results" "avgConsistency" "0")
 
-    local mig_total=$(echo "$mig_results" | grep -o '"total":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "0")
-    local mig_passed=$(echo "$mig_results" | grep -o '"passed":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "0")
+    local mig_total=$(parse_json_field "$mig_results" "total" "0")
+    local mig_passed=$(parse_json_field "$mig_results" "passed" "0")
 
-    local ref_total=$(echo "$crossref_results" | grep -o '"totalLinks":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "0")
-    local ref_valid=$(echo "$crossref_results" | grep -o '"validLinks":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "0")
-    local ref_broken=$(echo "$crossref_results" | grep -o '"brokenLinks":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "0")
-    local ref_validity=$(echo "$crossref_results" | grep -o '"validity":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "100")
+    local ref_total=$(parse_json_field "$crossref_results" "totalLinks" "0")
+    local ref_valid=$(parse_json_field "$crossref_results" "validLinks" "0")
+    local ref_broken=$(parse_json_field "$crossref_results" "brokenLinks" "0")
+    local ref_validity=$(parse_json_field "$crossref_results" "validity" "100")
 
     # 전체 상태 및 일관성 점수 (전달받은 값이 있으면 사용, 없으면 계산)
     local consistency_score="${passed_consistency_score:-$(( (doc_avg + ref_validity) / 2 ))}"
@@ -181,7 +219,7 @@ generate_markdown_report() {
     # 전달받지 않은 경우만 계산
     if [[ -z "$passed_overall_status" ]]; then
         if [[ $doc_passed -lt $doc_total ]] || [[ $mig_passed -lt $mig_total ]] || [[ $ref_validity -lt 100 ]]; then
-            if [[ $consistency_score -ge 70 ]]; then
+            if [[ $consistency_score -ge $VALIDATION_CONSISTENCY_THRESHOLD_WARNING ]]; then
                 overall_status="WARNING"
             else
                 overall_status="FAIL"
@@ -199,8 +237,15 @@ generate_markdown_report() {
     local ref_emoji="✅"
     [[ $ref_broken -gt 0 ]] && ref_emoji="⚠️"
 
-    # 보고서 생성 (템플릿 기반)
-    cat "$template_file" | \
+    # 보고서 생성 (템플릿 기반, 안전한 방식: 임시 파일 사용)
+    local temp_file
+    temp_file=$(mktemp) || {
+        log_error "임시 파일 생성 실패"
+        return 1
+    }
+
+    # 임시 파일에 먼저 작성
+    if ! cat "$template_file" | \
         sed "s|{{TIMESTAMP}}|$timestamp|g" | \
         sed "s|{{REPORT_ID}}|$report_id|g" | \
         sed "s|{{OVERALL_STATUS}}|$overall_status|g" | \
@@ -235,7 +280,19 @@ generate_markdown_report() {
         sed "s/{{EXECUTION_TIME}}/2/g" | \
         sed "s/{{VALIDATION_MODE}}/all/g" | \
         sed "s/{{LOG_FILE_PATH}}//g" \
-        > "$output_file"
+        > "$temp_file"
+    then
+        log_error "Markdown 작성 실패"
+        rm -f "$temp_file"
+        return 1
+    fi
+
+    # 최종 위치로 이동
+    if ! mv "$temp_file" "$output_file"; then
+        log_error "보고서 파일 저장 실패: $output_file"
+        rm -f "$temp_file"
+        return 1
+    fi
 
     log_success "  ✓ Markdown 보고서 생성: $output_file"
 
@@ -255,18 +312,18 @@ generate_terminal_output() {
     echo ""
 
     # 문서 검증 결과
-    local doc_total=$(echo "$doc_results" | grep -o '"total":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "0")
-    local doc_passed=$(echo "$doc_results" | grep -o '"passed":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "0")
-    local doc_avg=$(echo "$doc_results" | grep -o '"avgConsistency":[0-9]*' | cut -d':' -f2 2>/dev/null || echo "0")
+    local doc_total=$(parse_json_field "$doc_results" "total" "0")
+    local doc_passed=$(parse_json_field "$doc_results" "passed" "0")
+    local doc_avg=$(parse_json_field "$doc_results" "avgConsistency" "0")
 
     echo "  📄 문서 검증:"
     echo "     - 전체: $doc_total개"
     echo "     - 통과: $doc_passed개"
     echo "     - 평균 일치율: $doc_avg%"
 
-    if [[ $doc_passed -eq $doc_total ]] && [[ $doc_avg -ge 90 ]]; then
+    if [[ $doc_passed -eq $doc_total ]] && [[ $doc_avg -ge $VALIDATION_DOC_THRESHOLD_PASS ]]; then
         log_success "     ✓ 모든 문서 검증 통과"
-    elif [[ $doc_avg -ge 70 ]]; then
+    elif [[ $doc_avg -ge $VALIDATION_DOC_THRESHOLD_WARNING ]]; then
         log_warning "     ⚠️  일부 문서 개선 필요"
     else
         log_error "     ✗ 문서 검증 실패"
@@ -345,9 +402,9 @@ save_report_to_file() {
         ln -sf "$(basename "$md_file")" "$report_dir/latest.md" 2>/dev/null || true
     fi
 
-    # 30일 이상 된 보고서 자동 삭제
-    find "$report_dir" -name "validation-*.json" -mtime +30 -delete 2>/dev/null || true
-    find "$report_dir" -name "validation-*.md" -mtime +30 -delete 2>/dev/null || true
+    # 보존 기간 이상 된 보고서 자동 삭제
+    find "$report_dir" -name "validation-*.json" -mtime "+$VALIDATION_REPORT_RETENTION_DAYS" -delete 2>/dev/null || true
+    find "$report_dir" -name "validation-*.md" -mtime "+$VALIDATION_REPORT_RETENTION_DAYS" -delete 2>/dev/null || true
 
     log_info "  보고서 저장 완료"
     log_info "    - JSON: $json_file"

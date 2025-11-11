@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Claude Code Workflows Installer
-# Version: 2.6.0 - Enhanced Validation & Migration System
+# Version: 2.7.0 - FSD Custom Architecture Integration
 
 set -e
 
@@ -13,8 +13,8 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Version Configuration
-INSTALLER_VERSION="2.6.0"
-TARGET_VERSION="2.6.0"
+INSTALLER_VERSION="2.7.0"
+TARGET_VERSION="2.7.0"
 
 # Repository Configuration
 REPO_URL="https://github.com/Liamns/claude-workflows"
@@ -678,10 +678,10 @@ install_workflows() {
             print_error "Git error output:"
             echo "$git_output"
             echo ""
-            print_info "Please check:"
-            print_info "  - Internet connection"
-            print_info "  - Repository URL: $REPO_URL"
-            print_info "  - Git is installed: $(command -v git || echo 'NOT FOUND')"
+            print_info "다음을 확인하세요:"
+            print_info "  - 인터넷 연결 상태"
+            print_info "  - 저장소 URL: $REPO_URL"
+            print_info "  - Git 설치 여부: $(command -v git || echo '설치되지 않음')"
             exit 1
         fi
     fi
@@ -886,6 +886,32 @@ install_workflows() {
     print_success "File installation complete!"
     echo ""
 
+    # Download checksum manifest for integrity verification
+    if [ "$DRY_RUN" = false ]; then
+        print_info "Downloading checksum manifest..."
+
+        # Source verification helpers
+        if [ -f "$TARGET_DIR/.claude/lib/verify-with-checksum.sh" ]; then
+            source "$TARGET_DIR/.claude/lib/verify-with-checksum.sh"
+
+            # Change to target directory for verification
+            pushd "$TARGET_DIR" > /dev/null
+
+            if download_checksum_manifest "$REPO_URL" "$REPO_BRANCH"; then
+                print_success "Checksum manifest downloaded"
+            else
+                print_warning "Failed to download checksum manifest"
+                print_info "Installation will continue with basic verification"
+            fi
+
+            popd > /dev/null
+        else
+            print_warning "Checksum verification system not found"
+            print_info "Skipping checksum download"
+        fi
+        echo ""
+    fi
+
     # Create version tracking file
     if [ "$DRY_RUN" = false ]; then
         create_version_file
@@ -904,16 +930,64 @@ install_workflows() {
         fi
     fi
 
-    # Verify installation
+    # Verify installation with checksum-based integrity check
     echo ""
     if [ "$DRY_RUN" = true ]; then
         print_info "[DRY RUN] Installation verification skipped"
     else
-        if ! verify_installation; then
-            print_warning "Installation completed with errors"
-            print_info "Please check the log file: $LOG_FILE"
+        # Try checksum-based verification first, fallback to basic verification
+        local verification_passed=false
+        local checksum_available=false
+
+        if [ -f "$TARGET_DIR/.claude/.checksums.json" ] && [ -f "$TARGET_DIR/.claude/lib/verify-with-checksum.sh" ]; then
+            checksum_available=true
+            print_info "Running checksum-based file integrity verification..."
+
+            pushd "$TARGET_DIR" > /dev/null
+
+            if verify_installation_with_checksum; then
+                verification_passed=true
+                print_success "Checksum verification passed!"
+                log_to_file "Checksum verification: PASSED"
+            else
+                # Checksum verification failed - try to recover
+                print_warning "Some files failed checksum verification"
+                print_info "Attempting automatic recovery..."
+
+                if retry_failed_files "$REPO_URL" "$REPO_BRANCH"; then
+                    verification_passed=true
+                    print_success "All files recovered successfully!"
+                    log_to_file "File recovery: SUCCESS"
+                else
+                    print_error "File recovery failed"
+                    log_to_file "File recovery: FAILED"
+                    verification_passed=false
+                fi
+            fi
+
+            popd > /dev/null
+        fi
+
+        # Fallback to basic verification if checksum not available
+        if [ "$checksum_available" = false ]; then
+            print_info "Running basic file verification..."
+            if verify_installation; then
+                verification_passed=true
+            fi
+        fi
+
+        # Handle verification failure
+        if [ "$verification_passed" = false ]; then
+            print_error "Installation verification failed"
+            print_info "로그 파일을 확인하세요: $LOG_FILE"
             if [ -n "$BACKUP_DIR" ]; then
-                print_info "Backup location: $BACKUP_DIR"
+                print_warning "You can find the backup at: $BACKUP_DIR"
+                print_info "Rolling back installation..."
+                if rollback_from_backup; then
+                    print_info "Rollback completed. Previous version restored."
+                else
+                    print_error "Rollback failed. Please restore manually from: $BACKUP_DIR"
+                fi
             fi
             exit 1
         fi
@@ -941,6 +1015,24 @@ install_workflows() {
                     print_info "Installation is complete, but some validation issues were found"
                 fi
             fi
+        fi
+
+        # Update .gitignore with installer patterns
+        echo ""
+        if [ -f "$TARGET_DIR/.claude/lib/gitignore-manager.sh" ]; then
+            print_info "Updating .gitignore..."
+
+            pushd "$TARGET_DIR" > /dev/null
+            source "$TARGET_DIR/.claude/lib/gitignore-manager.sh"
+
+            if add_installer_patterns_to_gitignore ".gitignore"; then
+                print_success ".gitignore updated with installer patterns"
+                log_to_file ".gitignore updated"
+            else
+                print_warning "Failed to update .gitignore (non-critical)"
+            fi
+
+            popd > /dev/null
         fi
     fi
 
@@ -983,6 +1075,16 @@ install_workflows() {
     echo "   ├── steering/"
     echo "   └── specs/"
     echo ""
+
+    # Show verification statistics if checksum verification was used
+    if [ "$checksum_available" = true ] && [ "$DRY_RUN" = false ]; then
+        echo -e "${GREEN}Installation Verification:${NC}"
+        echo "   ✅ SHA256 checksum-based integrity verification"
+        echo "   ✅ Automatic file recovery on mismatch"
+        echo "   ✅ .gitignore updated with installer patterns"
+        echo ""
+    fi
+
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
 

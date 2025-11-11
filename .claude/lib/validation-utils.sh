@@ -123,10 +123,30 @@ create_temp_dir() {
 
 cleanup_temp_dir() {
     local temp_dir="$1"
-    if [[ -n "$temp_dir" ]] && [[ -d "$temp_dir" ]]; then
-        rm -rf "$temp_dir"
-        log_info "임시 디렉토리 정리: $temp_dir"
+
+    # 안전성 검사
+    if [[ -z "$temp_dir" ]]; then
+        log_warning "cleanup_temp_dir: 빈 경로"
+        return 1
     fi
+
+    # 보안: /tmp, /var/tmp, /var/folders (macOS) 하위만 허용
+    case "$temp_dir" in
+        /tmp/*|/var/tmp/*|/var/folders/*)
+            if [[ -d "$temp_dir" ]]; then
+                rm -rf "$temp_dir"
+                log_info "임시 디렉토리 정리: $temp_dir"
+                return 0
+            else
+                log_warning "디렉토리 없음: $temp_dir"
+                return 1
+            fi
+            ;;
+        *)
+            log_error "cleanup_temp_dir: 안전하지 않은 경로: $temp_dir"
+            return 1
+            ;;
+    esac
 }
 
 # 버전 검증 (install.sh에서 재사용)
@@ -184,6 +204,56 @@ count_files_in_dir() {
     return 0
 }
 
+# JSON 파싱 유틸리티
+
+parse_json_field() {
+    local json_string="$1"
+    local field_name="$2"
+    local default_value="${3:-}"
+    local field_type="${4:-number}"  # number 또는 string
+
+    if [[ -z "$json_string" ]] || [[ "$json_string" == "{}" ]]; then
+        echo "$default_value"
+        return 0
+    fi
+
+    # jq 사용 가능 시 (더 정확함)
+    if command -v jq > /dev/null 2>&1; then
+        local result
+        if [[ "$field_type" == "string" ]]; then
+            result=$(echo "$json_string" | jq -r ".$field_name // \"$default_value\"" 2>/dev/null)
+        else
+            result=$(echo "$json_string" | jq -r ".$field_name // $default_value" 2>/dev/null)
+        fi
+
+        if [[ -n "$result" ]] && [[ "$result" != "null" ]]; then
+            echo "$result"
+            return 0
+        fi
+    fi
+
+    # jq 없을 때 fallback (grep + cut)
+    if [[ "$field_type" == "string" ]]; then
+        # 문자열 필드: "field":"value" 형태
+        local result=$(echo "$json_string" | grep -o "\"$field_name\"[[:space:]]*:[[:space:]]*\"[^\"]*\"" | cut -d'"' -f4 2>/dev/null)
+        if [[ -n "$result" ]]; then
+            echo "$result"
+            return 0
+        fi
+    else
+        # 숫자 필드: "field":123 형태
+        local result=$(echo "$json_string" | grep -o "\"$field_name\"[[:space:]]*:[[:space:]]*[0-9]*" | grep -o '[0-9]*$' 2>/dev/null)
+        if [[ -n "$result" ]]; then
+            echo "$result"
+            return 0
+        fi
+    fi
+
+    # 모두 실패하면 기본값 반환
+    echo "$default_value"
+    return 0
+}
+
 # 보고서 타임스탬프 생성
 
 generate_timestamp() {
@@ -216,6 +286,16 @@ show_progress() {
     if [[ $current -eq $total ]]; then
         echo ""  # 줄바꿈
     fi
+}
+
+# Trap 설정 - 여러 시그널 처리 (EXIT, INT, TERM)
+
+setup_cleanup_trap() {
+    local cleanup_cmd="$1"
+
+    # 단순하고 안전한 trap 설정 (기존 trap은 덮어씀)
+    # shellcheck disable=SC2064
+    trap "$cleanup_cmd" EXIT INT TERM
 }
 
 # 사용 예시 (이 파일을 단독 실행하면 테스트)

@@ -1,0 +1,12 @@
+{
+  "version": "1.0.0",
+  "enabled": true,
+  "autoTriggerThreshold": 5,
+  "integrationMode": "auto",
+  "preserveMajorWorkflow": true,
+  "features": {
+    "autoDetection": true,
+    "userConfirmation": true,
+    "fallbackToManual": true
+  }
+}

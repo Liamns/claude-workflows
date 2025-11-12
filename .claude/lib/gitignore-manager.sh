@@ -29,6 +29,8 @@ readonly INSTALLER_GITIGNORE_PATTERNS=(
     # Cache directories
     ".claude/cache/"
     ".claude/cache/*"
+    "!.claude/cache/.gitkeep"
+    "!.claude/cache/*/gitkeep"
 
     # Log files
     "*.log"
@@ -37,6 +39,15 @@ readonly INSTALLER_GITIGNORE_PATTERNS=(
     # Temporary files
     "*.tmp"
     ".specify/temp/"
+
+    # Personal settings (user-specific)
+    ".claude/settings.local.json"
+    ".claude/config/*-local.json"
+    ".claude/config/plan-mode.json"
+
+    # Personal metrics (user-specific)
+    ".claude/metrics/"
+    ".claude/cache/metrics/"
 
     # OS-specific files
     ".DS_Store"

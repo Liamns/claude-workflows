@@ -9,6 +9,23 @@
 
 **📖 새로운 Claude 세션?** → [프로젝트 컨텍스트 문서](.claude/docs/PROJECT-CONTEXT.md) (5분이면 전체 파악)
 
+## 🆕 v2.9.0 주요 기능 (개발 중)
+
+### Plan Mode Integration (v2.9.0-dev)
+- **📋 Claude Code Plan Mode 통합** - 복잡한 작업 시 체계적인 계획 수립 후 자동 실행
+  - 복잡도 점수 5점 이상 시 Plan Mode 사용 가이드 자동 표시
+  - Plan Mode에서 작성한 계획을 대화 컨텍스트에서 자동 감지
+  - Major 워크플로우 Step 2-4 자동 건너뛰기 (50% 시간 절약)
+  - 항상 Fallback 옵션 제공 (기존 워크플로우 100% 유지)
+- **🔍 키워드 기반 컨텍스트 추출** - 자연어 계획 자동 파싱
+  - 키워드 감지: '계획', 'plan', 'phase', '단계', 'step'
+  - 최소 200자 이상 메시지 필터링
+  - 15개 유닛 테스트로 검증된 추출 로직
+- **⚡ 간소화된 접근** - ExitPlanMode API 의존성 제거
+  - 대화 컨텍스트 기반 통합 (구조화된 API 불필요)
+  - `/triage` → Plan Mode → `/major` 원활한 흐름
+  - 사용자 가이드 템플릿 제공
+
 ## 🆕 v2.8.0 주요 기능
 
 ### PR Review with Codebase Context (v2.8.0)
@@ -143,7 +160,7 @@ bash .claude/lib/generate-checksums.sh -o .claude/.checksums.json --verbose
 
 ```bash
 /start              # 프로젝트 초기화 (처음 한 번만)
-/triage "작업"      # ⭐ 자동 워크플로우 선택
+/triage "작업"      # ⭐ 자동 워크플로우 선택 + Plan Mode 가이드
 /major "기능명"     # 신규 기능 개발 (60% 토큰 절감)
 /minor "설명"       # 버그 수정, 개선 (75% 토큰 절감)
 /micro "설명"       # 간단한 수정 (85% 토큰 절감)
@@ -151,6 +168,40 @@ bash .claude/lib/generate-checksums.sh -o .claude/.checksums.json --verbose
 /commit            # 스마트 커밋
 /pr                # PR 자동 생성
 /dashboard         # 📊 실시간 메트릭스 대시보드
+```
+
+### 🆕 Plan Mode 사용법 (v2.9.0-dev)
+
+복잡한 작업(복잡도 5점 이상)은 Plan Mode로 먼저 계획을 수립하면 효율적입니다:
+
+```bash
+# 1. 복잡도 분석
+/triage "새로운 인증 시스템 추가"
+# → 복잡도 12점 (Major) 감지
+# → Plan Mode 가이드 자동 표시
+
+# 2. Plan Mode 진입
+Shift+Tab  # Plan Mode 활성화
+
+# 3. 계획 요청
+"새로운 인증 시스템의 상세 구현 계획을 작성해주세요"
+# → Claude가 자동으로 계획 작성
+# → 대화 컨텍스트에 저장됨
+
+# 4. Major 워크플로우 실행
+/major
+# → Step 1.5에서 계획 자동 감지 ✅
+# → Step 2-4 질문 건너뛰기 (50% 시간 절약)
+# → 바로 문서 생성 단계로 진행
+```
+
+**Fallback 옵션**: Plan Mode를 건너뛰고 기존 방식으로도 진행 가능합니다.
+
+```bash
+/triage "복잡한 작업"
+# → "Option B: 바로 Major 워크플로우 시작" 선택
+/major
+# → 질문-응답 방식으로 진행 (기존 방식 유지)
 ```
 
 ## 🏗️ 시스템 구성

@@ -16,17 +16,46 @@ Thumbs.db
 # Logs
 *.log
 
-# Development-only directories (auto-generated at runtime)
+# ==============================================
+# Claude Workflow - Runtime & Personal Files
+# ==============================================
+
+# Runtime cache (auto-generated)
 .claude/cache/
+!.claude/cache/.gitkeep
+!.claude/cache/*/gitkeep
+
+# Backup files (auto-generated)
 .claude/.backup/
 .claude/command/.backup/
+
+# Test outputs
 .claude/lib/__tests__/
 
-# Development specs and documentation
-.specify/specs/
+# Personal settings (user-specific)
+.claude/settings.local.json
+.claude/config/*-local.json
+.claude/config/plan-mode.json
 
-# Development TODO
-todos.md
+# Personal metrics (user-specific)
+.claude/metrics/
+.claude/cache/metrics/
 
 # Keep directory structure
 !.claude/cache/validation-reports/.gitkeep
+
+# ==============================================
+# .specify - Specs Documentation
+# ==============================================
+
+# Generated specs (project-specific work)
+.specify/specs/
+
+# Keep templates and memory (team-shared)
+# These are intentionally tracked
+
+# ==============================================
+# Development TODO
+# ==============================================
+
+todos.md

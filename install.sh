@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Claude Code Workflows Installer
-# Version: 2.7.2 - Hotfix: Exclude Local & Generated Files
+# Version: 2.8.0 - Plan Mode Integration & Enhanced .gitignore
 
 set -e
 

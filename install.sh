@@ -935,6 +935,24 @@ install_workflows() {
     if [ "$DRY_RUN" = true ]; then
         print_info "[DRY RUN] Installation verification skipped"
     else
+        # Update .gitignore with installer patterns (before verification)
+        echo ""
+        if [ -f "$TARGET_DIR/.claude/lib/gitignore-manager.sh" ]; then
+            print_info "Updating .gitignore..."
+
+            pushd "$TARGET_DIR" > /dev/null
+            source "$TARGET_DIR/.claude/lib/gitignore-manager.sh"
+
+            if add_installer_patterns_to_gitignore ".gitignore"; then
+                print_success ".gitignore updated with installer patterns"
+                log_to_file ".gitignore updated"
+            else
+                print_warning "Failed to update .gitignore (non-critical)"
+            fi
+
+            popd > /dev/null
+        fi
+
         # Try checksum-based verification first, fallback to basic verification
         local verification_passed=false
         local checksum_available=false
@@ -1017,23 +1035,6 @@ install_workflows() {
             fi
         fi
 
-        # Update .gitignore with installer patterns
-        echo ""
-        if [ -f "$TARGET_DIR/.claude/lib/gitignore-manager.sh" ]; then
-            print_info "Updating .gitignore..."
-
-            pushd "$TARGET_DIR" > /dev/null
-            source "$TARGET_DIR/.claude/lib/gitignore-manager.sh"
-
-            if add_installer_patterns_to_gitignore ".gitignore"; then
-                print_success ".gitignore updated with installer patterns"
-                log_to_file ".gitignore updated"
-            else
-                print_warning "Failed to update .gitignore (non-critical)"
-            fi
-
-            popd > /dev/null
-        fi
     fi
 
     # Print summary

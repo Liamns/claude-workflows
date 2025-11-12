@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [2.9.0-dev] - TBD
+## [2.9.0] - 2025-11-12
 
 ### Added
 - **Plan Mode Integration** - Claude Code Plan Mode와 Major 워크플로우 통합
@@ -30,6 +30,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **major.md** - Step 1.5 추가: Plan Mode 컨텍스트 감지 및 자동 건너뛰기
 - **major.md** - Step 2-4를 조건부 실행으로 변경 (planModeDetected 플래그)
 - **README.md** - Plan Mode 사용법 섹션 추가
+
+### Fixed
+- **Installation System** - 설치 프로세스 4가지 주요 개선
+  - **Version Sync**: install.sh 버전 동기화 (2.8.0 → 2.9.0)
+  - **Checksum Verification**: Self-referential checksum 스킵 로직 추가
+  - **Installation Flow**: .gitignore 업데이트를 체크섬 검증 전으로 이동
+  - **Non-Interactive Support**: `curl ... | bash` 파이프 모드에서 동일 버전 재설치 지원
+- **.gitignore Management** - 중복 검사 강화 (grep -Fxq로 정확한 패턴 매칭)
+- **Plan Mode Validation** - validate-system.sh에 Plan Mode 파일 검증 추가
 
 ### Impact
 - ✅ 계획 수립 시간 50% 단축 (15분 → 7.5분)

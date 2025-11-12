@@ -1,6 +1,6 @@
 # 🤖 Claude Workflows
 
-[![Version](https://img.shields.io/badge/version-2.8.0-blue.svg)](https://github.com/Liamns/claude-workflows)
+[![Version](https://img.shields.io/badge/version-2.9.0-blue.svg)](https://github.com/Liamns/claude-workflows)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-purple.svg)](https://claude.ai/code)
 [![Validation](https://img.shields.io/badge/validation-automated-success.svg)](https://github.com/Liamns/claude-workflows)
@@ -9,9 +9,9 @@
 
 **📖 새로운 Claude 세션?** → [프로젝트 컨텍스트 문서](.claude/docs/PROJECT-CONTEXT.md) (5분이면 전체 파악)
 
-## 🆕 v2.9.0 주요 기능 (개발 중)
+## 🆕 v2.9.0 주요 기능
 
-### Plan Mode Integration (v2.9.0-dev)
+### Plan Mode Integration
 - **📋 Claude Code Plan Mode 통합** - 복잡한 작업 시 체계적인 계획 수립 후 자동 실행
   - 복잡도 점수 5점 이상 시 Plan Mode 사용 가이드 자동 표시
   - Plan Mode에서 작성한 계획을 대화 컨텍스트에서 자동 감지

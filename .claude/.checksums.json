@@ -1,9 +1,9 @@
 {
-  "version": "2.9.0-dev",
-  "generatedAt": "2025-11-12T04:36:53Z",
+  "version": "2.9.0",
+  "generatedAt": "2025-11-12T05:09:03Z",
   "files": {
-    ".claude/.checksums.json": "162915568fd7d2b2ae8b2a8c2f80c033e49aa62a2c9f87143050d6b33e89e926",
-    ".claude/.version": "3e616d1461a948ee98209e2d6abf82117c348b04596d7ada281344609fe7696d",
+    ".claude/.checksums.json": "933e79f634c4b02654926fd992ce97011c5654d45406d8c587f16e177049c9e4",
+    ".claude/.version": "8113ce620372292c25fda221ad5e8adf77dbe71c92c2042f8ca1ec3dfe9c50a1",
     ".claude/agents/api-designer.md": "8d34ac2f5c3c7d9e25ffe46463b8efa3073a1f023f6226ef2f2d184b1a64c1b5",
     ".claude/agents/architect-unified.md": "509dd35487a5054f559f7ec6536f33a6015f09bfdcc113916718970d2c43f77f",
     ".claude/agents/code-reviewer/lib/cache-manager.sh": "7db245f6a880dac0c232f9f2acb4015ad49a3d22d0614491ef911855288661b4",
@@ -50,7 +50,7 @@
     ".claude/lib/cache-helper.sh": "3a7b241eaa1411caad09800251d33f130b30a12ce597abf7ce017f1306c9e124",
     ".claude/lib/checksum-helper.sh": "b2175e4bba40e2af44f6b98fce0ce5a816123980dbb8634de126dea611d6e59c",
     ".claude/lib/dashboard-generator.sh": "500e5e602ccdfac0a834d9de43a7fdaf38a2c56ede13a1f89d5bc9edea1aed25",
-    ".claude/lib/generate-checksums.sh": "eb4911e43bf3caaa19a5a750f61f4c285aa21d327210d246657cf1e02f849231",
+    ".claude/lib/generate-checksums.sh": "43bcee93319e4028728dcbdd7a234949935bc5952823a0a6c653cccfdd4b31b1",
     ".claude/lib/git-stats-helper.sh": "e511e6ea75b9fc22a9752a8ecbc5563429c0be33a407715640d537bff3f03a61",
     ".claude/lib/gitignore-manager.sh": "657d4b5c80f03dce48a715e5470f50127aad6fc635e305a679846dde37565989",
     ".claude/lib/metrics-collector.sh": "445f081eb83eb7bef46d908d40d8e9e3fb81a50cb27ab670af820c1e581db236",

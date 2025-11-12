@@ -38,6 +38,12 @@ model: sonnet
 - **영향 받는 컴포넌트**: 변경 파급 효과
 - **테스트 영향**: 깨질 가능성 있는 테스트
 
+### 5. 코드베이스 컨텍스트 (신규)
+- **재사용성 검증**: 기존 컴포넌트/함수 제안
+- **중복 코드 감지**: 80% 이상 유사 로직 경고
+- **패턴 일관성**: 프로젝트 표준 패턴 준수 확인
+- **모듈 검색**: 전체 코드베이스에서 유사 모듈 발견
+
 ## 통합 리뷰 프로세스
 
 ### Step 1: 변경사항 수집
@@ -46,13 +52,25 @@ git diff --name-only
 git diff --stat
 ```
 
+### Step 1.5: 코드베이스 인덱싱 (신규)
+```bash
+# Check cache validity
+if bash .claude/agents/code-reviewer/lib/cache-manager.sh is-valid; then
+  echo "✅ Using cached codebase index"
+else
+  echo "🔄 Building codebase index..."
+  bash .claude/agents/code-reviewer/lib/codebase-indexer.sh progressive . 30
+fi
+```
+
 ### Step 2: 병렬 분석
 ```typescript
 await Promise.all([
   analyzeCodeQuality(),
   scanSecurity(),
   checkPerformance(),
-  analyzeImpact()
+  analyzeImpact(),
+  analyzeReusability()  // 신규: 코드베이스 컨텍스트 분석
 ]);
 ```
 
@@ -81,6 +99,43 @@ Critical → High → Medium → Low
 - [ ] 복잡도 높음
 - [ ] 명명 규칙
 - [ ] 주석 부족
+
+### 🔵 Reusability (재사용성 개선)
+- [ ] 기존 컴포넌트 재사용 가능
+- [ ] 중복 함수/유틸리티 발견
+- [ ] 표준 패턴 미준수
+- [ ] 재사용성 낮은 구조
+
+## 코드베이스 컨텍스트 분석 예시
+
+```bash
+# 재사용 가능한 모듈 검색
+changed_files='["src/components/MyButton.tsx"]'
+bash .claude/agents/code-reviewer/lib/suggestion-generator.sh analyze "$changed_files"
+```
+
+```markdown
+## 재사용성 분석 결과
+
+### 발견된 유사 모듈
+
+⚠️  Reusability Issue (src/components/MyButton.tsx:1)
+Consider reusing existing Button instead of creating MyButton
+
+📊 Similarity: 85%
+📍 Existing Module:
+   Path: src/shared/ui/Button/Button.tsx
+   Name: Button
+   Usage: 45 times in codebase
+
+💡 Suggested Fix:
+import { Button } from '@/shared/ui/Button';
+
+📝 Rationale:
+   Reduces code duplication and maintains consistency across the application.
+   High similarity (85%) suggests the same functionality can be achieved
+   by reusing the existing module.
+```
 
 ## 보안 스캔 예시
 
@@ -119,12 +174,13 @@ if (code.match(/query.*\$\{.*\}/)) {
 ## 통합 보고서
 
 ```markdown
-# 코드 리뷰 결과
+# 코드 리뷰 결과 (with Codebase Context)
 
 ## 요약
 - 🔴 Critical: 2건
 - 🟡 High: 5건
 - 🟢 Medium: 8건
+- 🔵 Reusability: 3건 (신규)
 
 ## Critical Issues
 
@@ -141,6 +197,25 @@ if (code.match(/query.*\$\{.*\}/)) {
 ## 성능 개선 제안
 - React.memo() 적용 권장: 3개 컴포넌트
 - useMemo() 필요: calculateTotal 함수
+
+## 재사용성 개선 (신규)
+
+### 1. 중복 Button 컴포넌트
+**파일**: components/MyButton.tsx:1
+**제안**: shared/ui/Button 재사용
+**유사도**: 85%
+**절감**: ~50 lines of code
+
+### 2. 중복 formatDate 함수
+**파일**: utils/dateHelper.ts:15
+**제안**: shared/lib/dates/formatDate 재사용
+**유사도**: 90%
+**절감**: ~20 lines of code
+
+### 3. 표준 패턴 미준수
+**파일**: api/fetchUsers.ts:10
+**패턴**: React Query 사용 권장 (프로젝트 표준)
+**현재 사용률**: fetch 직접 사용
 
 ## 영향도
 - 총 변경 파일: 8개

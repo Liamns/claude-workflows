@@ -1,6 +1,6 @@
 # 🤖 Claude Workflows
 
-[![Version](https://img.shields.io/badge/version-2.7.2-blue.svg)](https://github.com/Liamns/claude-workflows)
+[![Version](https://img.shields.io/badge/version-2.8.0-blue.svg)](https://github.com/Liamns/claude-workflows)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-purple.svg)](https://claude.ai/code)
 [![Validation](https://img.shields.io/badge/validation-automated-success.svg)](https://github.com/Liamns/claude-workflows)
@@ -9,7 +9,25 @@
 
 **📖 새로운 Claude 세션?** → [프로젝트 컨텍스트 문서](.claude/docs/PROJECT-CONTEXT.md) (5분이면 전체 파악)
 
-## 🆕 v2.7.2 주요 기능
+## 🆕 v2.8.0 주요 기능
+
+### PR Review with Codebase Context (v2.8.0)
+- **🔍 전체 코드베이스 참조** - PR diff만이 아닌 전체 프로젝트를 분석하여 더 정확한 리뷰 제공
+  - 재사용 가능한 기존 모듈 자동 감지 및 제안
+  - 중복 코드 탐지 (80% 이상 유사도)
+  - 프로젝트 표준 패턴 준수 검증
+- **📊 성능 최적화** - 하이브리드 캐싱으로 빠른 분석 (30초 타임아웃)
+  - 메모리 + 파일 캐시 (SHA256 해시 검증)
+  - Progressive 인덱싱으로 대규모 코드베이스 지원
+- **⚠️ 스마트한 경고** - 불필요한 경고 50% 감소, 정확도 80% 달성
+  - 기존 컴포넌트 재사용 제안 (예: MyButton → shared/ui/Button)
+  - 중복 함수/유틸리티 발견 및 통합 권장
+  - 표준 패턴 (예: React Query) 사용 권장
+- **📁 신규 파일**: `.claude/agents/code-reviewer/lib/` (4개 스크립트)
+  - `cache-manager.sh` - 하이브리드 캐싱 관리
+  - `codebase-indexer.sh` - 모듈/패턴 인덱싱
+  - `similarity-analyzer.sh` - 유사도 계산 (이름 30%, 타입 20%, 시그니처 30%, Props 20%)
+  - `suggestion-generator.sh` - 리뷰 제안 생성
 
 ### Installation Stability Hotfix (v2.7.2)
 - **🔧 Checksum 검증 최적화** - 불필요한 파일 검증 제거

@@ -608,8 +608,8 @@ install_workflows() {
         elif [ "$VERSION_COMPARISON" = "equal" ]; then
             print_warning "Same version detected: v$EXISTING_VERSION"
 
-            # Ask for confirmation if not forced
-            if [ "$FORCE_INSTALL" = false ]; then
+            # Ask for confirmation if not forced and stdin is a terminal
+            if [ "$FORCE_INSTALL" = false ] && [ -t 0 ]; then
                 echo ""
                 print_warning "This will reinstall the same version."
                 echo -n "Do you want to continue? (y/N): "
@@ -624,13 +624,17 @@ install_workflows() {
                         ;;
                 esac
             else
-                print_warning "Reinstalling (forced)..."
+                if [ "$FORCE_INSTALL" = true ]; then
+                    print_warning "Reinstalling (forced)..."
+                else
+                    print_info "Reinstalling (non-interactive mode)..."
+                fi
             fi
         else
             print_warning "Downgrade detected: v$EXISTING_VERSION → v$TARGET_VERSION"
             print_error "Downgrade is not supported and may cause issues."
 
-            if [ "$FORCE_INSTALL" = false ]; then
+            if [ "$FORCE_INSTALL" = false ] && [ -t 0 ]; then
                 echo -n "Are you sure you want to continue? (y/N): "
                 read -r response
                 case "$response" in
@@ -642,6 +646,12 @@ install_workflows() {
                         exit 0
                         ;;
                 esac
+            else
+                if [ "$FORCE_INSTALL" = true ]; then
+                    print_warning "Proceeding with downgrade (forced)..."
+                else
+                    print_warning "Proceeding with downgrade (non-interactive mode)..."
+                fi
             fi
         fi
         echo ""

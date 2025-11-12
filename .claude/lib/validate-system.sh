@@ -213,6 +213,57 @@ run_migration_validation() {
     fi
 }
 
+# Plan Mode 파일 검증
+run_planmode_validation() {
+    log_info "🎯 Plan Mode 파일 검증 시작..."
+
+    local missing_files=0
+    local total_files=0
+
+    # Plan Mode 필수 파일 목록
+    local required_files=(
+        ".claude/config/plan-mode.json"
+        ".claude/lib/plan-mode/extract-context.sh"
+        ".claude/lib/plan-mode/guide-template.md"
+        ".claude/lib/plan-mode/integration-strategy.md"
+        ".claude/lib/__tests__/test-plan-mode-context.sh"
+    )
+
+    # 각 파일 존재 확인
+    for file in "${required_files[@]}"; do
+        ((total_files++))
+        if [[ -f "$file" ]]; then
+            if [[ "$VERBOSE" == "true" ]]; then
+                log_success "  ✓ $file"
+            fi
+        else
+            log_error "  ✗ $file (누락)"
+            ((missing_files++))
+        fi
+    done
+
+    # 실행 권한 확인
+    local exec_files=(
+        ".claude/lib/plan-mode/extract-context.sh"
+        ".claude/lib/__tests__/test-plan-mode-context.sh"
+    )
+
+    for file in "${exec_files[@]}"; do
+        if [[ -f "$file" ]] && [[ ! -x "$file" ]]; then
+            log_warning "  ⚠ $file (실행 권한 없음)"
+        fi
+    done
+
+    log_info "  검증 완료: $(($total_files - $missing_files))/$total_files 파일 존재"
+
+    # 모든 파일이 존재하면 성공
+    if [[ $missing_files -eq 0 ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 # 교차 참조 검증
 run_crossref_validation() {
     log_info "🔗 교차 참조 검증 시작..."
@@ -331,6 +382,7 @@ main() {
     local doc_status=0
     local mig_status=0
     local ref_status=0
+    local planmode_status=0
 
     case "$VALIDATION_MODE" in
         "docs-only")
@@ -352,6 +404,9 @@ main() {
             run_migration_validation
             mig_status=$?
             echo ""
+            run_planmode_validation
+            planmode_status=$?
+            echo ""
             run_crossref_validation
             ref_status=$?
             ;;
@@ -367,9 +422,9 @@ main() {
     __VS_CONSISTENCY_SCORE=$(( (doc_avg + ref_validity) / 2 ))
 
     # 전체 상태 결정
-    if [[ $doc_status -ne 0 ]] || [[ $mig_status -ne 0 ]] || [[ $ref_status -ne 0 ]]; then
+    if [[ $doc_status -ne 0 ]] || [[ $mig_status -ne 0 ]] || [[ $ref_status -ne 0 ]] || [[ $planmode_status -ne 0 ]]; then
         # 검증 실패가 있지만 일관성 점수가 높으면 WARNING
-        if [[ $__VS_CONSISTENCY_SCORE -ge $VALIDATION_CONSISTENCY_THRESHOLD_WARNING ]] && [[ $mig_status -eq 0 ]]; then
+        if [[ $__VS_CONSISTENCY_SCORE -ge $VALIDATION_CONSISTENCY_THRESHOLD_WARNING ]] && [[ $mig_status -eq 0 ]] && [[ $planmode_status -eq 0 ]]; then
             __VS_OVERALL_STATUS="WARNING"
         else
             __VS_OVERALL_STATUS="FAIL"

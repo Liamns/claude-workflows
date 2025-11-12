@@ -175,6 +175,11 @@ verify_installation_with_checksum() {
 
     # 각 파일 검증
     while IFS='=' read -r file_path expected_checksum; do
+        # Skip .checksums.json itself (self-referential checksum always fails)
+        if [[ "$file_path" == ".claude/.checksums.json" ]]; then
+            continue
+        fi
+
         ((total_files++))
 
         # 파일 존재 확인

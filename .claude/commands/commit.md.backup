@@ -10,52 +10,18 @@ Git 변경사항을 자동으로 분석하여 Conventional Commits 형식의 커
 ## 사용법
 
 ```bash
-/commit              # 변경사항 분석 후 확인 단계를 거쳐 커밋 (기본)
-/commit --force      # 확인 없이 바로 커밋 (긴급 상황용)
+/commit              # 변경사항 분석 후 커밋
 /commit --no-verify  # 검증 없이 빠른 커밋
 /commit "컨텍스트"   # 추가 컨텍스트와 함께 커밋
 ```
 
-**--force 옵션**:
-- 확인 단계(Step 5)를 건너뜁니다
-- 긴급 상황이나 CI/CD에서 유용합니다
-- 주의: 실수 가능성이 있으므로 신중히 사용하세요
-
 ## 프로세스
-
-### Step 0: 명령어 인자 파싱
-
-/commit 명령어의 인자를 파싱합니다:
-
-```javascript
-// 사용자 입력: /commit --force
-const args = parseCommandArgs();
-const has_force_flag = args.includes('--force');
-```
-
-파싱 결과:
-- has_force_flag = true → Step 5 건너뛰기
-- has_force_flag = false → 정상 프로세스 진행
 
 ### Step 1: 변경사항 분석
 ```bash
 git status  # 변경된 파일 목록 확인
 git diff    # 상세 변경 내용 분석
 ```
-
-### Step 1.5: Feature ID 자동 감지 (Epic 워크플로우)
-
-**Bash 도구로 Feature ID 감지**:
-```
-Bash:
-- command: "FEATURE_ID=''; if [ -f spec.md ]; then FEATURE_ID=$(grep '^- Feature ID:' spec.md | awk '{print $4}'); fi; echo $FEATURE_ID"
-- description: "Detect Feature ID from spec.md if exists"
-```
-
-Feature ID가 감지되면 `{featureId}` 변수에 저장하세요 (예: "001").
-Feature ID가 없으면 `{featureId}` 는 빈 문자열입니다.
-
-**Note**: 이 단계는 Epic 워크플로우 내부의 Feature에서만 작동합니다. 독립 Feature에는 spec.md가 없거나 Feature ID 필드가 없을 수 있습니다.
 
 ### Step 2: smart-committer Agent 활성화
 복잡한 변경사항 분석을 위해 전문 Agent를 활성화합니다:
@@ -113,170 +79,47 @@ src/entities/user/... → refactor(user): ...
 - **린트**: `yarn lint` (선택사항)
 - **민감 정보 검사**: .env, API 키 등 확인
 
-### Step 4.5: --force 플래그 분기 처리
-
-Step 4 (커밋 메시지 생성 및 검증) 완료 후, --force 플래그 확인:
-
-```javascript
-if (has_force_flag) {
-  // Step 5 건너뛰기
-  console.log("⚡ --force 옵션으로 확인 없이 커밋 실행");
-  // 바로 Step 6으로 이동
-} else {
-  // Step 5 (확인 단계) 실행
-}
-```
-
 ### Step 5: 커밋 메시지 확인 및 수정
 
-**Step 5 진입 전 초기화**:
+```markdown
+📝 생성된 커밋 메시지:
 
-Step 5에 처음 진입할 때 다음 변수를 초기화하세요:
-```javascript
-let edit_count = 0;  // 메시지 수정 횟수 추적
+feat(order): 운송 신청 폼에 차량 선택 기능 추가
+
+- 차량 타입별 이미지 표시
+- 선택 시 운임 자동 계산
+- 차량 정보 툴팁 추가
+
+이 메시지로 커밋하시겠습니까?
+[Y] 커밋 실행
+[E] 메시지 수정
+[R] 다시 분석
+[C] 취소
 ```
-
-📝 생성된 커밋 메시지를 표시한 후, **AskUserQuestion 도구를 사용**하여 사용자 확인을 받습니다.
-
-**AskUserQuestion 호출**:
-
-다음과 같이 AskUserQuestion 도구를 호출하세요:
-
-```
-AskUserQuestion({
-  questions: [{
-    question: "다음 커밋 메시지로 커밋하시겠습니까?\n\n" + generated_message,
-    header: "커밋 확인",
-    multiSelect: false,
-    options: [
-      {
-        label: "커밋 실행",
-        description: "이 메시지로 커밋합니다"
-      },
-      {
-        label: "메시지 수정",
-        description: "커밋 메시지를 수정합니다"
-      },
-      {
-        label: "취소",
-        description: "커밋하지 않습니다"
-      }
-    ]
-  }]
-})
-```
-
-**각 옵션 처리**:
-
-#### Option 1: "커밋 실행" 선택
-
-사용자가 "커밋 실행"을 선택한 경우:
-1. generated_message를 final_message로 설정
-2. Step 6 (Git Commit 실행)으로 이동
-
-#### Option 2: "메시지 수정" 선택
-
-사용자가 "메시지 수정"을 선택한 경우:
-
-1. edit_count 변수 증가 (최초 0에서 시작)
-2. edit_count > 3인지 확인:
-   - Yes → 에러 메시지 출력 후 종료:
-     ```
-     ❌ 최대 메시지 수정 횟수(3회)를 초과했습니다.
-
-     처음부터 다시 시작하려면 /commit을 다시 실행하세요.
-     ```
-   - No → 다음 단계 진행
-
-3. AskUserQuestion으로 수정된 메시지 입력 받기:
-   ```
-   AskUserQuestion({
-     questions: [{
-       question: "수정할 커밋 메시지를 입력하세요:\n\n기존 메시지:\n" + generated_message,
-       header: "메시지 수정",
-       multiSelect: false,
-       options: [
-         {
-           label: "직접 입력하겠습니다",
-           description: "Other 옵션으로 새 메시지 입력"
-         }
-       ]
-     }]
-   })
-   ```
-
-4. 사용자가 입력한 메시지를 new_message로 저장
-5. generated_message = new_message로 업데이트
-6. **Step 5로 다시 돌아가기** (재귀적 확인)
-
-#### Option 3: "취소" 선택
-
-사용자가 "취소"를 선택한 경우:
-1. 다음 메시지 출력:
-   ```
-   ❌ 커밋이 취소되었습니다.
-
-   Staged 파일은 그대로 유지됩니다.
-   다시 커밋하려면 /commit을 실행하세요.
-   ```
-2. 워크플로우 종료 (Step 6으로 이동하지 않음)
 
 ### Step 6: 커밋 실행
 
-**Feature ID 태그 추가 (Epic 워크플로우)**:
-
-Step 1.5에서 감지한 `{featureId}` 값이 있으면 커밋 메시지에 `[F{featureId}]` 태그를 추가합니다.
-
-**Bash 도구로 커밋 실행 (Feature ID 있으면)**:
+```bash
+git add .  # 또는 선택적 스테이징
+git commit -m "커밋 메시지"
 ```
-Bash (조건부 - {featureId}가 비어있지 않으면):
-- command: "git commit -m \"$(cat <<'EOF'
-[F{featureId}] {final_message}
-
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>
-EOF
-)\""
-- description: "Commit with Feature ID tag"
-```
-
-**Bash 도구로 커밋 실행 (Feature ID 없으면)**:
-```
-Bash (조건부 - {featureId}가 비어있으면):
-- command: "git commit -m \"$(cat <<'EOF'
-{final_message}
-
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>
-EOF
-)\""
-- description: "Commit without Feature ID tag"
-```
-
-**Note**: Epic 워크플로우 내부에서는 자동으로 [F{featureId}] 태그가 추가되어 Git log로 Feature 진행 상황을 추적할 수 있습니다.
 
 ## 실제 사용 예시
 
-### 예시 1: 새 기능 추가 (확인 단계 포함)
+### 예시 1: 새 기능 추가
 ```bash
 /commit
 
 🔍 변경사항 분석 중...
+변경된 파일: 5개
+주요 변경: VehicleSelector.tsx 추가
 
-📝 생성된 커밋 메시지:
+📝 생성된 메시지:
 feat(vehicle): 차량 선택 컴포넌트 구현
 
-┌─────────────────────────────────────┐
-│ 커밋 확인                            │
-│                                     │
-│ [커밋 실행] 이 메시지로 커밋        │
-│ [메시지 수정] 커밋 메시지 수정      │
-│ [취소] 커밋하지 않음                │
-└─────────────────────────────────────┘
-
-"커밋 실행" 선택 →
+- 차량 타입별 선택 UI 추가
+- 운임 계산 로직 통합
+- 반응형 디자인 적용
 
 ✅ 커밋이 완료되었습니다!
 ```

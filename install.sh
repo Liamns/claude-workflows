@@ -866,6 +866,17 @@ install_workflows() {
         print_success ".specify templates installed"
     fi
 
+    # Copy .specify scripts (Epic automation scripts)
+    if [ -d "$TEMP_DIR/.specify/scripts/bash" ]; then
+        print_info "Installing .specify scripts..."
+        if [ "$DRY_RUN" = false ]; then
+            cp -r "$TEMP_DIR/.specify/scripts/bash/"* "$TARGET_DIR/.specify/scripts/bash/" 2>/dev/null || true
+            # Make scripts executable
+            chmod +x "$TARGET_DIR/.specify/scripts/bash/"*.sh 2>/dev/null || true
+        fi
+        print_success ".specify scripts installed"
+    fi
+
     # Copy constitution template
     if [ -f "$TEMP_DIR/.specify/memory/constitution.md" ]; then
         if [ "$DRY_RUN" = false ]; then

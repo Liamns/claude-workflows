@@ -1,6 +1,6 @@
 # 🤖 Claude Workflows
 
-[![Version](https://img.shields.io/badge/version-2.9.0-blue.svg)](https://github.com/Liamns/claude-workflows)
+[![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)](https://github.com/Liamns/claude-workflows)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-purple.svg)](https://claude.ai/code)
 [![Validation](https://img.shields.io/badge/validation-automated-success.svg)](https://github.com/Liamns/claude-workflows)
@@ -8,6 +8,31 @@
 > Claude Code의 토큰 효율성을 극대화하면서 코드 품질을 보장하는 지능형 워크플로우 시스템
 
 **📖 새로운 Claude 세션?** → [프로젝트 컨텍스트 문서](.claude/docs/PROJECT-CONTEXT.md) (5분이면 전체 파악)
+
+## 🆕 v3.0.0 주요 기능
+
+### Epic Workflow System
+- **🏔️ 대규모 프로젝트 관리** - 복잡도 10+ 작업을 3-5개 Feature로 자동 분해
+  - `/epic` 명령어로 Epic 생성 및 Feature 분해
+  - AI 기반 자동 Feature 제안 (기능/레이어/우선순위 단위)
+  - 사용자 검토 및 수정 가능
+- **📋 체계적 진행 추적** - Epic 진행 상황 실시간 모니터링
+  - `progress.md` 자동 업데이트 (완료율, Feature 상태)
+  - `roadmap.md`로 Feature 간 의존성 및 순서 관리
+  - Mermaid 다이어그램으로 의존성 시각화
+- **🔍 무결성 검증** - Epic 구조 자동 검증
+  - `validate-epic.sh`로 필수 파일, 의존성 순환, Feature 수 검증
+  - DAG (Directed Acyclic Graph) 검증으로 순환 의존성 방지
+  - Feature 수 경고 (2개 이하/6개 이상)
+- **⚙️ 자동화 스크립트** - Epic 생명주기 전체 자동화
+  - `create-epic.sh`: Epic 디렉토리 구조 및 템플릿 생성
+  - `update-epic-progress.sh`: Feature 완료 시 자동 진행률 업데이트
+  - 각 Feature는 독립적인 Major 워크플로우로 구현
+- **🎯 /triage 통합** - 복잡도 10+ 자동 감지 및 Epic 추천
+  - 시스템/플랫폼 구축 → +8점
+  - 인증/권한 시스템 → +7점
+  - 결제 플랫폼 통합 → +7점
+  - Epic 선택 시 자동으로 `/epic` 실행
 
 ## 🆕 v2.9.0 주요 기능
 

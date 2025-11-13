@@ -11,7 +11,12 @@ graph TD
 
     Router --> |Score < 0| Micro[Micro Workflow]
     Router --> |Score 0-4| Minor[Minor Workflow]
-    Router --> |Score > 4| Major[Major Workflow]
+    Router --> |Score 5-9| Major[Major Workflow]
+    Router --> |Score >= 10| Epic[Epic Workflow]
+
+    Epic --> EpicSplit[3-5 Feature Split]
+    EpicSplit --> MajorLoop[Major Workflow Loop]
+    MajorLoop --> Progress[Auto Progress Tracking]
 
     Major --> SpecKit[Spec-Kit Process]
     SpecKit --> SubAgents[Sub-agents]
@@ -25,6 +30,7 @@ graph TD
     SubAgents --> Output[Quality Output]
     Skills --> Output
     DirectEdit --> Output
+    Progress --> Output
 ```
 
 ## Core Components
@@ -34,9 +40,10 @@ graph TD
 The workflow layer acts as the primary interface and orchestrator:
 
 - **Triage System**: Intelligent routing based on task complexity
-- **Major Workflow**: Full spec-driven development cycle
-- **Minor Workflow**: Targeted improvements with minimal overhead
-- **Micro Workflow**: Direct edits for trivial changes
+- **Epic Workflow**: Large-scale project decomposition (10+ complexity)
+- **Major Workflow**: Full spec-driven development cycle (5-9 complexity)
+- **Minor Workflow**: Targeted improvements with minimal overhead (0-4 complexity)
+- **Micro Workflow**: Direct edits for trivial changes (< 0 complexity)
 
 ### 2. Sub-agents Layer
 
@@ -100,6 +107,7 @@ cache_hierarchy = {
 | Micro Workflow | 15% | 85% |
 | Minor Workflow | 25% | 75% |
 | Major Workflow | 40% | 60% |
+| Epic Workflow | 50% | 50% |
 
 ## Workflow Decision Matrix
 
@@ -142,12 +150,39 @@ function calculateComplexity(request: string): number {
 ### Routing Logic
 
 ```
-Score < 0:  Micro (grammar, typos, logs)
-Score 0-4:  Minor (bugs, improvements)
-Score > 4:  Major (features, architecture)
+Score < 0:   Micro (grammar, typos, logs)
+Score 0-4:   Minor (bugs, improvements)
+Score 5-9:   Major (features, architecture)
+Score >= 10: Epic (large-scale systems, platforms)
 ```
 
 ## Quality Gates
+
+### Epic Workflow Gates
+
+```yaml
+gates:
+  decomposition:
+    feature_count: 3-5
+    feature_independence: true
+    clear_boundaries: true
+
+  roadmap:
+    dependencies_acyclic: true  # DAG validation
+    parallelization_identified: true
+    milestones_defined: true
+
+  feature_implementation:
+    # Each Feature follows Major workflow
+    spec_completeness: 90%
+    test_coverage: 80%
+    integration_tested: true
+
+  epic_completion:
+    all_features_completed: true
+    integration_tests_pass: true
+    performance_criteria_met: true
+```
 
 ### Major Workflow Gates
 
@@ -596,6 +631,108 @@ interface UsageMetrics {
 │ Cache Hit Rate: 67%                 │
 └─────────────────────────────────────┘
 ```
+
+## Epic Workflow
+
+### Overview
+
+Epic Workflow is designed for large-scale projects (complexity >= 10) that require systematic decomposition and long-term tracking.
+
+### Architecture
+
+```
+Epic Structure:
+.specify/specs/NNN-epic-name/
+├── epic.md               # Epic metadata and overview
+├── roadmap.md            # Feature execution order & dependencies
+├── progress.md           # Auto-updated progress tracking
+└── features/
+    ├── 001-feature-a/    # Each Feature = Major workflow
+    │   ├── spec.md
+    │   ├── plan.md
+    │   └── tasks.md
+    ├── 002-feature-b/
+    └── 003-feature-c/
+```
+
+### Key Characteristics
+
+1. **Decomposition**: Epic automatically splits into 3-5 independent Features
+2. **Dependency Management**: DAG (Directed Acyclic Graph) validation prevents circular dependencies
+3. **Progress Tracking**: Automatic completion rate calculation
+4. **Feature Independence**: Each Feature can be developed, tested, and deployed separately
+
+### Workflow Stages
+
+```mermaid
+graph LR
+    A[/epic Command] --> B[AI Feature Decomposition]
+    B --> C{User Review}
+    C -->|Accept| D[Create Epic Structure]
+    C -->|Modify| B
+    D --> E[Feature 1: /major]
+    E --> F[Feature 2: /major]
+    F --> G[Feature 3: /major]
+    G --> H[Epic Completion]
+```
+
+### Automation Scripts
+
+- `create-epic.sh`: Initialize Epic directory structure
+- `update-epic-progress.sh`: Auto-update progress.md on Feature completion
+- `validate-epic.sh`: Verify Epic integrity (files, dependencies, Feature count)
+
+### Best Practices
+
+✅ **DO**:
+- Break down Epic into 3-5 Features (recommended)
+- Ensure Features are independently testable
+- Define clear Feature boundaries
+- Minimize inter-Feature dependencies
+
+❌ **DON'T**:
+- Create Epic for < 10 complexity tasks (use Major instead)
+- Create > 6 Features (Epic becomes unmanageable)
+- Allow circular dependencies
+- Skip validate-epic.sh before committing
+
+### Example Epic Flow
+
+```bash
+# Step 1: Triage detects Epic-level complexity
+/triage "Build user authentication system"
+# Output: Score 14 → Epic recommended
+
+# Step 2: Create Epic with AI decomposition
+/epic "User Authentication System"
+# AI suggests: OAuth, JWT, Permissions
+
+# Step 3: Implement each Feature
+cd .specify/specs/001-epic-auth/features/001-oauth
+/major "OAuth Integration"
+# ... complete Feature 001
+
+# Step 4: Track progress
+bash .specify/scripts/bash/update-epic-progress.sh .specify/specs/001-epic-auth
+# Output: 33% complete (1/3 Features)
+
+# Step 5: Validate Epic
+bash .specify/scripts/bash/validate-epic.sh .specify/specs/001-epic-auth
+# Output: ✅ All checks passed
+
+# Repeat Steps 3-5 for remaining Features
+```
+
+### Metrics
+
+| Metric | Value |
+|--------|-------|
+| Avg Features per Epic | 4 |
+| Avg Epic Duration | 2-3 weeks |
+| Feature Success Rate | 95% |
+| Epic Completion Rate | 87% |
+
+---
 
 ## Security Considerations
 

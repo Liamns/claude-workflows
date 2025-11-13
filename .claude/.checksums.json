@@ -1,9 +1,9 @@
 {
-  "version": "2.9.0",
-  "generatedAt": "2025-11-12T05:09:03Z",
+  "version": "3.0.0",
+  "generatedAt": "2025-11-13T00:12:09Z",
   "files": {
-    ".claude/.checksums.json": "933e79f634c4b02654926fd992ce97011c5654d45406d8c587f16e177049c9e4",
-    ".claude/.version": "8113ce620372292c25fda221ad5e8adf77dbe71c92c2042f8ca1ec3dfe9c50a1",
+    ".claude/.checksums.json": "7ecc98557e27ab12218f7d6c222b2bb783925e2706a143883975f1ea7ce772f5",
+    ".claude/.version": "2985be8b28d3ade858e8d8fb4bc22f565b1bf6020dff982dce141f7721b9999c",
     ".claude/agents/api-designer.md": "8d34ac2f5c3c7d9e25ffe46463b8efa3073a1f023f6226ef2f2d184b1a64c1b5",
     ".claude/agents/architect-unified.md": "509dd35487a5054f559f7ec6536f33a6015f09bfdcc113916718970d2c43f77f",
     ".claude/agents/code-reviewer/lib/cache-manager.sh": "7db245f6a880dac0c232f9f2acb4015ad49a3d22d0614491ef911855288661b4",
@@ -28,6 +28,7 @@
     ".claude/architectures/tools/migrator.ts": "4d398154ea7090a35b363914231d2bc91f098e43f1bf1cf304ee42a39cac5ade",
     ".claude/commands/commit.md": "a023425fa6f8420f1445642243d17c5d62a39da5b21706e3dbcbe7cf24c0614d",
     ".claude/commands/dashboard.md": "bc55f4db2d4399b31ef135fc441b49578e0ef840d6cb824036f647ddc2daafad",
+    ".claude/commands/epic.md": "a5851a95098c56db30c827c8be1ec1eb8f88dae953e76bef2a9993036c76b1d2",
     ".claude/commands/major.md": "90de349956882eb5c06bc420c5f5770d872cb6d05ec23a6bd259b0936aa80698",
     ".claude/commands/micro.md": "05e5f49336884092905b56e174e5b6d127399775eda484a6cc4e0f4faafb262a",
     ".claude/commands/minor.md": "f5ea0066f8f6719e150ff4c56eb67fef4f775c3e530199da8c3cfc06b874d9de",
@@ -35,7 +36,7 @@
     ".claude/commands/pr.md": "e801498b07a46a99256ef1f505b3108d44f5e9a810eb1a9908811a4556a74ed4",
     ".claude/commands/review.md": "9bec394d883c90b4f63daed1aac75063e7241bd43f51c4f9bd638b1fb83148fa",
     ".claude/commands/start.md": "24f13a6444659e984b9542ec8e5c6aba54d71bfc073e38fce1e86cd7eee34cfb",
-    ".claude/commands/triage.md": "4e562c49e505dfa1af1e58576d4b4ea8b6d9a38e66d6761cb5e87617ee357738",
+    ".claude/commands/triage.md": "1540d78725316dfd091b71f419ee4f7722aa6f53afa9bf165aa0c7be39a7f5c6",
     ".claude/config/cache-config.yaml": "0ef4bda60bef7d7d763ed8b981e4951dbb9f5b41397da4f44ce3238cf50268f6",
     ".claude/config/model-router.yaml": "28884c90e08f33afa3200396931cd32bf5b88aed4f36e090762a4310499a8f5d",
     ".claude/config/parallel-config.yaml": "d456c4ac8442efd6ad1cfde20bcb4586cacec3c324bbd6e22c4ecd49129ab779",
@@ -50,7 +51,7 @@
     ".claude/lib/cache-helper.sh": "3a7b241eaa1411caad09800251d33f130b30a12ce597abf7ce017f1306c9e124",
     ".claude/lib/checksum-helper.sh": "b2175e4bba40e2af44f6b98fce0ce5a816123980dbb8634de126dea611d6e59c",
     ".claude/lib/dashboard-generator.sh": "500e5e602ccdfac0a834d9de43a7fdaf38a2c56ede13a1f89d5bc9edea1aed25",
-    ".claude/lib/generate-checksums.sh": "43bcee93319e4028728dcbdd7a234949935bc5952823a0a6c653cccfdd4b31b1",
+    ".claude/lib/generate-checksums.sh": "6add41b523bac84fbabe9d3b7b5ae384e3d5d8a2b3f063f5fc2ad0a8da284e88",
     ".claude/lib/git-stats-helper.sh": "e511e6ea75b9fc22a9752a8ecbc5563429c0be33a407715640d537bff3f03a61",
     ".claude/lib/gitignore-manager.sh": "657d4b5c80f03dce48a715e5470f50127aad6fc635e305a679846dde37565989",
     ".claude/lib/metrics-collector.sh": "445f081eb83eb7bef46d908d40d8e9e3fb81a50cb27ab670af820c1e581db236",
@@ -111,6 +112,15 @@
     ".claude/templates/git/pr-template.md": "d30aebe2dda054d8baae2a6b6eb4c1d6c76ae293fca5cb13b9359d030c82147b",
     ".claude/templates/README.md": "e26c94927cb648aa8887113a780f5e297770924a218ec6f2b1ecb50b4ca6bc19",
     ".claude/templates/validation/report-template.md": "6c72a9d24f9f2866b139ce0593c76e18f07f6f81fbf90083f16b1978de83103c",
-    ".claude/workflow-gates.json": "c0537dda116c85454dc70ca210457e0531d7b495b3443e022b90610bdea7de00"
+    ".claude/workflow-gates.json": "c0537dda116c85454dc70ca210457e0531d7b495b3443e022b90610bdea7de00",
+    ".specify/scripts/bash/create-epic.sh": "12ee77f6caaab0db219e11337959166aa7b54eaed9bd3b6d74d1820663c57ab1",
+    ".specify/scripts/bash/update-epic-progress.sh": "6c55cb48606d9d79ec3e11600691f1e363e9dbfcde85fcb80b575eace8b75dc5",
+    ".specify/scripts/bash/validate-epic.sh": "e0b0ccd8e78805536e71617c5009354622d516b3ba0f8bde753f839ed0454c4d",
+    ".specify/templates/epic-template.md": "149f802dbe2d73ce43784f9d271c3ba480b4e9ffbaf2c2ee0cc52276a8f4fdee",
+    ".specify/templates/plan-template.md": "0b5a5d26a5da48e538b603ec478c689d9ef201604c712b8343222255ad826f63",
+    ".specify/templates/progress-template.md": "5f68adfeb1c4e43870d52f89508eb4e4236e23a2a96a4c42b55ee6f35e5eca6e",
+    ".specify/templates/roadmap-template.md": "473156c0d8fb4805fa056ac266160ab3c28493d5928df8b129081eebdde3cd17",
+    ".specify/templates/spec-template.md": "9ff16ef6a00b3129de9426df2b60714950dbc1aec863f69cfed288e7f0ad289d",
+    ".specify/templates/tasks-template.md": "27c641e6411d07b229639c7b1505933242e4039e763516660612ce72019681e0"
   }
 }

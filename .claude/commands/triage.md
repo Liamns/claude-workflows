@@ -1,11 +1,11 @@
 ---
 name: triage
-description: 작업 복잡도를 자동 분류하여 최적 워크플로우(Major/Minor/Micro) 선택
+description: 작업 복잡도를 자동 분류하여 최적 워크플로우(Epic/Major/Minor/Micro) 선택
 ---
 
 # 🎯 Triage - 스마트 워크플로우 선택기
 
-작업의 복잡도를 자동으로 분석하여 Major/Minor/Micro 중 최적의 워크플로우를 선택합니다.
+작업의 복잡도를 자동으로 분석하여 Epic/Major/Minor/Micro 중 최적의 워크플로우를 선택합니다.
 토큰 낭비를 방지하고 작업 효율을 극대화합니다.
 
 ## 사용법
@@ -99,6 +99,24 @@ function calculateComplexity(request: string): {
     factors.push("테스트 작성 필요");
   }
 
+  // === EPIC 신호 (매우 높은 복잡도) ===
+  if (/시스템|system|플랫폼|platform|프레임워크|framework/i.test(request)) {
+    score += 8;
+    factors.push("대규모 시스템 구축");
+  }
+  if (/인증|authentication|권한|authorization|보안|security/i.test(request) && /시스템|전체/i.test(request)) {
+    score += 7;
+    factors.push("인증/권한 시스템 (복합)");
+  }
+  if (/결제|payment|정산|billing/i.test(request) && /통합|integration|연동/i.test(request)) {
+    score += 7;
+    factors.push("결제 플랫폼 통합 (복합)");
+  }
+  if (/(새\s*기능.*API.*테스트)|(API.*새\s*기능.*아키텍처)/i.test(request)) {
+    score += 6;
+    factors.push("다중 Major 요소 결합");
+  }
+
   // 신뢰도 계산 (얼마나 확실한지)
   const confidence = Math.min(0.9, 0.5 + (factors.length * 0.1));
 
@@ -119,10 +137,16 @@ score 0-4:
   → 30분-4시간 작업
   → 토큰 절약: 75%
 
-score > 4:
+score 5-9:
   → Major 워크플로우
-  → 4시간 이상 작업
+  → 4시간-2일 작업
   → 토큰 절약: 60% (품질 최우선)
+
+score >= 10:
+  → Epic 워크플로우
+  → 2-3주 작업
+  → 3-5개 Feature로 분해
+  → 토큰 절약: 50% (체계적 관리)
 ```
 
 ### 4️⃣ 추가 질문 (필요시)
@@ -361,10 +385,17 @@ history:
    - 다중 파일 → +3점
    - 테스트 작성 → +2점
 
-4. **최종 점수 계산**:
+4. **EPIC 신호 확인** (점수 대폭 증가):
+   - 시스템/플랫폼 구축 → +8점
+   - 인증/권한 시스템 → +7점
+   - 결제 플랫폼 통합 → +7점
+   - 다중 Major 요소 결합 → +6점
+
+5. **최종 점수 계산**:
    - score < 0 → Micro
    - score 0-4 → Minor
-   - score > 4 → Major
+   - score 5-9 → Major
+   - score >= 10 → Epic
 
 5. 계산 결과를 다음 변수에 저장:
    - `{complexityScore}`: 계산된 점수
@@ -461,12 +492,12 @@ multiSelect: false
 옵션:
   1. label: "추천된 {recommendedWorkflow} 워크플로우로 진행"
      description: "AI가 분석한 최적의 워크플로우로 자동 진행합니다."
-  2. label: "Major 워크플로우 강제 실행"
+  2. label: "Epic 워크플로우 실행 (복잡도 10+ 전용)"
+     description: "대규모 프로젝트를 3-5개 Feature로 분해하여 체계적 관리"
+  3. label: "Major 워크플로우 강제 실행"
      description: "신규 기능 개발 프로세스 (통합 워크플로우)"
-  3. label: "Minor 워크플로우 강제 실행"
-     description: "버그 수정 및 개선 프로세스"
-  4. label: "Micro 워크플로우 강제 실행"
-     description: "빠른 수정 프로세스"
+  4. label: "Minor/Micro 워크플로우 실행"
+     description: "버그 수정 및 빠른 개선 프로세스"
 
 사용자의 선택을 `{selectedWorkflow}` 변수에 저장하세요.
 
@@ -489,6 +520,25 @@ SlashCommand: /{recommendedWorkflow를 소문자로} "{사용자 요청}"
 
 **Option 2를 선택한 경우:**
 ```
+SlashCommand: /epic "{사용자 요청}"
+```
+
+**Epic 워크플로우 실행 후 확인사항:**
+- AskUserQuestion으로 Epic 관련 질문 3개를 했는가? (목표, 분해 방식, 우선순위)
+- epic.md, roadmap.md, progress.md 파일이 생성되었는가?
+- features/ 디렉토리에 Feature 디렉토리들이 생성되었는가?
+
+하나라도 누락되었다면 워크플로우가 잘못 실행된 것입니다.
+
+**Epic 복잡도 경고:**
+복잡도가 10 미만인데 Epic을 선택한 경우:
+```markdown
+⚠️ 복잡도가 10 미만입니다. Epic으로 분해하기엔 작은 작업일 수 있습니다.
+그래도 Epic 워크플로우로 진행하시겠습니까? (y/n)
+```
+
+**Option 3을 선택한 경우:**
+```
 SlashCommand: /major "{사용자 요청}"
 ```
 
@@ -499,14 +549,12 @@ SlashCommand: /major "{사용자 요청}"
 
 하나라도 누락되었다면 워크플로우가 잘못 실행된 것입니다.
 
-**Option 3을 선택한 경우:**
-```
-SlashCommand: /minor "{사용자 요청}"
-```
-
 **Option 4를 선택한 경우:**
 ```
+SlashCommand: /minor "{사용자 요청}"
+# 또는
 SlashCommand: /micro "{사용자 요청}"
+# (복잡도에 따라 선택)
 ```
 
 ### Step 7: 완료

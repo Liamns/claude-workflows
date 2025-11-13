@@ -30,7 +30,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.."; pwd)"
 
 # 버전 정보 (install.sh와 동기화)
-VERSION="2.9.0"
+VERSION="3.0.0"
 
 # 기본 출력 파일 (설정하지 않으면 stdout)
 OUTPUT_FILE=""
@@ -199,7 +199,7 @@ for file in "${ALL_FILES[@]}"; do
 
     # 제외 디렉토리 체크
     for dir in "${EXCLUDE_DIRS[@]}"; do
-        if [[ "$file" == "$dir"* || "$file" == "./$dir"* ]]; then
+        if [[ "$file" == "$dir/"* || "$file" == "./$dir/"* ]]; then
             log_verbose "Excluding (dir): $file"
             skip=true
             break

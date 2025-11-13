@@ -76,6 +76,75 @@ find src/features -name "*Modal.tsx" -type f | head -20
 grep -r "useForm\|useQuery\|useMutation" src/features/
 ```
 
+#### 2.4 NestJS Backend 패턴 검색
+
+**중요:** 백엔드 경로는 자동 감지됩니다 (apps/api/src, backend/src, server/src 등)
+
+**통합 CLI 사용:**
+```bash
+# 재사용성 검사 메인 스크립트
+bash .claude/lib/reusability/reusability-checker.sh -e backend -t all "<검색어>"
+
+# 백엔드만 검색
+bash .claude/lib/reusability/reusability-checker.sh -e backend -t service "Auth"
+bash .claude/lib/reusability/reusability-checker.sh -e backend -t prisma "User"
+```
+
+**수동 검색 (필요시):**
+```bash
+# 백엔드 경로 자동 감지
+source .claude/lib/reusability/detect-architecture.sh
+BACKEND_PATH=$(detect_backend_path 2>/dev/null)
+
+# @Injectable 서비스 검색
+grep -r "@Injectable()" "$BACKEND_PATH" --include="*.service.ts"
+
+# @Controller 검색
+grep -r "@Controller(" "$BACKEND_PATH" --include="*.controller.ts"
+
+# 서비스 메서드 검색
+grep -r "async.*function" "$BACKEND_PATH" --include="*.service.ts"
+
+# DTO 클래스 검색
+find "$BACKEND_PATH" -name "*.dto.ts" -type f
+
+# class-validator 데코레이터
+grep -r "@Is(String|Number|Email|Optional)" "$BACKEND_PATH" --include="*.dto.ts"
+
+# Prisma Schema model 검색
+find . -name "schema.prisma" -type f
+grep "^model " prisma/schema.prisma 2>/dev/null
+
+# Prisma Client 사용
+grep -r "prisma\." "$BACKEND_PATH" --include="*.service.ts" | grep -E "(findMany|findUnique|create|update)"
+
+# PrismaService injection
+grep -r "constructor.*PrismaService" "$BACKEND_PATH" --include="*.service.ts"
+```
+
+#### 2.5 Capacitor 플러그인 검색
+
+**통합 CLI 사용:**
+```bash
+# Capacitor 플러그인 검색
+bash .claude/lib/reusability/reusability-checker.sh -e mobile -t function "Camera"
+```
+
+**수동 검색 (필요시):**
+```bash
+# Capacitor 플러그인 import 검색
+grep -r "from '@capacitor" src/ --include="*.ts" --include="*.tsx" -n | head -20
+
+# Capacitor API 사용
+grep -r "Capacitor\.\|Plugins\." src/ --include="*.ts" --include="*.tsx" -n | head -20
+
+# 커스텀 플러그인 훅
+grep -r "use.*Camera\|use.*Filesystem" src/ --include="*.ts" --include="*.tsx" | grep -i "capacitor"
+
+# 플러그인 래퍼 함수
+grep -r "export.*function" src/shared/lib/capacitor --include="*.ts" -n
+```
+
 ### 3. 유사도 분석 단계
 
 #### 3.1 컴포넌트 유사도 (80% 이상 일치 시 재사용)
@@ -242,6 +311,88 @@ User: "주문 생성 폼을 만들어줘"
    - Will be used 2+ times? No (order-create only)
    - Domain-agnostic? No (order-specific)
    - Decision: Keep in features/order-create/
+```
+
+### 시나리오 4: NestJS 서비스 필요
+```bash
+User: "사용자 인증 서비스를 만들어줘"
+
+[자동 실행]
+1. Running reusability check...
+   $ bash .claude/lib/reusability/reusability-checker.sh -e backend -t service Auth
+
+2. Found existing patterns:
+   ✓ AuthService: backend/src/auth/auth.service.ts (95% match)
+   ✓ PrismaService injection pattern
+   ✓ JWT token generation pattern
+
+3. Recommendation:
+   ✅ REUSE (95%): backend/src/auth/auth.service.ts
+   - Already implements login/logout/refresh
+   - Uses Prisma for user queries
+   - JWT token handling included
+
+4. Action:
+   - Use existing AuthService
+   - Extend if additional methods needed
+```
+
+### 시나리오 5: Prisma Model 필요
+```bash
+User: "Order 엔티티를 추가해줘"
+
+[자동 실행]
+1. Searching Prisma schema...
+   $ bash .claude/lib/reusability/reusability-checker.sh -e backend -t prisma Order
+
+2. Analyzing schema.prisma:
+   ✓ Found: User, Product models
+   ✗ Not found: Order model
+
+3. Pattern analysis:
+   - User model pattern: id, createdAt, updatedAt fields
+   - Naming: camelCase for fields
+   - Relations: @relation decorator
+
+4. Recommendation:
+   🆕 CREATE new model following existing pattern:
+   ```prisma
+   model Order {
+     id        String   @id @default(uuid())
+     userId    String
+     user      User     @relation(fields: [userId], references: [id])
+     status    String
+     createdAt DateTime @default(now())
+     updatedAt DateTime @updatedAt
+   }
+   ```
+```
+
+### 시나리오 6: Capacitor 플러그인 사용
+```bash
+User: "카메라로 사진을 찍는 기능을 추가해줘"
+
+[자동 실행]
+1. Searching Capacitor plugins...
+   $ bash .claude/lib/reusability/reusability-checker.sh -e mobile -t function Camera
+
+2. Found existing wrappers:
+   ✓ useCameraPlugin: src/shared/lib/capacitor/useCameraPlugin.ts (90% match)
+   ✓ Permission handling included
+   ✓ Error handling included
+
+3. Recommendation:
+   ✅ REUSE (90%): src/shared/lib/capacitor/useCameraPlugin.ts
+   ```tsx
+   import { useCameraPlugin } from '@/shared/lib/capacitor';
+
+   const { takePhoto, error } = useCameraPlugin();
+   const photo = await takePhoto({ quality: 90 });
+   ```
+
+4. Action:
+   - Use existing hook
+   - No new implementation needed
 ```
 
 ## 메트릭 수집

@@ -97,38 +97,57 @@ for FEATURE_DIR in "${EPIC_DIR}"/features/*/; do
 
   TASKS_FILE="${FEATURE_DIR}/tasks.md"
 
+  # Git log 기반 Feature 커밋 추적
+  # Feature ID를 [F001] 형식으로 grep
+  FEATURE_NUM=$(echo "$FEATURE_ID" | grep -o '^[0-9]\{3\}' || echo "")
+  FEATURE_COMMITS=0
+  LATEST_COMMIT=""
+
+  if [ -n "$FEATURE_NUM" ]; then
+    FEATURE_COMMITS=$(git log --all --grep="^\[F${FEATURE_NUM}\]" --oneline 2>/dev/null | wc -l | tr -d ' ')
+    LATEST_COMMIT=$(git log -1 --grep="^\[F${FEATURE_NUM}\]" --format="%h %s" 2>/dev/null || echo "")
+  fi
+
   if [ -f "$TASKS_FILE" ]; then
     # tasks.md에서 완료된 task 개수 확인
-    TOTAL_TASKS=$(grep -c "^\- \[" "$TASKS_FILE" || echo "0")
-    COMPLETED_TASKS=$(grep -c "^\- \[x\]" "$TASKS_FILE" || echo "0")
+    TOTAL_TASKS=$(grep "^\- \[" "$TASKS_FILE" 2>/dev/null | wc -l | tr -d ' ')
+    COMPLETED_TASKS=$(grep "^\- \[x\]" "$TASKS_FILE" 2>/dev/null | wc -l | tr -d ' ')
 
     if [ "$TOTAL_TASKS" -gt 0 ]; then
       COMPLETION_PERCENT=$((COMPLETED_TASKS * 100 / TOTAL_TASKS))
 
-      if [ "$COMPLETION_PERCENT" -eq 100 ]; then
-        # 100% 완료 → 테스트 및 빌드 확인
-        # 실제로는 yarn test/build를 실행하지 않고, 완료로 간주
-        # (테스트 실행은 Feature 구현 단계에서 이미 수행됨)
+      # Feature 완료 판단: tasks.md 100% AND 커밋 존재
+      if [ "$COMPLETION_PERCENT" -eq 100 ] && [ "$FEATURE_COMMITS" -gt 0 ]; then
         COMPLETED_FEATURES=$((COMPLETED_FEATURES + 1))
-        info_msg "Feature ${FEATURE_ID}: ✅ Completed"
-      elif [ "$COMPLETION_PERCENT" -gt 0 ]; then
-        # 0% < x < 100% → In Progress
+        info_msg "Feature ${FEATURE_ID}: ✅ Completed (${FEATURE_COMMITS} commits)"
+      elif [ "$COMPLETION_PERCENT" -gt 0 ] || [ "$FEATURE_COMMITS" -gt 0 ]; then
+        # tasks.md 진행 중 OR 커밋 있음 → In Progress
         IN_PROGRESS_FEATURES=$((IN_PROGRESS_FEATURES + 1))
-        info_msg "Feature ${FEATURE_ID}: 🔄 In Progress (${COMPLETION_PERCENT}%)"
+        info_msg "Feature ${FEATURE_ID}: 🔄 In Progress (${COMPLETION_PERCENT}%, ${FEATURE_COMMITS} commits)"
       else
-        # 0% → Pending
+        # 둘 다 없음 → Pending
         PENDING_FEATURES=$((PENDING_FEATURES + 1))
         info_msg "Feature ${FEATURE_ID}: ⬜ Pending"
       fi
     else
-      # tasks.md가 비어있으면 Pending
-      PENDING_FEATURES=$((PENDING_FEATURES + 1))
-      info_msg "Feature ${FEATURE_ID}: ⬜ Pending (no tasks)"
+      # tasks.md 비어있지만 커밋은 있을 수 있음
+      if [ "$FEATURE_COMMITS" -gt 0 ]; then
+        IN_PROGRESS_FEATURES=$((IN_PROGRESS_FEATURES + 1))
+        info_msg "Feature ${FEATURE_ID}: 🔄 In Progress (no tasks, ${FEATURE_COMMITS} commits)"
+      else
+        PENDING_FEATURES=$((PENDING_FEATURES + 1))
+        info_msg "Feature ${FEATURE_ID}: ⬜ Pending (no tasks)"
+      fi
     fi
   else
-    # tasks.md가 없으면 Pending
-    PENDING_FEATURES=$((PENDING_FEATURES + 1))
-    info_msg "Feature ${FEATURE_ID}: ⬜ Pending (no tasks.md)"
+    # tasks.md 없지만 커밋은 있을 수 있음
+    if [ "$FEATURE_COMMITS" -gt 0 ]; then
+      IN_PROGRESS_FEATURES=$((IN_PROGRESS_FEATURES + 1))
+      info_msg "Feature ${FEATURE_ID}: 🔄 In Progress (no tasks.md, ${FEATURE_COMMITS} commits)"
+    else
+      PENDING_FEATURES=$((PENDING_FEATURES + 1))
+      info_msg "Feature ${FEATURE_ID}: ⬜ Pending (no tasks.md)"
+    fi
   fi
 done
 

@@ -164,9 +164,61 @@ bash .specify/scripts/bash/create-new-feature.sh [feature-name]
    이대로 진행하시겠습니까? (y/N)
    ```
 
+#### Phase 6: 재사용성 검사 (자동 실행)
+
+**실행 시점**: spec.md 작성 직전 (사용자 질문 완료 후)
+
+**자동 실행**:
+```bash
+# 프로젝트 아키텍처 감지 및 재사용성 검사
+bash .claude/lib/reusability/reusability-checker.sh -e all -t all "<작업명 키워드>"
+```
+
+**검색 결과 분석 및 적용**:
+```markdown
+🔍 Reusability Analysis Result:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📱 Frontend (React)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ REUSE (95%): Button 컴포넌트
+   → src/shared/ui/Button/Button.tsx
+   → 그대로 import하여 사용
+
+🔧 EXTEND (75%): useFormatDate 훅
+   → src/shared/lib/dates/useFormatDate.ts
+   → formatKoreanDate 추가 필요
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚙️  Backend (NestJS)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ REUSE (90%): AuthService 패턴
+   → backend/src/auth/auth.service.ts
+   → PrismaService injection 동일 패턴 사용
+
+🆕 CREATE: OrderService
+   → AuthService 패턴 참고하여 신규 작성
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📋 적용 계획:
+1. Button, Input 컴포넌트는 기존 것 사용
+2. useFormatDate 확장하여 formatKoreanDate 추가
+3. OrderService는 AuthService 구조 참고하여 작성
+4. Prisma 모델은 기존 패턴(id, createdAt, updatedAt) 따름
+```
+
+**재사용성 점수 기준**:
+- **90-100% 유사**: ✅ REUSE - 기존 모듈 그대로 import하여 사용
+- **70-89% 유사**: 🔧 EXTEND - 기존 모듈 확장하거나 wrapper 생성
+- **50-69% 유사**: 📝 ADAPT - 패턴을 참고하여 작성
+- **0-49% 유사**: 🆕 CREATE - 새로운 모듈 작성 (유사한 모듈 없음)
+
 ### 3단계: spec.md 생성
 
 **🔴 매우 중요**: 다음 문서는 **반드시 한글로 작성**하세요. Overview, User Scenarios, Functional Requirements 등 모든 설명은 한글로 작성하되, 코드 예시, 파일 경로, 기술 용어는 영어를 유지하세요.
+
+**📝 재사용성 검사 결과 반영**: spec.md 작성 시 위에서 발견한 재사용 가능 모듈 정보를 포함하세요.
 
 답변을 기반으로 `.specify/specs/NNN-feature-name/spec.md` 파일을 생성합니다.
 
@@ -196,6 +248,38 @@ bash .specify/scripts/bash/create-new-feature.sh [feature-name]
 **Test Verification:**
 - [ ] {검증 항목 1}
 - [ ] {검증 항목 2}
+
+## Reusability Analysis
+
+**검색 대상**: {작업명 키워드}
+
+**발견된 재사용 가능 모듈**:
+
+### Frontend (React)
+- ✅ **REUSE (95%)**: Button 컴포넌트
+  - 경로: `src/shared/ui/Button/Button.tsx`
+  - 사용방법: 그대로 import하여 사용
+  - 예시: `<Button variant="primary" onClick={handleSubmit}>제출</Button>`
+
+- 🔧 **EXTEND (75%)**: useFormatDate 훅
+  - 경로: `src/shared/lib/dates/useFormatDate.ts`
+  - 확장 필요: formatKoreanDate 함수 추가
+  - 계획: 기존 훅에 새 포맷 옵션 추가
+
+### Backend (NestJS)
+- ✅ **REUSE (90%)**: AuthService 패턴
+  - 경로: `backend/src/auth/auth.service.ts`
+  - 참고사항: PrismaService injection 동일 패턴 사용
+
+- 🆕 **CREATE**: OrderService
+  - 참고 패턴: AuthService 구조 참고하여 작성
+  - 이유: 기존 유사 서비스 없음 (유사도 <50%)
+
+### 적용 계획
+1. Button, Input 등 UI 컴포넌트는 shared/ui에서 재사용
+2. 날짜 포맷 함수는 기존 유틸리티 확장
+3. OrderService는 신규 작성하되 AuthService 구조 참고
+4. Prisma 모델은 기존 패턴(id, createdAt, updatedAt) 준수
 
 ## Functional Requirements
 - FR-001: {요구사항 설명}
@@ -591,11 +675,18 @@ Bash:
 
 결과를 기반으로 다음 번호 계산: `{nextNumber} = result + 1` (또는 001 if empty)
 
-**Bash 도구로 브랜치 및 디렉토리 생성**:
+**Bash 도구로 디렉토리 생성**:
 ```
 Bash:
-- command: "mkdir -p .specify/specs/{nextNumber}-{featureName} && mkdir -p .specify/specs/{nextNumber}-{featureName}/contracts && git checkout -b {nextNumber}-{featureName} 2>/dev/null || true"
-- description: "Create feature directory and branch"
+- command: "mkdir -p .specify/specs/{nextNumber}-{featureName} && mkdir -p .specify/specs/{nextNumber}-{featureName}/contracts"
+- description: "Create feature directory"
+```
+
+**Bash 도구로 조건부 브랜치 생성 (Epic 감지)**:
+```
+Bash:
+- command: "if [ ! -f ../../epic.md ]; then git checkout -b {nextNumber}-{featureName} 2>/dev/null || true; else echo 'Epic 내부: 브랜치 $(git branch --show-current) 유지'; fi"
+- description: "Conditionally create branch (skip if inside Epic)"
 ```
 
 생성된 디렉토리를 `{featureDir}` 변수에 저장: `.specify/specs/{nextNumber}-{featureName}`

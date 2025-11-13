@@ -1,6 +1,6 @@
 # 🤖 Claude Workflows
 
-[![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)](https://github.com/Liamns/claude-workflows)
+[![Version](https://img.shields.io/badge/version-3.1.0-blue.svg)](https://github.com/Liamns/claude-workflows)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-purple.svg)](https://claude.ai/code)
 [![Validation](https://img.shields.io/badge/validation-automated-success.svg)](https://github.com/Liamns/claude-workflows)
@@ -8,6 +8,55 @@
 > Claude Code의 토큰 효율성을 극대화하면서 코드 품질을 보장하는 지능형 워크플로우 시스템
 
 **📖 새로운 Claude 세션?** → [프로젝트 컨텍스트 문서](.claude/docs/PROJECT-CONTEXT.md) (5분이면 전체 파악)
+
+## 🆕 v3.1.0 주요 기능 (Epic 001 완료!)
+
+### 🏗️ Architecture Compliance Check (Feature #002)
+- **자동 아키텍처 검증** - 코드 작성 중 자동으로 아키텍처 패턴 준수 여부 확인
+  - FSD, Clean Architecture, Hexagonal, DDD 등 다중 패턴 지원
+  - 순환 의존성 자동 검출 및 경고
+  - 레이어 규칙 검증 (features → entities → shared)
+  - 네이밍 규칙 자동 체크 (useXxx, xxxStore 등)
+- **Major 워크플로우 통합** - Step 13.7에서 자동 실행
+  - TypeScript 기반 고성능 검증 (2,762 lines)
+  - 5개 테스트 스위트로 품질 보증
+  - 실패 시 상세한 위반 내역 및 수정 제안 제공
+
+### 📝 Korean Documentation Validation (Feature #003)
+- **한글 문서화 강제** - 계획 문서가 한글로 작성되도록 자동 검증
+  - 한글 비율 자동 계산 (목표: 60%, 통과: 45%)
+  - spec.md, plan.md, tasks.md 등 자동 검증
+  - Major 워크플로우 5곳에 통합
+- **유연한 임계값** - 프로젝트 특성에 맞게 조정 가능
+  - 16개 테스트로 검증된 안정성
+  - 명확한 에러 메시지 및 가이드 제공
+
+### 🌿 Branch State Management (Feature #004)
+- **자동 Git 상태 관리** - 브랜치 생성 시 Git 상태를 자동으로 처리
+  - Clean state: 즉시 브랜치 생성
+  - Dirty state: 5가지 옵션 제공 (commit/move/stash/discard/cancel)
+  - Auto-commit 메시지 생성 및 리뷰
+- **Parallel Work 지원** - Feature 브랜치에서 Epic 브랜치로 자동 분기
+  - 충돌 방지 자동 감지
+  - Epic 브랜치 자동 검색 및 분기
+  - 명확한 경고 메시지 제공
+- **완벽한 에러 복구** - 모든 상황에서 데이터 손실 0%
+  - 자동 rollback 메커니즘
+  - 70개 테스트 (100% passing)
+  - 350+ 라인 통합 가이드 (INTEGRATION.md)
+
+### 🔐 Checksum Verification Improvements (Feature #005)
+- **파일 무결성 검증 강화** - SHA256 체크섬 기반 설치 파일 검증
+  - `.specify/` 디렉토리 포함
+  - 설치 시 자동 무결성 검증
+  - 선택적 파일 재다운로드 지원
+
+### ✨ Plan Mode Removal (Feature #001)
+- **워크플로우 간소화** - Plan Mode 제거로 사용자 경험 개선
+  - 실행 시간 30초-1분 단축
+  - 수동 복사-붙여넣기 단계 제거
+  - AskUserQuestion 기반 정보 수집으로 전환
+  - 롤백 가능 (`.deprecated` 디렉토리 보존)
 
 ## 🆕 v3.0.0 주요 기능
 

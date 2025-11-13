@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Claude Code Workflows Installer
-# Version: 2.8.0 - Plan Mode Integration & Enhanced .gitignore
+# Version: 3.1.0 - Epic 001 Completion (Architecture, Korean Docs, Branch State, Checksum)
 
 set -e
 
@@ -13,8 +13,8 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Version Configuration
-INSTALLER_VERSION="2.9.0"
-TARGET_VERSION="2.9.0"
+INSTALLER_VERSION="3.1.0"
+TARGET_VERSION="3.1.0"
 
 # Repository Configuration
 REPO_URL="https://github.com/Liamns/claude-workflows"
@@ -42,7 +42,7 @@ print_header() {
     echo -e "${BLUE}╔════════════════════════════════════════╗${NC}"
     echo -e "${BLUE}║   Claude Code Workflows Installer     ║${NC}"
     echo -e "${BLUE}║   Version ${INSTALLER_VERSION}                        ║${NC}"
-    echo -e "${BLUE}║   Enhanced Validation & Migration     ║${NC}"
+    echo -e "${BLUE}║   Epic 001 - System Improvements      ║${NC}"
     echo -e "${BLUE}╚════════════════════════════════════════╝${NC}"
     echo ""
 }
@@ -93,7 +93,7 @@ health_check() {
     local agents_count=$(find "$TARGET_DIR/.claude/agents" -maxdepth 1 -type f -name '*.md' ! -path '*/_deprecated/*' 2>/dev/null | wc -l | tr -d ' ')
     local skills_count=$(find "$TARGET_DIR/.claude/skills" -maxdepth 1 -type d ! -name 'skills' 2>/dev/null | wc -l | tr -d ' ')
 
-    echo "  Commands: $commands_count (expected: 10)"
+    echo "  Commands: $commands_count (expected: 11)"
     echo "  Agents: $agents_count (expected: 6)"
     echo "  Skills: $skills_count (expected: 15)"
 

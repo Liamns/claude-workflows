@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.1.1] - 2025-11-13
+
+### Fixed
+- **GitHub Raw CDN Cache Issue** - 설치 시 체크섬 검증 실패 문제 해결
+  - GitHub Raw Content CDN이 캐시된 이전 버전 `.checksums.json` 제공하는 문제
+  - v3.1.1 패치 릴리스로 새 URL 제공하여 캐시 우회
+  - 테스트 파일 제외 후 체크섬 불일치로 인한 설치 중단 해결 (159개 → 143개 파일)
+
 ## [3.1.0] - 2025-11-13
 
 Epic 001 (Workflow System v3.1 Improvements) - 5개 Features 완료

@@ -13,8 +13,8 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Version Configuration
-INSTALLER_VERSION="3.1.0"
-TARGET_VERSION="3.1.0"
+INSTALLER_VERSION="3.1.1"
+TARGET_VERSION="3.1.1"
 
 # Repository Configuration
 REPO_URL="https://github.com/Liamns/claude-workflows"

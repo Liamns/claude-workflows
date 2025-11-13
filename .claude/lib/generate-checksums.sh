@@ -30,7 +30,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.."; pwd)"
 
 # 버전 정보 (install.sh와 동기화)
-VERSION="3.0.0"
+VERSION="3.1.0"
 
 # 기본 출력 파일 (설정하지 않으면 stdout)
 OUTPUT_FILE=""
@@ -42,7 +42,10 @@ EXCLUDE_DIRS=(
     ".claude/cache"
     ".claude/commands/_backup"
     ".claude/agents/_deprecated"
+    ".claude/__tests__"
     ".claude/lib/__tests__"
+    ".claude/architectures/__tests__"
+    ".claude/agents/code-reviewer/__tests__"
     ".claude/hooks"
     ".specify/specs"
     ".specify/temp"

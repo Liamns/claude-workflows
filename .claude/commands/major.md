@@ -166,6 +166,8 @@ bash .specify/scripts/bash/create-new-feature.sh [feature-name]
 
 ### 3단계: spec.md 생성
 
+**🔴 매우 중요**: 다음 문서는 **반드시 한글로 작성**하세요. Overview, User Scenarios, Functional Requirements 등 모든 설명은 한글로 작성하되, 코드 예시, 파일 경로, 기술 용어는 영어를 유지하세요.
+
 답변을 기반으로 `.specify/specs/NNN-feature-name/spec.md` 파일을 생성합니다.
 
 **생성 구조**:
@@ -256,6 +258,8 @@ spec.md를 기반으로 `.specify/specs/NNN-feature-name/plan.md` 파일을 생�
 
 #### Phase 0: Research
 
+**🔴 매우 중요**: 다음 문서는 **반드시 한글로 작성**하세요. Existing Solutions Analysis, Technical Feasibility, Risks & Mitigation 등 모든 설명은 한글로 작성하되, 코드 예시, 라이브러리 이름, 파일 경로는 영어를 유지하세요.
+
 **생성 파일**: `research.md`
 
 **내용**:
@@ -281,6 +285,8 @@ spec.md를 기반으로 `.specify/specs/NNN-feature-name/plan.md` 파일을 생�
 ```
 
 #### Phase 1: Design Artifacts
+
+**🔴 매우 중요**: 다음 문서들은 **반드시 한글로 작성**하세요. Entities, State Management, Setup Steps, Verification 등 모든 설명은 한글로 작성하되, 코드 예시, 타입 정의, 파일 경로, API 스펙은 영어를 유지하세요.
 
 **생성 파일**: `data-model.md`, `contracts/openapi.yaml`, `quickstart.md`
 
@@ -355,6 +361,8 @@ paths:
 
 #### plan.md 메인 파일
 
+**🔴 매우 중요**: plan.md는 **반드시 한글로 작성**하세요. Technical Foundation, Constitution Check, Implementation Phases 등 모든 설명은 한글로 작성하되, 코드 예시, 라이브러리 이름, 파일 경로는 영어를 유지하세요.
+
 ```markdown
 # Implementation Plan: {Feature Name}
 
@@ -400,6 +408,8 @@ paths:
 ```
 
 ### 6단계: Tasks 생성
+
+**🔴 매우 중요**: tasks.md는 **반드시 한글로 작성**하세요. Task 설명, Phase 제목 등 모든 설명은 한글로 작성하되, 코드 예시, 파일 경로, 명령어는 영어를 유지하세요.
 
 plan.md를 기반으로 실행 가능한 task breakdown을 생성합니다.
 
@@ -592,50 +602,7 @@ Bash:
 
 ✅ **Step 1 완료** - Feature 브랜치 및 디렉토리 생성 완료
 
-### Step 1.5: Plan Mode 컨텍스트 감지 (자동)
-
-**목적**: 이전 대화에서 Plan Mode로 작성된 계획이 있는지 확인합니다.
-
-**조건 확인**:
-```bash
-# 대화 컨텍스트에서 계획 키워드 검색
-# Keywords: '계획', 'plan', 'phase', '단계', 'step'
-# Minimum length: 200 characters
-```
-
-**Case A: 계획 발견됨** ✅
-```markdown
-✅ Plan Mode 계획이 감지되었습니다!
-
-다음 정보가 대화 컨텍스트에서 추출되었습니다:
-- 기능 목표: {extracted from plan}
-- 사용자 시나리오: {extracted from plan}
-- 데이터 모델: {extracted from plan}
-- 구현 단계: {extracted from plan}
-
-이 정보를 사용하여 Step 2-5를 자동으로 진행합니다.
-```
-
-→ **Step 2-5 자동 진행** (사용자 질문 건너뛰기)
-→ `{planModeDetected}` = true
-→ `{extractedPlan}` = conversation context의 plan 내용
-
-**Case B: 계획 미발견** ❌
-```markdown
-ℹ️ Plan Mode 계획이 감지되지 않았습니다.
-
-질문-응답 방식으로 진행합니다 (Step 2-5).
-```
-
-→ **Step 2-5 수동 진행** (아래 질문 실행)
-→ `{planModeDetected}` = false
-
-✅ **Step 1.5 완료** - Plan Mode 컨텍스트 감지 완료
-
 ### Step 2: 핵심 질문 (필수)
-
-**조건**: `{planModeDetected}` = false인 경우에만 실행
-**건너뛰기**: `{planModeDetected}` = true인 경우 이 단계 건너뛰고 Step 6으로 이동
 
 **🔴 필수**: 이 단계에서는 **반드시 AskUserQuestion 도구를 사용**해야 합니다.
 
@@ -688,9 +655,6 @@ multiSelect: false
 
 ### Step 3: 선택적 컨텍스트 수집
 
-**조건**: `{planModeDetected}` = false인 경우에만 실행
-**건너뛰기**: `{planModeDetected}` = true인 경우 이 단계 건너뛰고 Step 6으로 이동
-
 **AskUserQuestion 도구 사용 - Block 2 (선택적 질문 통합)**:
 ```
 질문: "추가 컨텍스트를 제공하시겠습니까?"
@@ -724,9 +688,6 @@ multiSelect: true  ← 여러 항목 선택 가능
 
 ### Step 4: 우선순위 설정
 
-**조건**: `{planModeDetected}` = false인 경우에만 실행
-**건너뛰기**: `{planModeDetected}` = true인 경우 이 단계 건너뛰고 Step 6으로 이동
-
 **AskUserQuestion 도구 사용**:
 ```
 질문: "마감일이나 우선순위가 있나요?"
@@ -744,10 +705,6 @@ multiSelect: false
 답변을 `{priority}` 변수에 저장하세요.
 
 ### Step 5: AI 자동 추정
-
-**조건**: 항상 실행 (Plan Mode 계획이 있어도 복잡도 추정은 필요)
-
-**Plan Mode 감지 시**: `{extractedPlan}` 내용을 기반으로 복잡도 추정
 
 수집된 정보를 바탕으로 다음을 추정하세요:
 

@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+- **Plan Mode** - Major 워크플로우에서 Plan Mode 가이드 제거 (Feature #001-plan-mode-improvement)
+  - `/triage` 명령어에서 Plan Mode 안내 메시지 제거 (triage.md Step 4.5 제거)
+  - `major.md` Step 1.5 (Plan Mode 컨텍스트 감지) 제거
+  - `major.md` Step 2-4의 `{planModeDetected}` 조건 분기 제거
+  - `.claude/lib/plan-mode/` → `.claude/lib/plan-mode.deprecated/` 이동
+  - **사유**: Major 워크플로우의 AskUserQuestion이 충분한 정보를 수집하므로 불필요
+  - **영향**: 기존 사용자는 Plan Mode 대신 AskUserQuestion 기반 정보 수집 사용
+
+### Improved
+- **Major Workflow** - AskUserQuestion 기반 정보 수집으로 사용자 경험 간소화
+  - 워크플로우 실행 시간 30초-1분 단축
+  - 수동 복사-붙여넣기 단계 제거
+  - 더 직관적이고 끊김없는 워크플로우 경험
+  - 롤백 가능: `.backup` 파일 및 `.deprecated` 디렉토리 보존
+
+### BREAKING CHANGE
+- Plan Mode 기능 제거. 기존 Plan Mode 사용자는 롤백 가이드 참조: `.claude/lib/plan-mode.deprecated/README.md`
+
 ## [2.9.0] - 2025-11-12
 
 ### Added

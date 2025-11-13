@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.1.2] - 2025-11-13
+
+### Fixed
+- **Installation Directory Creation Bug** - 파일 복구 중 디렉토리 생성 실패 문제 해결
+  - `retry-helper.sh`의 `download_file_with_retry()` 함수에 디렉토리 자동 생성 추가
+  - 상위 디렉토리가 없을 때 `mkdir -p`로 자동 생성
+  - 설치 중 "File recovery failed" 오류 해결
+  - 권한 오류 시 명확한 에러 메시지 제공
+
 ## [3.1.1] - 2025-11-13
 
 ### Fixed

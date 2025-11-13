@@ -30,7 +30,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.."; pwd)"
 
 # 버전 정보 (install.sh와 동기화)
-VERSION="3.1.1"
+VERSION="3.1.2"
 
 # 기본 출력 파일 (설정하지 않으면 stdout)
 OUTPUT_FILE=""

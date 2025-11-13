@@ -91,6 +91,17 @@ download_file_with_retry() {
         return 1
     fi
 
+    # 상위 디렉토리 생성
+    local dest_dir
+    dest_dir="$(dirname "$dest")"
+    if [[ ! -d "$dest_dir" ]]; then
+        if ! mkdir -p "$dest_dir" 2>/dev/null; then
+            echo "오류: 디렉토리 생성 실패: $dest_dir" >&2
+            echo "       파일 쓰기 권한을 확인하세요" >&2
+            return 1
+        fi
+    fi
+
     # 재시도 루프
     local retry_count=0
     local backoff=1  # 초 (지수 백오프)

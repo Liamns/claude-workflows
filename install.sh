@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Claude Code Workflows Installer
-# Version: 3.1.0 - Epic 001 Completion (Architecture, Korean Docs, Branch State, Checksum)
+# Version: 3.1.2 - Patch Release (Directory Creation Fix)
 
 set -e
 
@@ -13,8 +13,8 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Version Configuration
-INSTALLER_VERSION="3.1.1"
-TARGET_VERSION="3.1.1"
+INSTALLER_VERSION="3.1.2"
+TARGET_VERSION="3.1.2"
 
 # Repository Configuration
 REPO_URL="https://github.com/Liamns/claude-workflows"
@@ -42,7 +42,7 @@ print_header() {
     echo -e "${BLUE}╔════════════════════════════════════════╗${NC}"
     echo -e "${BLUE}║   Claude Code Workflows Installer     ║${NC}"
     echo -e "${BLUE}║   Version ${INSTALLER_VERSION}                        ║${NC}"
-    echo -e "${BLUE}║   Epic 001 - System Improvements      ║${NC}"
+    echo -e "${BLUE}║   Patch - Directory Creation Fix     ║${NC}"
     echo -e "${BLUE}╚════════════════════════════════════════╝${NC}"
     echo ""
 }

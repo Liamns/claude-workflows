@@ -319,7 +319,7 @@ git rm test-commit-*.txt
 git commit -m "test: remove commit enhancement test files"
 ```
 
-- [ ] [T022] Epic progress 업데이트
+- [x] [T022] Epic progress 업데이트
 ```bash
 # .specify/specs/005-epic-workflow-system-improvement/progress.md 업데이트
 # Feature 003 상태를 "completed"로 변경

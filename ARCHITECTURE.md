@@ -696,6 +696,131 @@ graph LR
 - Allow circular dependencies
 - Skip validate-epic.sh before committing
 
+### Git Branch Strategy
+
+Epic Workflow implements a **trunk-based development** pattern with Feature ID tagging for precise tracking.
+
+#### Branch Structure
+
+```
+main
+└── epic-branch (e.g., 005-epic-workflow-system-improvement)
+    ├── [F001] commits (Feature 001)
+    ├── [F002] commits (Feature 002)
+    ├── [F003] commits (Feature 003)
+    └── [F004] commits (Feature 004)
+```
+
+**Key Principles**:
+- **Single Epic Branch**: All Features within an Epic use the same branch
+- **Feature ID Tagging**: Commits are tagged with `[F{id}]` prefix (e.g., `[F001]`)
+- **Git Log Tracking**: Feature progress tracked via `git log --grep="^\[F001\]"`
+- **Backward Compatible**: Standalone Features outside Epic still create their own branches
+
+#### Automatic Branch Detection
+
+The `/major` workflow automatically detects Epic context:
+
+```bash
+# Epic Detection Logic
+if [ ! -f ../../epic.md ]; then
+  # Epic External: Create new feature branch
+  git checkout -b {nextNumber}-{featureName}
+else
+  # Epic Internal: Stay on epic branch
+  echo "Epic 내부: 브랜치 유지"
+fi
+```
+
+#### Automatic Feature ID Tagging
+
+The `/commit` workflow automatically tags commits inside Epic Features:
+
+```bash
+# Feature ID Detection
+FEATURE_ID=$(grep '^- Feature ID:' spec.md | awk '{print $4}')
+
+# Commit with Tag (if Feature ID exists)
+git commit -m "[F${FEATURE_ID}] ${COMMIT_MESSAGE}"
+
+# Example Output
+[F001] feat(epic-005): implement Epic branch strategy
+```
+
+#### Progress Tracking Integration
+
+The `update-epic-progress.sh` script uses dual tracking:
+
+1. **tasks.md Checkboxes**: Task-level completion tracking
+2. **Git Commits**: Code-level implementation tracking
+
+```bash
+# Feature Status Criteria
+Completed  = tasks.md 100% AND commits exist
+In Progress = tasks.md > 0% OR commits exist
+Pending    = tasks.md 0% AND no commits
+```
+
+#### Benefits
+
+✅ **Simplified History**:
+- One epic branch instead of multiple feature branches
+- Cleaner git log with Feature ID tags
+- Easy to filter commits by Feature: `git log --grep="^\[F001\]"`
+
+✅ **Better Tracking**:
+- Feature progress visible in git log
+- No manual progress updates needed
+- Dual verification (tasks + commits)
+
+✅ **Easier Merging**:
+- Single merge to main branch
+- All Features included in one PR
+- Atomic Epic deployment
+
+#### Example Workflow
+
+```bash
+# 1. Start Epic (creates epic branch)
+/epic "Workflow System Improvement"
+# Branch: 005-epic-workflow-system-improvement
+
+# 2. Start Feature 001 (stays on epic branch)
+cd .specify/specs/005-epic-workflow-system-improvement/features/001-epic-branch-strategy
+/major "Epic Branch Strategy"
+# Branch: 005-epic-workflow-system-improvement (unchanged)
+
+# 3. Make changes and commit (auto-tagged)
+echo "feature code" > code.ts
+git add code.ts
+/commit
+# Commit: [F001] feat(epic-005): add feature code
+
+# 4. Track progress (detects commits)
+bash .specify/scripts/bash/update-epic-progress.sh ../..
+# Output: Feature 001: 🔄 In Progress (0%, 1 commits)
+
+# 5. Complete Epic and merge
+git checkout main
+git merge --no-ff 005-epic-workflow-system-improvement
+# All [F001], [F002], [F003]... commits merged
+```
+
+#### Git Log Filtering
+
+Query commits by Feature ID:
+
+```bash
+# All Feature 001 commits
+git log --grep="^\[F001\]" --oneline
+
+# All Epic commits
+git log --grep="^\[F" --oneline
+
+# Feature commit count
+git log --all --grep="^\[F001\]" --oneline | wc -l
+```
+
 ### Example Epic Flow
 
 ```bash

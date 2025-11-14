@@ -1,7 +1,7 @@
 # Tasks: Commit Workflow Enhancement
 
 ## Task Format
-- [ ] [T001] [P?] [Story?] Description /absolute/path/to/file
+Format: [T001] [P?] [Story?] Description /absolute/path/to/file
   - [P]: Parallelizable
   - [Story]: User Story ID (e.g., US1)
 

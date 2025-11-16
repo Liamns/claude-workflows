@@ -15,8 +15,12 @@ search_nestjs_services() {
     local pattern="$1"
     echo "🔍 Searching NestJS Services in $BACKEND_PATH..."
 
+    # Find service files once and cache
+    local service_files
+    service_files=$(find "$BACKEND_PATH" -name "*.service.ts" -type f)
+
     # @Injectable 데코레이터가 있는 서비스
-    find "$BACKEND_PATH" -name "*.service.ts" -type f -exec grep -l "@Injectable()" {} \; \
+    echo "$service_files" | xargs grep -l "@Injectable()" 2>/dev/null \
         | xargs grep -l "${pattern}" 2>/dev/null | head -20
 
     # 서비스 메서드
@@ -29,8 +33,12 @@ search_nestjs_controllers() {
     local pattern="$1"
     echo "🔍 Searching NestJS Controllers in $BACKEND_PATH..."
 
+    # Find controller files once and cache
+    local controller_files
+    controller_files=$(find "$BACKEND_PATH" -name "*.controller.ts" -type f)
+
     # @Controller 데코레이터
-    find "$BACKEND_PATH" -name "*.controller.ts" -type f -exec grep -l "@Controller(" {} \; \
+    echo "$controller_files" | xargs grep -l "@Controller(" 2>/dev/null \
         | xargs grep -l "${pattern}" 2>/dev/null | head -20
 
     # 엔드포인트 메서드

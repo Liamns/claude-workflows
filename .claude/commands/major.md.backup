@@ -18,6 +18,73 @@ description: 신규 기능 개발을 위한 통합 워크플로우. 모든 단�
 /major "결제 모듈 통합"
 ```
 
+## 생성되는 문서
+
+이 워크플로우는 Feature의 복잡도에 따라 **4-6개 문서**를 생성합니다:
+
+### 필수 문서 (항상 생성)
+- **spec.md**: 요구사항 정의
+- **plan.md**: 통합 계획
+- **tasks.md**: 실행 작업 (Prerequisites와 Setup Steps 포함)
+
+### 조건부 문서
+- **research.md**: complexity > 5일 때만 생성 (라이브러리 비교, 리스크 분석)
+- **data-model.md**: entities.length > 0일 때만 생성 (TypeScript 인터페이스, Zod 스키마)
+- **contracts/openapi.yaml**: API 통합 시 생성
+
+### 제거된 문서
+- ~~**quickstart.md**~~: tasks.md의 Phase 1로 통합됨
+
+**토큰 절감 효과**:
+- 간단한 Feature (complexity ≤ 5): 40% 절감 (3개 문서)
+- 복잡한 Feature (complexity > 5): 20% 절감 (5-6개 문서)
+
+## 사용 예시
+
+### 예시 1: 간단한 Feature (3개 문서 생성)
+
+```bash
+/major "UI 텍스트 수정"
+```
+
+**생성된 문서:**
+- ✅ spec.md - 요구사항 정의
+- ✅ plan.md - 구현 계획
+- ✅ tasks.md - 실행 작업 목록
+
+**생략된 문서:**
+- ⏭️ research.md (complexity=3 ≤ 5)
+- ⏭️ data-model.md (entities=[])
+- ⏭️ contracts/ (API 통합 없음)
+
+**결과:**
+- 💡 토큰 절감: 56% (7.0K → 3.1K)
+- 📁 파일 수: 3개
+- ⏱️ 생성 시간: ~2분
+
+### 예시 2: 복잡한 Feature (6개 문서 생성)
+
+```bash
+/major "사용자 인증 시스템"
+```
+
+**생성된 문서:**
+- ✅ spec.md - 요구사항 정의 (5.5K)
+- ✅ research.md - 기술 조사 및 리스크 분석 (7.3K) ← complexity=7 > 5
+- ✅ data-model.md - Entity 및 Zod 스키마 (8.3K) ← entities=3 > 0
+- ✅ contracts/openapi.yaml - API 명세 (7.3K) ← API 통합
+- ✅ plan.md - 통합 구현 계획 (9.9K)
+- ✅ tasks.md - 45개 실행 작업 (11K)
+
+**생략된 문서:**
+- ⏭️ quickstart.md (tasks.md로 통합)
+
+**결과:**
+- 💡 토큰 절감: 17.6% (59.8K → 49.3K)
+- 📁 파일 수: 6개
+- ⏱️ 생성 시간: ~5분
+- 📋 작업 개수: 45개 (7개 Phase로 구성)
+
 ## 실행 순서
 
 ### 0단계: 사전 조건 확인
@@ -955,23 +1022,36 @@ Edit:
 - new_string: "## Open Questions\n{업데이트된 내용 - 답변 반영}"
 ```
 
-### Step 8: research.md 생성
+### Step 8: research.md 생성 (조건부)
+
+**조건 확인**:
+IF complexity > 5:
+  - research.md 생성 진행
+ELSE:
+  - research.md 생략
+  - "⏭️  research.md 생략 (complexity={complexity} ≤ 5). plan.md에서 리서치 내용을 직접 작성합니다." 출력
+  - Step 9로 이동
 
 **🔴 중요**: 먼저 spec.md를 읽어서 내용을 참조하세요.
 
-**Read 도구로 spec.md 읽기**:
+**Read 도구로 spec.md의 Functional Requirements 섹션 읽기**:
 ```
 Read:
 - file_path: "{featureDir}/spec.md"
+- offset: 60  # Functional Requirements 섹션 시작 예상 위치
+- limit: 50   # FR-001 ~ FR-009 전체를 읽을 수 있는 범위
 ```
 
-spec.md에서 다음 정보를 추출하세요:
-- Functional Requirements (FR-001, FR-002, ...)
-- Key Entities (Entity 이름과 속성)
-- Success Criteria
-- Assumptions & Constraints
+**참조 패턴 적용**:
+1. spec.md의 Functional Requirements 섹션에서 FR-001 ~ FR-009의 **정확한 번호와 설명**을 추출
+2. 요약하지 말고 **원문 그대로 복사** (Entity 이름, User Story ID 정확히 일치시켜야 함)
+3. Key Entities, Success Criteria도 동일하게 추출
 
 이 정보를 `{specFunctionalRequirements}`, `{specKeyEntities}`, `{specSuccessCriteria}` 변수에 저장하세요.
+
+**중복 제거 원칙**:
+- Requirements Summary는 spec.md FR을 **정확히 복사** (번호, 설명 일치율 100%)
+- Library Options, Risks는 research.md에만 작성 (spec.md에 없는 새로운 내용)
 
 **Write 도구로 research.md 생성**:
 ```
@@ -985,7 +1065,14 @@ Write:
 
 ## Requirements Summary (from spec.md)
 
-{specFunctionalRequirements를 요약}
+### Functional Requirements
+{spec.md에서 추출한 FR-001 ~ FR-009를 **원문 그대로 복사**}
+- FR-001: {정확한 설명}
+- FR-002: {정확한 설명}
+- ...
+
+### Key Entities
+{spec.md의 Key Entities를 그대로 복사 - Entity 이름 100% 일치 필수}
 
 ## Existing Solutions Analysis
 
@@ -1031,7 +1118,34 @@ Read:
 
 ✅ **Step 8 완료** - research.md 생성 완료 (spec.md를 참조하여 작성함)
 
-### Step 9: data-model.md 생성
+### Step 9: data-model.md 생성 (조건부)
+
+**조건 확인**:
+IF entities.length > 0:
+  - data-model.md 생성 진행
+ELSE:
+  - data-model.md 생략
+  - "⏭️  data-model.md 생략 (entities=[])입니다." 출력
+  - Step 10으로 이동
+
+**Read 도구로 spec.md의 Key Entities 섹션 읽기**:
+```
+Read:
+- file_path: "{featureDir}/spec.md"
+- offset: 40  # Key Entities 섹션 시작 예상 위치
+- limit: 30   # 모든 Entity 정의를 읽을 수 있는 범위
+```
+
+**참조 패턴 적용**:
+1. spec.md의 Key Entities에서 **Entity 이름을 100% 정확히** 추출
+   - 예: spec.md에 "Task"라고 정의되어 있으면 → interface Task (대소문자 정확히 일치)
+2. 각 Entity의 **속성을 모두 포함** (누락 금지)
+3. **추가 속성 최소화** - id, createdAt, updatedAt만 추가 (필수적인 경우에만 다른 속성 추가)
+4. 명시적 참조 추가: "> 이 문서는 [spec.md](./spec.md)의 Key Entities를 기반으로 작성되었습니다."
+
+**중복 제거 원칙**:
+- TypeScript 인터페이스, Zod 스키마는 data-model.md에만 작성
+- spec.md의 Entity 정의는 간단한 설명만 포함 (타입 정의 없음)
 
 **Write 도구로 data-model.md 생성**:
 ```
@@ -1039,6 +1153,8 @@ Write:
 - file_path: "{featureDir}/data-model.md"
 - content: """
 # Data Model: {featureName}
+
+> 이 문서는 [spec.md](./spec.md)의 Key Entities를 기반으로 작성되었습니다.
 
 ## Entities
 
@@ -1186,98 +1302,45 @@ components:
 """
 ```
 
-### Step 11: quickstart.md 생성
+### Step 12: plan.md 생성
 
-**🔴 중요**: 먼저 spec.md와 data-model.md를 읽어서 내용을 참조하세요.
-
-**Read 도구로 spec.md 읽기**:
+**Read 도구로 spec.md 읽기** (Constraints, Assumptions 섹션):
 ```
 Read:
 - file_path: "{featureDir}/spec.md"
+- offset: 100  # Assumptions & Constraints 섹션 예상 위치
+- limit: 30
 ```
 
-**Read 도구로 data-model.md 읽기**:
+**조건부 참조 읽기**:
 ```
-Read:
-- file_path: "{featureDir}/data-model.md"
-```
+IF research.md exists (complexity > 5):
+  Read:
+  - file_path: "{featureDir}/research.md"
+  - offset: 30   # Library Options, Risks 섹션
+  - limit: 80
 
-다음 정보를 추출하세요:
-- spec.md의 User Scenarios (Given-When-Then)
-- spec.md의 Success Criteria
-- data-model.md의 Entities (실제 Entity 이름들)
-- data-model.md의 API Types (Request/Response 구조)
+  research.md에서 추출:
+  - Library Options (Technical Foundation에 사용)
+  - Risks & Mitigation (Implementation Phases에 반영)
 
-이 정보를 `{specUserScenarios}`, `{specSuccessCriteria}`, `{dataModelEntities}`, `{dataModelApiTypes}` 변수에 저장하세요.
+IF data-model.md exists (entities.length > 0):
+  Read:
+  - file_path: "{featureDir}/data-model.md"
+  - limit: 50    # Entity 구조 파악
 
-**Write 도구로 quickstart.md 생성**:
-```
-Write:
-- file_path: "{featureDir}/quickstart.md"
-- content: """
-# Quickstart: {featureName}
-
-> 이 문서는 spec.md의 시나리오와 data-model.md의 구조를 기반으로 작성되었습니다.
-> 참조: [spec.md](./spec.md), [data-model.md](./data-model.md)
-
-## Prerequisites
-- [ ] Node.js 18+ installed
-- [ ] Dependencies installed (yarn install)
-{techStack이 있으면 각 라이브러리에 대한 전제조건 추가}
-{apiDetails가 있으면:}
-- [ ] API endpoint accessible at {API URL}
-- [ ] API credentials configured
-
-## Data Model Overview (from data-model.md)
-
-이 기능은 다음 Entities를 사용합니다:
-{dataModelEntities를 나열}
-
-## Setup Steps
-
-1. **Install dependencies** (if not already):
-```bash
-yarn add {techStack에서 추출한 패키지들}
+  data-model.md에서 추출:
+  - Entity 이름 및 관계 (Source Code Structure에 반영)
 ```
 
-2. **Environment variables** (if API integration):
-```bash
-cp .env.example .env
-# Edit .env and add:
-VITE_API_BASE_URL={API URL}
-{필요한 환경 변수들}
-```
-
-3. **Run development server**:
-```bash
-yarn dev
-```
-
-4. **Navigate to feature**:
-Open http://localhost:5173/{feature-route}
-
-## Verification (from spec.md User Scenarios)
-
-{specUserScenarios의 각 시나리오에 대해:}
-### Scenario: {시나리오 이름}
-1. **Given**: {전제조건}
-2. **When**: {사용자 행동}
-3. **Then**: {기대 결과}
-
-Expected result:
-✅ {specSuccessCriteria}
-
-## Troubleshooting
-
-**Issue:** {예상되는 문제 1}
-**Solution:** {해결 방법 1}
-
-**Issue:** {예상되는 문제 2}
-**Solution:** {해결 방법 2}
-"""
-```
-
-### Step 12: plan.md 생성
+**참조 패턴 적용**:
+- Technical Foundation 작성 시:
+  - research.md가 있으면 → Library Options 참조
+  - 없으면 → spec.md의 Constraints 기반으로 직접 작성
+- Implementation Phases 작성 시:
+  - research.md가 있으면 → Risks & Mitigation 반영
+- Source Code Structure 작성 시:
+  - data-model.md가 있으면 → Entity별 파일 구조 생성
 
 **Write 도구로 plan.md 생성**:
 ```
@@ -1285,6 +1348,13 @@ Write:
 - file_path: "{featureDir}/plan.md"
 - content: """
 # Implementation Plan: {featureName}
+
+> 이 문서는 다음 문서들을 참조하여 작성되었습니다:
+> - [spec.md](./spec.md) - 요구사항 및 성공 기준
+{IF research.md exists:}
+> - [research.md](./research.md) - 기술적 실현 가능성 및 리스크 분석
+{IF data-model.md exists:}
+> - [data-model.md](./data-model.md) - 데이터 구조 정의
 
 ## Technical Foundation
 
@@ -1320,16 +1390,20 @@ Write:
 | VIII: Anti-Abstraction | ✅ | None | Direct implementation | - |
 
 ## Phase 0: Research
+{IF research.md exists (complexity > 5):}
 [Link to research.md](./research.md)
 
 **Key Findings:**
 - {research.md에서 주요 발견 사항 요약}
+{ELSE:}
+**Key Findings** (from spec.md Constraints):
+- {spec.md의 Constraints/Assumptions를 기반으로 직접 작성}
 
 ## Phase 1: Design Artifacts
+{IF data-model.md exists (entities.length > 0):}
 - [Data Model](./data-model.md)
 {apiDetails가 있으면:}
 - [API Contracts](./contracts/openapi.yaml)
-- [Quickstart Guide](./quickstart.md)
 
 ## Source Code Structure
 
@@ -1372,12 +1446,44 @@ Total: {estimatedDays}
 
 ### Step 13: tasks.md 생성
 
+**Read 도구로 spec.md의 User Scenarios 섹션 읽기**:
+```
+Read:
+- file_path: "{featureDir}/spec.md"
+- offset: 10   # User Scenarios 섹션 시작
+- limit: 60    # US1, US2, US3 전체
+```
+
+**Read 도구로 plan.md의 Implementation Phases 읽기**:
+```
+Read:
+- file_path: "{featureDir}/plan.md"
+- offset: 80   # Implementation Phases 섹션
+- limit: 100   # 전체 Phase 구조 파악
+```
+
+**참조 패턴 적용**:
+1. spec.md의 User Scenarios에서:
+   - US1, US2, US3의 목표(Goal)와 검증 항목(Test Verification) 추출
+   - 각 Phase 3, 4, 5... 의 제목과 테스트에 사용
+2. plan.md의 Implementation Phases에서:
+   - Technical Foundation → Phase 1 (Dependencies)
+   - Source Code Structure → Phase 2-N (파일 경로)
+   - Testing Strategy → Tests 섹션 (테스트 종류)
+3. 명시적 참조:
+   - 각 Phase에 User Story ID [US1], [US2] 표시
+   - Goal과 Test Verification을 spec.md에서 정확히 복사
+
 **Write 도구로 tasks.md 생성**:
 ```
 Write:
 - file_path: "{featureDir}/tasks.md"
 - content: """
 # Tasks: {featureName}
+
+> 이 문서는 다음 문서들을 기반으로 작성되었습니다:
+> - [spec.md](./spec.md) - User Scenarios (US1, US2, US3)
+> - [plan.md](./plan.md) - Implementation Phases
 
 ## Task Format
 - [ ] [T001] [P?] [Story?] Description /absolute/path/to/file
@@ -1498,14 +1604,15 @@ Read:
 📁 생성된 파일:
 .specify/specs/{nextNumber}-{featureName}/
 ├── spec.md                  ✅ (Specification)
-├── plan.md                  ✅ (Implementation Plan)
-├── tasks.md                 ✅ (Executable Tasks)
-├── research.md              ✅ (Phase 0 Research)
-├── data-model.md            ✅ (Phase 1 Design)
-├── quickstart.md            ✅ (Phase 1 Setup)
+{complexity > 5이면:}
+├── research.md              ✅ (Technical Research)
+{entities.length > 0이면:}
+├── data-model.md            ✅ (Data Models & Schemas)
 {apiDetails가 있으면:}
-└── contracts/
-    └── openapi.yaml         ✅ (API Contracts)
+├── contracts/
+│   └── openapi.yaml         ✅ (API Contracts)
+├── plan.md                  ✅ (Implementation Plan)
+└── tasks.md                 ✅ (Executable Tasks)
 
 📊 작업 분석:
 - Feature Number: {nextNumber}
@@ -1540,13 +1647,13 @@ Read:
 - Step 0-14를 순차적으로 실행하세요
 - 사전 조건 확인에서 실패하면 즉시 중단하고 /start 실행 안내
 - 질문은 2개 블록으로 축소 (필수 3개 + 선택 통합)
-- 7개 파일을 Write 도구로 반드시 생성하세요:
-  1. spec.md
-  2. research.md
-  3. data-model.md
-  4. contracts/openapi.yaml (API 있을 때만)
-  5. quickstart.md
-  6. plan.md
-  7. tasks.md
+- **조건부 파일 생성** (complexity와 entities에 따라 4-6개):
+  1. spec.md (필수)
+  2. research.md (complexity > 5일 때만)
+  3. data-model.md (entities.length > 0일 때만)
+  4. contracts/openapi.yaml (API 통합 시)
+  5. plan.md (필수)
+  6. tasks.md (필수)
+- **참조 패턴 적용**: 각 문서는 Read 도구로 이전 문서를 참조하여 중복 제거
 - 각 파일은 이전 단계의 변수를 참조하여 일관성 유지
 - tasks.md는 실행 가능한 구체적 명령어 포함

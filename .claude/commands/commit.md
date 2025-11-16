@@ -45,11 +45,11 @@ git diff    # 상세 변경 내용 분석
 
 ### Step 1.5: Feature ID 자동 감지 (Epic 워크플로우)
 
-**Bash 도구로 Feature ID 감지**:
+**Bash 도구로 Feature ID 감지 (공통 함수 사용)**:
 ```
 Bash:
-- command: "FEATURE_ID=''; if [ -f spec.md ]; then FEATURE_ID=$(grep '^- Feature ID:' spec.md | awk '{print $4}'); fi; echo $FEATURE_ID"
-- description: "Detect Feature ID from spec.md if exists"
+- command: "bash .claude/lib/git/detect-feature-id.sh spec.md"
+- description: "Detect Feature ID from spec.md using shared function"
 ```
 
 Feature ID가 감지되면 `{featureId}` 변수에 저장하세요 (예: "001").

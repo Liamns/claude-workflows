@@ -24,7 +24,6 @@ REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || {
 }
 
 HOOKS_DIR="$REPO_ROOT/.git/hooks"
-HOOKS_SOURCE_DIR="$SCRIPT_DIR/../hooks"
 
 # ════════════════════════════════════════════════════════════════════════════
 # Functions

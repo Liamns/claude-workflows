@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.2.0] - 2025-11-17
+
+### Added
+- Epic 009 Feature 001 comprehensive documentation ([#T029], [#T031])
+- Command-resource relationship guide for better documentation structure ([#T028])
+- Template compliance registry system ([#T024], [#T025])
+
+### Changed
+- Improved template compliance tracking and validation
+
+### Fixed
+- ShellCheck unused variable warning in install-git-hooks ([#T030])
+- Version header comment in install.sh updated to reflect Epic 009 changes
+
+### Documentation
+- Added Epic 009 Feature 001 section to README
+- Created feature summary documentation for Epic 009
+
 ## [3.1.2] - 2025-11-13
 
 ### Fixed

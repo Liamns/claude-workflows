@@ -32,7 +32,7 @@ source "$SCRIPT_DIR/common.sh"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.."; pwd)"
 
 # 버전 정보 (install.sh와 동기화)
-VERSION="3.1.2"
+VERSION="3.2.0"
 
 # 기본 출력 파일 (설정하지 않으면 stdout)
 OUTPUT_FILE=""

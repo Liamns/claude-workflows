@@ -53,6 +53,8 @@ EXCLUDE_DIRS=(
     ".specify/temp"
     ".specify/memory"
     ".git"
+    "node_modules"
+    ".claude/lib/node_modules"
 )
 
 # 제외할 파일 패턴

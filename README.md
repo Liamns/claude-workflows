@@ -1,6 +1,6 @@
 # 🤖 Claude Workflows
 
-[![Version](https://img.shields.io/badge/version-3.2.0-blue.svg)](https://github.com/Liamns/claude-workflows)
+[![Version](https://img.shields.io/badge/version-3.3.0-blue.svg)](https://github.com/Liamns/claude-workflows)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-purple.svg)](https://claude.ai/code)
 [![Validation](https://img.shields.io/badge/validation-automated-success.svg)](https://github.com/Liamns/claude-workflows)
@@ -11,23 +11,34 @@
 
 ## 🆕 최신 기능
 
+### v3.3.0 - Database Tools
+
+- **DB 동기화**: `/db-sync` - .env DB → .env.docker DB 자동 동기화
+- **Prisma 마이그레이션**: `/prisma-migrate` - 스키마 변경 자동 마이그레이션
+- **안전 보장**: 자동 백업, 롤백, 데이터 검증
+- **지능형 네이밍**: Git diff 분석 기반 마이그레이션 이름 자동 생성
+
 ### v3.2.0 - Command Template System
+
 - **문서 표준화**: 템플릿 기반 커맨드 시스템 (11/11 완료)
 - **자동화 도구**: 생성/검증/마이그레이션 스크립트
 - **Git 통합**: Pre-commit hook 품질 관리
 
 ### v3.1.0 - 품질 자동화
+
 - **아키텍처 검증**: FSD/Clean/Hexagonal/DDD 자동 검증
 - **한글 문서화**: 계획 문서 한글 비율 자동 체크
 - **Git 상태 관리**: 브랜치 생성 시 자동 처리 (5가지 옵션)
 - **체크섬 강화**: SHA256 기반 파일 무결성 검증
 
 ### v3.0.0 - Epic Workflow
+
 - **대규모 관리**: 복잡도 10+ 작업을 3-5개 Feature로 분해
 - **진행 추적**: progress.md/roadmap.md 자동 업데이트
 - **의존성 검증**: DAG 기반 순환 의존성 방지
 
 ### v2.8.0 - 스마트 리뷰
+
 - **코드베이스 분석**: 전체 프로젝트 기반 PR 리뷰
 - **재사용 탐지**: 기존 모듈/패턴 자동 제안
 - **중복 감지**: 80% 이상 유사 코드 경고
@@ -35,6 +46,7 @@
 **📚 상세 문서**: [Feature 001 Summary](.claude/docs/FEATURE-001-SUMMARY.md) | [Command-Resource Guide](.claude/docs/COMMAND-RESOURCE-GUIDE.md)
 
 ### 핵심 개선사항
+
 - **🔒 SHA256 체크섬 기반 파일 무결성 검증** - 설치 시 자동 파일 검증 및 복구
   - 100개 핵심 파일의 SHA256 체크섬 자동 검증
   - 불일치 파일 자동 재다운로드
@@ -50,6 +62,7 @@
 - **🔍 통합 Validation** - install.sh에 validation 자동 실행 통합
 
 ### 기존 기능 (v2.5)
+
 - **📊 실시간 메트릭스 대시보드** - 토큰 사용량, 성능, 품질 지표 모니터링
 - **🎯 자동 워크플로우 선택** - /triage로 Major/Minor/Micro 자동 분류
 
@@ -119,11 +132,11 @@ bash .claude/lib/generate-checksums.sh -o .claude/.checksums.json --verbose
 /dashboard            # 실시간 메트릭스 모니터링
 ```
 
-| 워크플로우 | 토큰 절감 | 대상 |
-|------------|-----------|------|
-| **Micro** | 85% | 타이포, 로그 제거 등 간단한 수정 |
-| **Minor** | 75% | 버그 수정, 기능 개선 |
-| **Major** | 60% | 신규 기능, 아키텍처 변경 |
+| 워크플로우      | 토큰 절감 | 대상                             |
+| --------------- | --------- | -------------------------------- |
+| **Micro** | 85%       | 타이포, 로그 제거 등 간단한 수정 |
+| **Minor** | 75%       | 버그 수정, 기능 개선             |
+| **Major** | 60%       | 신규 기능, 아키텍처 변경         |
 
 ### 주요 명령어
 
@@ -137,6 +150,10 @@ bash .claude/lib/generate-checksums.sh -o .claude/.checksums.json --verbose
 /commit            # 스마트 커밋
 /pr                # PR 자동 생성
 /dashboard         # 📊 실시간 메트릭스 대시보드
+
+# 🗄️ Database Tools (v3.3.0)
+/db-sync           # Production → Development DB 동기화
+/prisma-migrate    # Prisma 스키마 자동 마이그레이션
 ```
 
 ### 🆕 Plan Mode 사용법 (v2.9.0-dev)
@@ -203,6 +220,7 @@ workflow-gates.json # 품질 게이트 설정
 ## ✅ Validation 시스템
 
 ### 자동 검증
+
 ```bash
 # 전체 검증
 bash .claude/lib/validate-system.sh
@@ -218,6 +236,7 @@ bash .claude/lib/validate-system.sh --crossref-only
 ```
 
 ### Pre-commit Hook
+
 ```bash
 # Hook 설치
 bash .claude/hooks/install-hooks.sh
@@ -228,6 +247,7 @@ git commit -m "feat: new feature"
 ```
 
 ### Validation 리포트
+
 - 위치: `.claude/cache/validation-reports/`
 - 형식: JSON + Markdown
 - 자동 정리: 30일 이상 된 리포트 삭제
@@ -235,6 +255,7 @@ git commit -m "feat: new feature"
 ## 🔄 마이그레이션 지원
 
 ### 지원하는 시나리오 (v2.6 강화)
+
 1. **v1.0 → v2.6**: 레거시 시스템 완전 업그레이드
    - Deprecated 파일 자동 정리 (major-specify.md, 구 agents 등)
    - v2.6 구조로 자동 변환
@@ -250,6 +271,7 @@ git commit -m "feat: new feature"
    - 사용자 데이터 보존
 
 ### 마이그레이션 실행
+
 ```bash
 # 자동으로 현재 버전 감지 및 적절한 마이그레이션 실행
 bash install.sh
@@ -262,6 +284,7 @@ bash install.sh --health-check
 ```
 
 ### 백업 및 롤백
+
 - 백업 위치: `.claude/.backup/install-YYYYMMDD-HHMMSS/`
 - 마이그레이션 실패 시 자동 롤백
 - Critical 파일 우선 복구 (workflow-gates.json, config/, cache/)
@@ -269,16 +292,19 @@ bash install.sh --health-check
 ## 📚 더 알아보기
 
 ### 핵심 문서
+
 - [프로젝트 컨텍스트](.claude/docs/PROJECT-CONTEXT.md) - 전체 구조 이해 (필독)
 - [아키텍처 가이드](ARCHITECTURE.md) - 시스템 설계
 - [기여 가이드](CONTRIBUTING.md) - 개발 참여
 
 ### 상세 가이드
+
 - [Sub-agents 가이드](.claude/docs/SUB-AGENTS-GUIDE.md)
 - [Skills 가이드](.claude/docs/SKILLS-GUIDE.md)
 - [모델 최적화](.claude/docs/MODEL-OPTIMIZATION-GUIDE.md)
 
 ### 예시 및 템플릿
+
 - [사용 예시](EXAMPLES.md)
 - [변경 이력](CHANGELOG.md)
 

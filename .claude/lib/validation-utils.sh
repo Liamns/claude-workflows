@@ -4,38 +4,9 @@
 
 set -e
 
-# 색상 정의
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
-
-# 로깅 함수들
-
-log_info() {
-    local message="$1"
-    echo -e "${BLUE}ℹ${NC} $message"
-    [[ -n "${LOG_FILE:-}" ]] && echo "[$(date '+%Y-%m-%d %H:%M:%S')] INFO: $message" >> "$LOG_FILE"
-}
-
-log_success() {
-    local message="$1"
-    echo -e "${GREEN}✓${NC} $message"
-    [[ -n "${LOG_FILE:-}" ]] && echo "[$(date '+%Y-%m-%d %H:%M:%S')] SUCCESS: $message" >> "$LOG_FILE"
-}
-
-log_warning() {
-    local message="$1"
-    echo -e "${YELLOW}⚠${NC} $message"
-    [[ -n "${LOG_FILE:-}" ]] && echo "[$(date '+%Y-%m-%d %H:%M:%S')] WARNING: $message" >> "$LOG_FILE"
-}
-
-log_error() {
-    local message="$1"
-    echo -e "${RED}✗${NC} $message" >&2
-    [[ -n "${LOG_FILE:-}" ]] && echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: $message" >> "$LOG_FILE"
-}
+# Source common module for logging and file validation functions
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/common.sh"
 
 # 전제조건 검증
 

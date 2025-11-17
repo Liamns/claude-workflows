@@ -59,9 +59,87 @@
 
 ## 실행 흐름
 
-### Step 1: 현재 브랜치 확인
+### Step 1: 현재 브랜치 및 Base Branch 확인
+
+#### Step 1-1: 명령어 인자 파싱
+- 사용자가 `--base <branch>` 플래그를 제공했는지 확인
+- 제공한 경우:
+  - 해당 브랜치를 BASE_BRANCH 변수에 저장
+  - Step 1-2, 1-3을 건너뛰고 Step 1-4(검증)로 이동
+- 제공하지 않은 경우: Step 1-2로 진행
+
+#### Step 1-2: Git 원격 브랜치 목록 가져오기
+다음 Bash 명령어로 원격 브랜치 목록 수집 (최근 커밋 순):
+```bash
+REMOTE_BRANCHES=$(git for-each-ref --sort=-committerdate --format='%(refname:short)' refs/remotes/origin/ | sed 's/origin\///' | head -10)
+
+# main, develop, master 존재 여부 확인
+HAS_MAIN=$(echo "$REMOTE_BRANCHES" | grep -c "^main$" || true)
+HAS_DEVELOP=$(echo "$REMOTE_BRANCHES" | grep -c "^develop$" || true)
+HAS_MASTER=$(echo "$REMOTE_BRANCHES" | grep -c "^master$" || true)
+```
+
+#### Step 1-3: AskUserQuestion으로 Base Branch 선택
+**옵션 동적 생성:**
+```bash
+OPTIONS=()
+[[ $HAS_MAIN -eq 1 ]] && OPTIONS+=("main")
+[[ $HAS_DEVELOP -eq 1 ]] && OPTIONS+=("develop")
+[[ $HAS_MASTER -eq 1 ]] && OPTIONS+=("master")
+OPTIONS+=("Other")
+```
+
+**AskUserQuestion 호출:**
+- question: "어느 브랜치로 PR을 생성하시겠습니까?"
+- header: "Base Branch"
+- multiSelect: false
+- options: OPTIONS 배열 기반으로 2-4개 옵션 제공
+  - 존재하는 브랜치들 (main, develop, master 중)
+  - "Other" - 사용자 정의 브랜치 입력
+- 선택된 값을 BASE_BRANCH 변수에 저장
+
+#### Step 1-4: Base Branch 검증 및 재시도
+**브랜치 존재 여부 검증:**
+```bash
+validate_branch() {
+  local branch=$1
+  local exists=$(git ls-remote --heads origin "$branch" | wc -l)
+
+  if [[ $exists -eq 0 ]]; then
+    echo "⚠️  브랜치 '$branch'가 원격 저장소에 존재하지 않습니다."
+    return 1
+  else
+    echo "✓ 브랜치 '$branch' 확인됨"
+    return 0
+  fi
+}
+```
+
+**재시도 로직 (최대 3회):**
+```bash
+RETRY_COUNT=0
+MAX_RETRIES=3
+
+while [[ $RETRY_COUNT -lt $MAX_RETRIES ]]; do
+  if validate_branch "$BASE_BRANCH"; then
+    break
+  fi
+
+  RETRY_COUNT=$((RETRY_COUNT + 1))
+
+  if [[ $RETRY_COUNT -lt $MAX_RETRIES ]]; then
+    echo "다시 브랜치를 선택해주세요. (시도: $RETRY_COUNT/$MAX_RETRIES)"
+    # Step 1-3의 AskUserQuestion을 다시 호출하여 재선택
+  else
+    echo "❌ 유효한 브랜치를 선택하지 못했습니다. 워크플로우를 중단합니다."
+    exit 1
+  fi
+done
+```
+
+#### Step 1-5: 현재 브랜치 확인 (기존 로직)
 - 현재 브랜치가 main/master가 아닌지 확인
-- 베이스 브랜치 (기본값: main) 확인
+- main/master에서 PR 생성 시도하면 에러 메시지 표시
 
 ### Step 2: Git 데이터 수집
 다음 명령어들을 **병렬로 실행**하여 정보 수집:
@@ -163,9 +241,10 @@ git diff --stat main..HEAD
 
 ```bash
 # 템플릿 내용을 heredoc으로 전달
+# BASE_BRANCH 변수는 Step 1에서 설정됨
 gh pr create \
   --title "{생성된 제목}" \
-  --base {베이스 브랜치} \
+  --base "$BASE_BRANCH" \
   --body "$(cat <<'EOF'
 {자동 완성된 템플릿 내용}
 EOF

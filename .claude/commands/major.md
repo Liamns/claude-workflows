@@ -688,19 +688,23 @@ plan.md를 기반으로 실행 가능한 task breakdown을 생성합니다.
 
 1. **Step 0-14를 순차적으로 실행**하세요. 단 하나의 Step도 건너뛸 수 없습니다.
 2. **각 Step 완료 시 명시적으로 보고**하세요: "✅ Step X 완료"
-3. **AskUserQuestion 도구를 반드시 사용**하세요 (Step 2, 3, 4, 7)
-4. **Write 도구로 7개 파일을 반드시 생성**하세요:
-   - spec.md (Step 6)
-   - research.md (Step 8)
-   - data-model.md (Step 9)
+3. **AskUserQuestion 도구를 반드시 사용**하세요 (Step 2, 3, 4, 7, 13.5)
+4. **Write 도구로 파일을 반드시 생성**하세요:
+   - spec.md (Step 6, 필수)
+   - research.md (Step 8, complexity > 5일 때만)
+   - data-model.md (Step 9, entities.length > 0일 때만)
    - contracts/openapi.yaml (Step 10, API 있을 때만)
-   - quickstart.md (Step 11)
-   - plan.md (Step 12)
-   - tasks.md (Step 13)
+   - plan.md (Step 12, 필수)
+   - tasks.md (Step 13, 필수)
 5. **각 문서는 이전에 생성된 문서를 참조**해야 합니다:
    - Read 도구로 이전 문서를 읽어서 내용 추출
    - 변수만 사용하지 말고 실제 파일 내용을 참조
-6. **파일 생성 후 검증**하세요: 파일이 실제로 생성되었는지 확인
+6. **문서 미리보기 및 동의 요청 필수** (Step 13.5)
+   - 배치 미리보기 생성
+   - 각 문서별 미리보기 표시
+   - Production 모드: 동의 요청 (AskUserQuestion)
+   - Development 모드: 자동 승인 (미리보기만 표시)
+7. **파일 생성 후 검증**하세요: 파일이 실제로 생성되었는지 확인
 
 **이 규칙을 위반하면 워크플로우가 실패합니다.**
 
@@ -1593,6 +1597,254 @@ Read:
 파일이 정상적으로 생성되었는지 확인하세요. 생성되지 않았다면 다시 Write 도구를 사용하세요.
 
 ✅ **Step 13 완료** - tasks.md 생성 완료 (spec.md의 User Stories 참조)
+
+### Step 13.5: 문서 미리보기 및 동의 요청
+
+**목적**: 파일 생성 전 사용자에게 문서 내용을 미리보기로 보여주고 동의를 받습니다.
+
+**🔴 필수**: 이 단계는 모든 문서가 준비된 후 실제 파일 생성 전에 실행됩니다.
+
+#### 13.5.1: 문서 컬렉션 생성
+
+**Bash 도구로 document-collection.sh 사용**:
+```
+Bash:
+- command: "source .claude/lib/document-preview/document-collection.sh && collection=$(create_document_collection 2>/dev/null) && echo \"$collection\""
+- description: "Create document collection for Major feature files"
+```
+
+생성된 컬렉션 ID를 `{collectionId}` 변수에 저장하세요.
+
+#### 13.5.2: 문서 컬렉션에 파일 추가
+
+**필수 문서 추가**:
+```
+Bash:
+- command: "source .claude/lib/document-preview/document-collection.sh && add_document_to_collection '{collectionId}' '{featureDir}/spec.md' 2>/dev/null && add_document_to_collection '{collectionId}' '{featureDir}/plan.md' 2>/dev/null && add_document_to_collection '{collectionId}' '{featureDir}/tasks.md' 2>/dev/null"
+- description: "Add core Major documents to collection"
+```
+
+**조건부 문서 추가** (complexity > 5인 경우):
+```
+Bash:
+- command: "if [ -n '{researchMdPath}' ]; then source .claude/lib/document-preview/document-collection.sh && add_document_to_collection '{collectionId}' '{featureDir}/research.md' 2>/dev/null; fi"
+- description: "Add research.md if generated"
+```
+
+**조건부 문서 추가** (entities.length > 0인 경우):
+```
+Bash:
+- command: "if [ -n '{dataModelPath}' ]; then source .claude/lib/document-preview/document-collection.sh && add_document_to_collection '{collectionId}' '{featureDir}/data-model.md' 2>/dev/null; fi"
+- description: "Add data-model.md if generated"
+```
+
+**조건부 문서 추가** (API 통합이 있는 경우):
+```
+Bash:
+- command: "if [ -n '{openApiPath}' ]; then source .claude/lib/document-preview/document-collection.sh && add_document_to_collection '{collectionId}' '{featureDir}/contracts/openapi.yaml' 2>/dev/null; fi"
+- description: "Add openapi.yaml if generated"
+```
+
+#### 13.5.3: 배치 미리보기 생성
+
+**Bash 도구로 batch-preview.sh 사용**:
+```
+Bash:
+- command: "source .claude/lib/document-preview/batch-preview.sh && result=$(generate_batch_preview '{collectionId}' 300 2>/dev/null) && echo \"$result\""
+- description: "Generate batch preview for all Major feature documents"
+```
+
+생성된 배치 결과 파일 경로를 `{batchResultFile}` 변수에 저장하세요.
+
+#### 13.5.4: 미리보기 통계 확인
+
+**Bash 도구로 통계 조회**:
+```
+Bash:
+- command: "source .claude/lib/document-preview/batch-preview.sh && get_batch_preview_stats '{batchResultFile}' 2>/dev/null"
+- description: "Get batch preview statistics"
+```
+
+통계를 사용자에게 보고:
+```markdown
+📊 문서 미리보기 통계:
+- 총 문서 수: {total}
+- 성공: {success}
+- 실패: {failure}
+```
+
+#### 13.5.5: 각 문서 미리보기 및 동의 요청
+
+**환경 확인**:
+```
+Bash:
+- command: "echo ${CLAUDE_ENV:-production}"
+- description: "Check environment mode"
+```
+
+환경 변수를 `{environment}` 변수에 저장하세요.
+
+**각 문서에 대해 반복**:
+
+1. **spec.md 미리보기**:
+```
+Bash:
+- command: "source .claude/lib/document-preview/batch-preview.sh && get_document_preview_from_batch '{batchResultFile}' '{featureDir}/spec.md' 2>/dev/null"
+- description: "Get spec.md preview"
+```
+
+미리보기를 사용자에게 표시:
+```markdown
+📄 spec.md 미리보기:
+
+{미리보기 내용}
+```
+
+**Production 모드인 경우 동의 요청**:
+```
+IF {environment} == "production":
+  AskUserQuestion:
+    질문: "spec.md 파일을 생성하시겠습니까?"
+    헤더: "파일 생성"
+    multiSelect: false
+    옵션:
+      1. label: "승인"
+         description: "파일 생성 진행"
+      2. label: "수정 요청"
+         description: "내용 수정 후 재생성"
+      3. label: "거부"
+         description: "파일 생성 취소"
+ELSE:
+  # Development 모드: 자동 승인
+  동의 상태 = "승인"
+  "ℹ️  Development 모드: spec.md 자동 승인" 출력
+```
+
+2. **research.md 미리보기** (complexity > 5인 경우):
+```
+IF complexity > 5:
+  Bash:
+  - command: "source .claude/lib/document-preview/batch-preview.sh && get_document_preview_from_batch '{batchResultFile}' '{featureDir}/research.md' 2>/dev/null"
+  - description: "Get research.md preview"
+
+  # 동일한 동의 요청 프로세스
+```
+
+3. **data-model.md 미리보기** (entities.length > 0인 경우):
+```
+IF entities.length > 0:
+  Bash:
+  - command: "source .claude/lib/document-preview/batch-preview.sh && get_document_preview_from_batch '{batchResultFile}' '{featureDir}/data-model.md' 2>/dev/null"
+  - description: "Get data-model.md preview"
+
+  # 동일한 동의 요청 프로세스
+```
+
+4. **contracts/openapi.yaml 미리보기** (API 통합이 있는 경우):
+```
+IF apiDetails exists:
+  Bash:
+  - command: "source .claude/lib/document-preview/batch-preview.sh && get_document_preview_from_batch '{batchResultFile}' '{featureDir}/contracts/openapi.yaml' 2>/dev/null"
+  - description: "Get openapi.yaml preview"
+
+  # 동일한 동의 요청 프로세스
+```
+
+5. **plan.md 미리보기**:
+```
+Bash:
+- command: "source .claude/lib/document-preview/batch-preview.sh && get_document_preview_from_batch '{batchResultFile}' '{featureDir}/plan.md' 2>/dev/null"
+- description: "Get plan.md preview"
+
+# 동일한 동의 요청 프로세스
+```
+
+6. **tasks.md 미리보기**:
+```
+Bash:
+- command: "source .claude/lib/document-preview/batch-preview.sh && get_document_preview_from_batch '{batchResultFile}' '{featureDir}/tasks.md' 2>/dev/null"
+- description: "Get tasks.md preview"
+
+# 동일한 동의 요청 프로세스
+```
+
+#### 13.5.6: 동의 결과 저장
+
+각 문서의 동의 결과를 변수에 저장:
+- `{specConsent}` - spec.md 동의 여부
+- `{researchConsent}` - research.md 동의 여부 (조건부)
+- `{dataModelConsent}` - data-model.md 동의 여부 (조건부)
+- `{contractsConsent}` - openapi.yaml 동의 여부 (조건부)
+- `{planConsent}` - plan.md 동의 여부
+- `{tasksConsent}` - tasks.md 동의 여부
+
+**Bash 도구로 동의 결과 저장** (consent-manager.sh 사용):
+```
+Bash:
+- command: "source .claude/lib/document-preview/consent-manager.sh && record_consent '{featureDir}/spec.md' '{specConsent}' 'user-approved' 2>/dev/null"
+- description: "Record spec.md consent"
+```
+
+각 문서에 대해 동일한 프로세스 반복.
+
+#### 13.5.7: 동의 거부 처리
+
+**거부된 문서 확인**:
+```
+거부된 문서 = [문서 for 문서 in [spec, research, dataModel, contracts, plan, tasks] if 동의 == "거부"]
+수정 요청 문서 = [문서 for 문서 in [spec, research, dataModel, contracts, plan, tasks] if 동의 == "수정 요청"]
+```
+
+**거부/수정 요청이 있는 경우**:
+```markdown
+⚠️ 다음 문서가 거부되었습니다:
+{거부된 문서 목록}
+
+⚠️ 다음 문서의 수정이 요청되었습니다:
+{수정 요청 문서 목록}
+
+옵션:
+1. 수정 요청 문서를 수정하고 다시 미리보기 (Step 6-13 재실행)
+2. 승인된 문서만으로 계속 진행
+3. 워크플로우 중단
+```
+
+**AskUserQuestion으로 다음 단계 결정**:
+```
+질문: "어떻게 진행하시겠습니까?"
+헤더: "다음 단계"
+multiSelect: false
+옵션:
+  1. label: "문서 수정 후 재생성"
+     description: "거부/수정 요청된 문서를 수정하고 다시 생성합니다"
+  2. label: "승인된 문서만 진행"
+     description: "승인된 문서만 생성하고 계속 진행합니다"
+  3. label: "워크플로우 중단"
+     description: "Major 워크플로우를 중단합니다"
+```
+
+선택에 따라:
+- **문서 수정 후 재생성**: Step 6으로 돌아가서 해당 문서 재생성
+- **승인된 문서만 진행**: 승인된 문서만 생성하고 Step 14로 진행
+- **워크플로우 중단**: 워크플로우 종료
+
+#### 13.5.8: 컬렉션 정리
+
+**Bash 도구로 배치 결과 정리**:
+```
+Bash:
+- command: "source .claude/lib/document-preview/batch-preview.sh && cleanup_batch_result '{batchResultFile}' 2>/dev/null"
+- description: "Cleanup batch preview results"
+```
+
+**Bash 도구로 컬렉션 삭제**:
+```
+Bash:
+- command: "source .claude/lib/document-preview/document-collection.sh && delete_document_collection '{collectionId}' 2>/dev/null"
+- description: "Delete document collection"
+```
+
+✅ **Step 13.5 완료** - 문서 미리보기 및 동의 요청 완료
 
 ### Step 14: 완료 보고
 

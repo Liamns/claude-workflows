@@ -591,6 +591,178 @@ cd {epicDir}/features/{feature-id}
 
 ✅ **Step 9 완료** - Feature spec.md 템플릿 생성 완료
 
+### Step 9.5: 문서 미리보기 및 동의 요청
+
+**🎯 목적**: 파일 생성 전에 사용자에게 미리보기를 보여주고 동의를 받습니다.
+
+**Source 의존성 모듈**:
+```bash
+source .claude/lib/document-preview/document-collection.sh
+source .claude/lib/document-preview/batch-preview.sh
+source .claude/lib/document-preview/consent-manager.sh
+```
+
+#### 9.5.1 문서 컬렉션 생성
+
+모든 생성될 문서를 컬렉션으로 관리:
+
+```bash
+Bash:
+- command: "source .claude/lib/document-preview/document-collection.sh && collection=$(create_document_collection 2>/dev/null) && echo \"$collection\""
+- description: "Create document collection for Epic files"
+```
+
+컬렉션 ID를 `{collectionId}` 변수에 저장.
+
+#### 9.5.2 문서 컬렉션에 파일 추가
+
+생성 예정인 모든 문서를 컬렉션에 추가:
+
+```bash
+Bash:
+- command: "source .claude/lib/document-preview/document-collection.sh && add_document_to_collection '{collectionId}' '{epicDir}/epic.md' 2>/dev/null && add_document_to_collection '{collectionId}' '{epicDir}/roadmap.md' 2>/dev/null && add_document_to_collection '{collectionId}' '{epicDir}/progress.md' 2>/dev/null"
+- description: "Add Epic core documents to collection"
+```
+
+각 Feature spec.md도 추가:
+```bash
+Bash:
+- command: "for feature in {epicDir}/features/*/spec.md; do source .claude/lib/document-preview/document-collection.sh && add_document_to_collection '{collectionId}' \"$feature\" 2>/dev/null; done"
+- description: "Add Feature spec.md files to collection"
+```
+
+#### 9.5.3 배치 미리보기 생성
+
+모든 문서에 대한 미리보기를 일괄 생성:
+
+```bash
+Bash:
+- command: "source .claude/lib/document-preview/batch-preview.sh && result=$(generate_batch_preview '{collectionId}' 300 2>/dev/null) && echo \"$result\""
+- description: "Generate batch preview for all Epic documents"
+```
+
+배치 결과 파일 경로를 `{batchResultFile}` 변수에 저장.
+
+#### 9.5.4 미리보기 통계 확인
+
+```bash
+Bash:
+- command: "source .claude/lib/document-preview/batch-preview.sh && get_batch_preview_stats '{batchResultFile}' 2>/dev/null"
+- description: "Get batch preview statistics"
+```
+
+통계를 사용자에게 표시:
+```markdown
+📊 문서 미리보기 생성 완료:
+- 총 문서 수: {total}
+- 성공: {success}
+- 실패: {failure}
+```
+
+#### 9.5.5 각 문서 미리보기 및 동의 요청
+
+**환경 확인**:
+```bash
+Bash:
+- command: "echo ${CLAUDE_ENV:-production}"
+- description: "Check environment mode"
+```
+
+**Development 모드인 경우**: 자동 승인 (미리보기만 표시)
+
+**Production 모드인 경우**: 각 문서별로 동의 요청
+
+주요 문서(epic.md, roadmap.md, progress.md)에 대해:
+
+```bash
+Bash:
+- command: "source .claude/lib/document-preview/batch-preview.sh && get_document_preview_from_batch '{batchResultFile}' '{epicDir}/epic.md' 2>/dev/null"
+- description: "Get epic.md preview"
+```
+
+미리보기를 사용자에게 표시:
+```markdown
+📄 **파일:** {epicDir}/epic.md
+
+{preview 내용}
+```
+
+**AskUserQuestion 도구 사용** (Production 모드):
+```
+질문: "epic.md 파일을 생성하시겠습니까?"
+헤더: "파일 생성"
+multiSelect: false
+옵션:
+  1. label: "승인"
+     description: "파일 생성 진행"
+  2. label: "수정 요청"
+     description: "내용 수정 후 재생성"
+  3. label: "거부"
+     description: "파일 생성 취소"
+```
+
+**각 동의 응답 처리**:
+- **승인**: 해당 파일 생성 진행
+- **수정 요청**: 수정 지시 받고 해당 Step(6/7/8) 재실행
+- **거부**: 워크플로우 중단, 사용자에게 이유 확인
+
+roadmap.md, progress.md에 대해서도 동일한 프로세스 반복.
+
+**Feature spec.md 파일들**:
+모든 Feature spec.md에 대해 일괄 동의 요청:
+
+```
+질문: "{finalFeatures 개수}개의 Feature spec.md 파일을 생성하시겠습니까?"
+헤더: "Feature 파일"
+multiSelect: false
+옵션:
+  1. label: "모두 승인"
+     description: "모든 Feature spec.md 생성"
+  2. label: "개별 검토"
+     description: "각 Feature별로 개별 확인"
+  3. label: "거부"
+     description: "Feature 파일 생성 취소"
+```
+
+**"개별 검토" 선택 시**: 각 Feature spec.md에 대해 미리보기 표시 및 동의 요청
+
+#### 9.5.6 동의 결과 저장
+
+모든 동의 응답을 변수에 저장:
+- `{epicMdConsent}`: epic.md 동의 여부
+- `{roadmapMdConsent}`: roadmap.md 동의 여부
+- `{progressMdConsent}`: progress.md 동의 여부
+- `{featureSpecConsents}`: Feature spec.md 동의 목록 (배열)
+
+#### 9.5.7 동의 거부 처리
+
+어느 하나라도 거부된 경우:
+
+```markdown
+⚠️ 일부 파일 생성이 거부되었습니다.
+
+**거부된 파일:**
+{거부된 파일 목록}
+
+워크플로우를 계속하시겠습니까? (y/n)
+- y: 승인된 파일만 생성하고 계속
+- n: 워크플로우 중단
+```
+
+#### 9.5.8 컬렉션 정리
+
+```bash
+Bash:
+- command: "source .claude/lib/document-preview/batch-preview.sh && cleanup_batch_result '{batchResultFile}' 2>/dev/null"
+- description: "Cleanup batch preview results"
+```
+
+✅ **Step 9.5 완료** - 문서 미리보기 및 동의 요청 완료
+
+**다음 단계 조건**:
+- 모든 파일이 승인되었거나, 부분 승인 후 계속 진행 선택한 경우에만 Step 10으로 진행
+- 워크플로우 중단 선택 시: Epic 생성 중단, 사용자에게 /epic 재실행 안내
+
 ### Step 10: Git 브랜치 생성
 
 **Bash 도구로 브랜치 생성**:
@@ -697,13 +869,18 @@ bash .specify/scripts/bash/validate-epic.sh {epicDir}
 
 1. **Step 0-11을 순차적으로 실행**하세요. 단 하나의 Step도 건너뛸 수 없습니다.
 2. **각 Step 완료 시 명시적으로 보고**하세요: "✅ Step X 완료"
-3. **AskUserQuestion 도구를 반드시 사용**하세요 (Step 2, 3)
+3. **AskUserQuestion 도구를 반드시 사용**하세요 (Step 2, 3, 9.5)
 4. **Write 도구로 3개 파일을 반드시 생성**하세요:
    - epic.md (Step 6)
    - roadmap.md (Step 7)
    - progress.md (Step 8)
 5. **Feature 디렉토리 및 spec.md 템플릿 생성** (Step 9)
-6. **파일 생성 후 검증**하세요: 파일이 실제로 생성되었는지 확인
+6. **문서 미리보기 및 동의 요청 필수** (Step 9.5)
+   - 배치 미리보기 생성
+   - 각 문서별 미리보기 표시
+   - Production 모드: 동의 요청 (AskUserQuestion)
+   - Development 모드: 자동 승인 (미리보기만 표시)
+7. **파일 생성 후 검증**하세요: 파일이 실제로 생성되었는지 확인
 
 **이 규칙을 위반하면 워크플로우가 실패합니다.**
 

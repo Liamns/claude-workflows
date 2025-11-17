@@ -9,166 +9,30 @@
 
 **📖 새로운 Claude 세션?** → [프로젝트 컨텍스트 문서](.claude/docs/PROJECT-CONTEXT.md) (5분이면 전체 파악)
 
-## 🆕 Epic 009 - Workflow System Improvement V2
+## 🆕 최신 기능
 
-### 📝 Command Template System (Feature #001) ✅
-- **100% 문서 표준화** - 모든 커맨드가 일관된 구조를 따르도록 템플릿 시스템 구축
-  - 표준 템플릿: Overview → Usage → Examples → Implementation
-  - 최소 템플릿: 빠른 커맨드 생성용 경량 버전
-  - 11/11 커맨드 마이그레이션 완료 (100% 준수)
-- **자동화 도구** - 템플릿 생성부터 검증까지 완전 자동화
-  - `create-new-command.sh`: 템플릿 기반 커맨드 자동 생성 (47ms)
-  - `validate-command-template.sh`: 템플릿 준수 검증 (34ms)
-  - `migrate-to-template.sh`: 기존 문서 자동 마이그레이션 (8ms)
-  - `install-git-hooks.sh`: Pre-commit 검증 훅 설치
-- **품질 보증** - TDD 방식으로 구축된 견고한 시스템
-  - 6개 유닛 테스트 (validate 검증)
-  - 6개 통합 테스트 (migration 검증)
-  - Shellcheck 검증 통과
-  - Bash 3.2+ 호환 (macOS 기본 지원)
-- **Git 통합** - Pre-commit Hook으로 자동 품질 관리
-  - 잘못된 템플릿 커밋 자동 차단
-  - 명확한 에러 메시지 및 수정 가이드
-  - `--no-verify`로 우회 가능
-- **레지스트리 시스템** - 커맨드-리소스 관계 중앙 관리
-  - 모든 커맨드의 Skills/Agents/Scripts 매핑
-  - 템플릿 준수 상태 추적
-  - 참고: [Command-Resource Guide](.claude/docs/COMMAND-RESOURCE-GUIDE.md)
+### v3.2.0 - Command Template System
+- **문서 표준화**: 템플릿 기반 커맨드 시스템 (11/11 완료)
+- **자동화 도구**: 생성/검증/마이그레이션 스크립트
+- **Git 통합**: Pre-commit hook 품질 관리
 
-**📚 관련 문서**:
-- [Feature 001 Summary](.claude/docs/FEATURE-001-SUMMARY.md) - 전체 구현 요약
-- [Command-Resource Guide](.claude/docs/COMMAND-RESOURCE-GUIDE.md) - 리소스 관계 가이드
-- [Template Directory](.claude/templates/) - 템플릿 파일
+### v3.1.0 - 품질 자동화
+- **아키텍처 검증**: FSD/Clean/Hexagonal/DDD 자동 검증
+- **한글 문서화**: 계획 문서 한글 비율 자동 체크
+- **Git 상태 관리**: 브랜치 생성 시 자동 처리 (5가지 옵션)
+- **체크섬 강화**: SHA256 기반 파일 무결성 검증
 
-## 🆕 v3.1.0 주요 기능 (Epic 001 완료!)
+### v3.0.0 - Epic Workflow
+- **대규모 관리**: 복잡도 10+ 작업을 3-5개 Feature로 분해
+- **진행 추적**: progress.md/roadmap.md 자동 업데이트
+- **의존성 검증**: DAG 기반 순환 의존성 방지
 
-### 🏗️ Architecture Compliance Check (Feature #002)
-- **자동 아키텍처 검증** - 코드 작성 중 자동으로 아키텍처 패턴 준수 여부 확인
-  - FSD, Clean Architecture, Hexagonal, DDD 등 다중 패턴 지원
-  - 순환 의존성 자동 검출 및 경고
-  - 레이어 규칙 검증 (features → entities → shared)
-  - 네이밍 규칙 자동 체크 (useXxx, xxxStore 등)
-- **Major 워크플로우 통합** - Step 13.7에서 자동 실행
-  - TypeScript 기반 고성능 검증 (2,762 lines)
-  - 5개 테스트 스위트로 품질 보증
-  - 실패 시 상세한 위반 내역 및 수정 제안 제공
+### v2.8.0 - 스마트 리뷰
+- **코드베이스 분석**: 전체 프로젝트 기반 PR 리뷰
+- **재사용 탐지**: 기존 모듈/패턴 자동 제안
+- **중복 감지**: 80% 이상 유사 코드 경고
 
-### 📝 Korean Documentation Validation (Feature #003)
-- **한글 문서화 강제** - 계획 문서가 한글로 작성되도록 자동 검증
-  - 한글 비율 자동 계산 (목표: 60%, 통과: 45%)
-  - spec.md, plan.md, tasks.md 등 자동 검증
-  - Major 워크플로우 5곳에 통합
-- **유연한 임계값** - 프로젝트 특성에 맞게 조정 가능
-  - 16개 테스트로 검증된 안정성
-  - 명확한 에러 메시지 및 가이드 제공
-
-### 🌿 Branch State Management (Feature #004)
-- **자동 Git 상태 관리** - 브랜치 생성 시 Git 상태를 자동으로 처리
-  - Clean state: 즉시 브랜치 생성
-  - Dirty state: 5가지 옵션 제공 (commit/move/stash/discard/cancel)
-  - Auto-commit 메시지 생성 및 리뷰
-- **Parallel Work 지원** - Feature 브랜치에서 Epic 브랜치로 자동 분기
-  - 충돌 방지 자동 감지
-  - Epic 브랜치 자동 검색 및 분기
-  - 명확한 경고 메시지 제공
-- **완벽한 에러 복구** - 모든 상황에서 데이터 손실 0%
-  - 자동 rollback 메커니즘
-  - 70개 테스트 (100% passing)
-  - 350+ 라인 통합 가이드 (INTEGRATION.md)
-
-### 🔐 Checksum Verification Improvements (Feature #005)
-- **파일 무결성 검증 강화** - SHA256 체크섬 기반 설치 파일 검증
-  - `.specify/` 디렉토리 포함
-  - 설치 시 자동 무결성 검증
-  - 선택적 파일 재다운로드 지원
-
-### ✨ Plan Mode Removal (Feature #001)
-- **워크플로우 간소화** - Plan Mode 제거로 사용자 경험 개선
-  - 실행 시간 30초-1분 단축
-  - 수동 복사-붙여넣기 단계 제거
-  - AskUserQuestion 기반 정보 수집으로 전환
-  - 롤백 가능 (`.deprecated` 디렉토리 보존)
-
-## 🆕 v3.0.0 주요 기능
-
-### Epic Workflow System
-- **🏔️ 대규모 프로젝트 관리** - 복잡도 10+ 작업을 3-5개 Feature로 자동 분해
-  - `/epic` 명령어로 Epic 생성 및 Feature 분해
-  - AI 기반 자동 Feature 제안 (기능/레이어/우선순위 단위)
-  - 사용자 검토 및 수정 가능
-- **📋 체계적 진행 추적** - Epic 진행 상황 실시간 모니터링
-  - `progress.md` 자동 업데이트 (완료율, Feature 상태)
-  - `roadmap.md`로 Feature 간 의존성 및 순서 관리
-  - Mermaid 다이어그램으로 의존성 시각화
-- **🔍 무결성 검증** - Epic 구조 자동 검증
-  - `validate-epic.sh`로 필수 파일, 의존성 순환, Feature 수 검증
-  - DAG (Directed Acyclic Graph) 검증으로 순환 의존성 방지
-  - Feature 수 경고 (2개 이하/6개 이상)
-- **⚙️ 자동화 스크립트** - Epic 생명주기 전체 자동화
-  - `create-epic.sh`: Epic 디렉토리 구조 및 템플릿 생성
-  - `update-epic-progress.sh`: Feature 완료 시 자동 진행률 업데이트
-  - 각 Feature는 독립적인 Major 워크플로우로 구현
-- **🎯 /triage 통합** - 복잡도 10+ 자동 감지 및 Epic 추천
-  - 시스템/플랫폼 구축 → +8점
-  - 인증/권한 시스템 → +7점
-  - 결제 플랫폼 통합 → +7점
-  - Epic 선택 시 자동으로 `/epic` 실행
-
-## 🆕 v2.9.0 주요 기능
-
-### Plan Mode Integration
-- **📋 Claude Code Plan Mode 통합** - 복잡한 작업 시 체계적인 계획 수립 후 자동 실행
-  - 복잡도 점수 5점 이상 시 Plan Mode 사용 가이드 자동 표시
-  - Plan Mode에서 작성한 계획을 대화 컨텍스트에서 자동 감지
-  - Major 워크플로우 Step 2-4 자동 건너뛰기 (50% 시간 절약)
-  - 항상 Fallback 옵션 제공 (기존 워크플로우 100% 유지)
-- **🔍 키워드 기반 컨텍스트 추출** - 자연어 계획 자동 파싱
-  - 키워드 감지: '계획', 'plan', 'phase', '단계', 'step'
-  - 최소 200자 이상 메시지 필터링
-  - 15개 유닛 테스트로 검증된 추출 로직
-- **⚡ 간소화된 접근** - ExitPlanMode API 의존성 제거
-  - 대화 컨텍스트 기반 통합 (구조화된 API 불필요)
-  - `/triage` → Plan Mode → `/major` 원활한 흐름
-  - 사용자 가이드 템플릿 제공
-
-## 🆕 v2.8.0 주요 기능
-
-### PR Review with Codebase Context (v2.8.0)
-- **🔍 전체 코드베이스 참조** - PR diff만이 아닌 전체 프로젝트를 분석하여 더 정확한 리뷰 제공
-  - 재사용 가능한 기존 모듈 자동 감지 및 제안
-  - 중복 코드 탐지 (80% 이상 유사도)
-  - 프로젝트 표준 패턴 준수 검증
-- **📊 성능 최적화** - 하이브리드 캐싱으로 빠른 분석 (30초 타임아웃)
-  - 메모리 + 파일 캐시 (SHA256 해시 검증)
-  - Progressive 인덱싱으로 대규모 코드베이스 지원
-- **⚠️ 스마트한 경고** - 불필요한 경고 50% 감소, 정확도 80% 달성
-  - 기존 컴포넌트 재사용 제안 (예: MyButton → shared/ui/Button)
-  - 중복 함수/유틸리티 발견 및 통합 권장
-  - 표준 패턴 (예: React Query) 사용 권장
-- **📁 신규 파일**: `.claude/agents/code-reviewer/lib/` (4개 스크립트)
-  - `cache-manager.sh` - 하이브리드 캐싱 관리
-  - `codebase-indexer.sh` - 모듈/패턴 인덱싱
-  - `similarity-analyzer.sh` - 유사도 계산 (이름 30%, 타입 20%, 시그니처 30%, Props 20%)
-  - `suggestion-generator.sh` - 리뷰 제안 생성
-
-### Installation Stability Hotfix (v2.7.2)
-- **🔧 Checksum 검증 최적화** - 불필요한 파일 검증 제거
-  - 로컬 설정 파일 제외 (`.claude/settings.local.json`, `*.local.json`)
-  - 설치 시 생성되는 파일 제외 (`.claude/hooks/*`)
-  - 프로젝트별 문서 제외 (`.specify/memory/*`)
-  - 체크섬 파일 수: 105 → 100개 (5개 제외)
-- **✅ 설치 안정성 향상** - 404 에러 완전 제거, 설치 속도 개선
-
-### FSD Custom Architecture (v2.7.0)
-- **🏗️ Domain-Centric Features** - 하나의 feature = 하나의 도메인 (백엔드 서비스처럼)
-  - config.json v2.1.0-team-custom
-  - Widgets 레이어 제거 → Features/Pages로 병합
-  - Type-only imports 지원 (feature 간 타입 참조)
-  - Pages First 원칙 적용 (페이지 특화 로직은 pages에 유지)
-- **📐 4 Core Layers** - app → pages → features → entities (optional) → shared
-- **📖 자세한 가이드** - [FSD Architecture Guide](architectures/frontend/fsd/fsd-architecture.mdc)
-
-### 이전 기능 (v2.6.0)
+**📚 상세 문서**: [Feature 001 Summary](.claude/docs/FEATURE-001-SUMMARY.md) | [Command-Resource Guide](.claude/docs/COMMAND-RESOURCE-GUIDE.md)
 
 ### 핵심 개선사항
 - **🔒 SHA256 체크섬 기반 파일 무결성 검증** - 설치 시 자동 파일 검증 및 복구

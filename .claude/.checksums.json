@@ -1,8 +1,8 @@
 {
   "version": "3.2.0",
-  "generatedAt": "2025-11-17T05:32:03Z",
+  "generatedAt": "2025-11-17T05:36:41Z",
   "files": {
-    ".claude/.checksums.json": "70f6214f368a88713c6fb8cf3f34ba5c4cddbb1719180000472a00e3fc30e10f",
+    ".claude/.checksums.json": "cab9c14a1eb4cec0a7118963f5569ee73d791ec227a015e8d19faf5967184e8d",
     ".claude/.version": "33bdaf9e2d6bcbde2e4e613e865e403f8fe21fc621078d34c30b0bdc7f68d903",
     ".claude/agents/api-designer.md": "8d34ac2f5c3c7d9e25ffe46463b8efa3073a1f023f6226ef2f2d184b1a64c1b5",
     ".claude/agents/architect-unified.md": "509dd35487a5054f559f7ec6536f33a6015f09bfdcc113916718970d2c43f77f",
@@ -92,7 +92,7 @@
     ".claude/lib/document-preview/prompts/summarize.md": "62c9b078d574cd5677502633c9af8caf5dd22b6dff6686d2851ad2a6e264249a",
     ".claude/lib/document-preview/summary-generator.sh": "94972a742a4f849c60b4aba9264894e9dc2acbe1abf28524b6715cea60f8e8c5",
     ".claude/lib/extract-resource-mappings.sh": "4074c0fcd7ce230d5d0363bb1f4582a75eccef96c1c72b9c7f19ea214e091ad9",
-    ".claude/lib/generate-checksums.sh": "bab45494330316fe0a845ebaa9de9d72423f47c809f600ddf625bc334bfd1a3f",
+    ".claude/lib/generate-checksums.sh": "c2079a59587e0a20c3e8f9c0a0a10d665d43da52be0f09acc912165b7de821b6",
     ".claude/lib/git-operations.sh": "b29f65dfb3867ce5eec2b4b2603b226685ef90cd75b26f63f256e84c8b83dc00",
     ".claude/lib/git-stats-helper.sh": "e511e6ea75b9fc22a9752a8ecbc5563429c0be33a407715640d537bff3f03a61",
     ".claude/lib/git-status-checker.sh": "4aaea24b5ab4fa4065250366535820ff0cbb78c8287f4bd762c9fe0d2dfe3709",
@@ -136,7 +136,6 @@
     ".claude/lib/validation-config.sh": "383db94fd94aaf286045b417d6ef0177dcff34076141c6c1fd64c6b56841374c",
     ".claude/lib/validation-utils.sh": "ea97034b353ce9ce577cc7a3e273dc19ef5f3e1292575231bc7b5d6115066785",
     ".claude/lib/verify-with-checksum.sh": "542267848b25b4ceed924115151f1aa0e84013d6e620ba4813056be6c99e985b",
-    ".claude/metrics/pr-review-stats.json": "e1e6f68295e23b9ca3b6b3faa77e60c2d9e2c55c6c0a0b476eae7a1b6fb48bd9",
     ".claude/registry/command-resource-mapping.json": "52908fa6090500e7fa7ae5d8d84b4a2af0fbbf1d03f0473b3108f7194b71612c",
     ".claude/skills/api-integration/examples/mutation-example.md": "b38e36ed8d9f12b72d3897aa525e01aca093b6e830cec3c85f64a08f9c3e2c42",
     ".claude/skills/api-integration/examples/query-example.md": "d146cadddc817ab0d69bb789fb7d75e3df05a97a6ba71f76693eaac2dceed95a",

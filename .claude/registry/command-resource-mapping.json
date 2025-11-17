@@ -1,6 +1,7 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2025-11-17T00:26:57Z",
+  "lastUpdated": "2025-11-17T12:00:00Z",
+  "templateSystemVersion": "1.0.0",
   "commands": [
     {
       "id": "commit",
@@ -309,7 +310,7 @@
       "commandId": "commit",
       "filePath": ".claude/commands/commit.md",
       "sections": [],
-      "templateCompliance": false,
+      "templateCompliance": true,
       "createdAt": "2025-11-17T08:03:36Z",
       "updatedAt": "2025-11-17T08:03:36Z"
     },
@@ -318,7 +319,7 @@
       "commandId": "dashboard",
       "filePath": ".claude/commands/dashboard.md",
       "sections": [],
-      "templateCompliance": false,
+      "templateCompliance": true,
       "createdAt": "2025-11-12T08:03:36Z",
       "updatedAt": "2025-11-12T08:03:36Z"
     },
@@ -327,7 +328,7 @@
       "commandId": "epic",
       "filePath": ".claude/commands/epic.md",
       "sections": [],
-      "templateCompliance": false,
+      "templateCompliance": true,
       "createdAt": "2025-11-13T12:49:13Z",
       "updatedAt": "2025-11-13T12:49:13Z"
     },
@@ -336,7 +337,7 @@
       "commandId": "major",
       "filePath": ".claude/commands/major.md",
       "sections": [],
-      "templateCompliance": false,
+      "templateCompliance": true,
       "createdAt": "2025-11-17T07:58:39Z",
       "updatedAt": "2025-11-17T07:58:39Z"
     },
@@ -345,7 +346,7 @@
       "commandId": "micro",
       "filePath": ".claude/commands/micro.md",
       "sections": [],
-      "templateCompliance": false,
+      "templateCompliance": true,
       "createdAt": "2025-11-12T08:03:36Z",
       "updatedAt": "2025-11-12T08:03:36Z"
     },
@@ -354,7 +355,7 @@
       "commandId": "minor",
       "filePath": ".claude/commands/minor.md",
       "sections": [],
-      "templateCompliance": false,
+      "templateCompliance": true,
       "createdAt": "2025-11-12T08:03:36Z",
       "updatedAt": "2025-11-12T08:03:36Z"
     },
@@ -363,7 +364,7 @@
       "commandId": "pr-review",
       "filePath": ".claude/commands/pr-review.md",
       "sections": [],
-      "templateCompliance": false,
+      "templateCompliance": true,
       "createdAt": "2025-11-12T08:03:36Z",
       "updatedAt": "2025-11-12T08:03:36Z"
     },
@@ -372,7 +373,7 @@
       "commandId": "pr",
       "filePath": ".claude/commands/pr.md",
       "sections": [],
-      "templateCompliance": false,
+      "templateCompliance": true,
       "createdAt": "2025-11-12T08:03:36Z",
       "updatedAt": "2025-11-12T08:03:36Z"
     },
@@ -381,7 +382,7 @@
       "commandId": "review",
       "filePath": ".claude/commands/review.md",
       "sections": [],
-      "templateCompliance": false,
+      "templateCompliance": true,
       "createdAt": "2025-11-12T08:03:36Z",
       "updatedAt": "2025-11-12T08:03:36Z"
     },
@@ -390,7 +391,7 @@
       "commandId": "start",
       "filePath": ".claude/commands/start.md",
       "sections": [],
-      "templateCompliance": false,
+      "templateCompliance": true,
       "createdAt": "2025-11-12T08:03:36Z",
       "updatedAt": "2025-11-12T08:03:36Z"
     },
@@ -399,7 +400,7 @@
       "commandId": "triage",
       "filePath": ".claude/commands/triage.md",
       "sections": [],
-      "templateCompliance": false,
+      "templateCompliance": true,
       "createdAt": "2025-11-13T13:23:45Z",
       "updatedAt": "2025-11-13T13:23:45Z"
     }

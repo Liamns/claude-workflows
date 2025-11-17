@@ -18,45 +18,9 @@
 
 set -e
 
-# ════════════════════════════════════════════════════════════════════════════
-# SHA256 도구 감지
-# ════════════════════════════════════════════════════════════════════════════
-
-# SHA256 도구를 감지하고 사용 가능한 명령어를 반환합니다.
-#
-# @return string SHA256 명령어 ("shasum -a 256" | "sha256sum" | "openssl dgst -sha256")
-# @exit 1 사용 가능한 도구가 없는 경우
-#
-# @example
-#   tool=$(detect_sha256_tool)
-#   echo "Using: $tool"
-detect_sha256_tool() {
-    # 우선순위 1: shasum (macOS default)
-    if command -v shasum &> /dev/null; then
-        echo "shasum -a 256"
-        return 0
-    fi
-
-    # 우선순위 2: sha256sum (Linux default)
-    if command -v sha256sum &> /dev/null; then
-        echo "sha256sum"
-        return 0
-    fi
-
-    # 우선순위 3: openssl (universal fallback)
-    if command -v openssl &> /dev/null; then
-        echo "openssl dgst -sha256"
-        return 0
-    fi
-
-    # 사용 가능한 도구 없음
-    echo "오류: SHA256 도구를 찾을 수 없습니다 (shasum, sha256sum, openssl)" >&2
-    echo "다음 중 하나를 설치하세요:" >&2
-    echo "  macOS: shasum (기본 설치됨)" >&2
-    echo "  Linux: apt-get install coreutils (sha256sum 포함)" >&2
-    echo "  공통: openssl (대부분 기본 설치됨)" >&2
-    return 1
-}
+# Source common module for detect_sha256_tool function
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/common.sh"
 
 # ════════════════════════════════════════════════════════════════════════════
 # SHA256 체크섬 계산

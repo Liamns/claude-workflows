@@ -1,6 +1,6 @@
 # 🤖 Claude Workflows
 
-[![Version](https://img.shields.io/badge/version-3.1.2-blue.svg)](https://github.com/Liamns/claude-workflows)
+[![Version](https://img.shields.io/badge/version-3.2.0-blue.svg)](https://github.com/Liamns/claude-workflows)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-purple.svg)](https://claude.ai/code)
 [![Validation](https://img.shields.io/badge/validation-automated-success.svg)](https://github.com/Liamns/claude-workflows)
@@ -8,6 +8,37 @@
 > Claude Code의 토큰 효율성을 극대화하면서 코드 품질을 보장하는 지능형 워크플로우 시스템
 
 **📖 새로운 Claude 세션?** → [프로젝트 컨텍스트 문서](.claude/docs/PROJECT-CONTEXT.md) (5분이면 전체 파악)
+
+## 🆕 Epic 009 - Workflow System Improvement V2
+
+### 📝 Command Template System (Feature #001) ✅
+- **100% 문서 표준화** - 모든 커맨드가 일관된 구조를 따르도록 템플릿 시스템 구축
+  - 표준 템플릿: Overview → Usage → Examples → Implementation
+  - 최소 템플릿: 빠른 커맨드 생성용 경량 버전
+  - 11/11 커맨드 마이그레이션 완료 (100% 준수)
+- **자동화 도구** - 템플릿 생성부터 검증까지 완전 자동화
+  - `create-new-command.sh`: 템플릿 기반 커맨드 자동 생성 (47ms)
+  - `validate-command-template.sh`: 템플릿 준수 검증 (34ms)
+  - `migrate-to-template.sh`: 기존 문서 자동 마이그레이션 (8ms)
+  - `install-git-hooks.sh`: Pre-commit 검증 훅 설치
+- **품질 보증** - TDD 방식으로 구축된 견고한 시스템
+  - 6개 유닛 테스트 (validate 검증)
+  - 6개 통합 테스트 (migration 검증)
+  - Shellcheck 검증 통과
+  - Bash 3.2+ 호환 (macOS 기본 지원)
+- **Git 통합** - Pre-commit Hook으로 자동 품질 관리
+  - 잘못된 템플릿 커밋 자동 차단
+  - 명확한 에러 메시지 및 수정 가이드
+  - `--no-verify`로 우회 가능
+- **레지스트리 시스템** - 커맨드-리소스 관계 중앙 관리
+  - 모든 커맨드의 Skills/Agents/Scripts 매핑
+  - 템플릿 준수 상태 추적
+  - 참고: [Command-Resource Guide](.claude/docs/COMMAND-RESOURCE-GUIDE.md)
+
+**📚 관련 문서**:
+- [Feature 001 Summary](.claude/docs/FEATURE-001-SUMMARY.md) - 전체 구현 요약
+- [Command-Resource Guide](.claude/docs/COMMAND-RESOURCE-GUIDE.md) - 리소스 관계 가이드
+- [Template Directory](.claude/templates/) - 템플릿 파일
 
 ## 🆕 v3.1.0 주요 기능 (Epic 001 완료!)
 

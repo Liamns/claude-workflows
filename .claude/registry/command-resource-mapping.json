@@ -1,0 +1,408 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2025-11-17T12:00:00Z",
+  "templateSystemVersion": "1.0.0",
+  "commands": [
+    {
+      "id": "commit",
+      "name": "🚀 Smart Commit Command",
+      "description": "Git 변경사항을 자동으로 분석하여 Conventional Commits 형식의 커밋 메시지를 생성하고 커밋합니다.",
+      "filePath": ".claude/commands/commit.md",
+      "relatedSkills": [],
+      "relatedAgents": [],
+      "relatedScripts": [
+        ".claude/lib/git/detect-feature-id.sh"
+      ],
+      "createdAt": "2025-11-17T08:03:36Z",
+      "updatedAt": "2025-11-17T08:03:36Z"
+    },
+    {
+      "id": "dashboard",
+      "name": "📊 실시간 메트릭스 대시보드",
+      "description": "워크플로우 실행 통계와 성능 지표를 실시간으로 표시합니다.",
+      "filePath": ".claude/commands/dashboard.md",
+      "relatedSkills": [],
+      "relatedAgents": [],
+      "relatedScripts": [],
+      "createdAt": "2025-11-12T08:03:36Z",
+      "updatedAt": "2025-11-12T08:03:36Z"
+    },
+    {
+      "id": "epic",
+      "name": "🏔️ Epic - 대형 작업 관리 워크플로우",
+      "description": "복잡도 10점 이상의 대규모 작업을 3-5개의 Feature로 분해하여 단계적으로 구현합니다.",
+      "filePath": ".claude/commands/epic.md",
+      "relatedSkills": [],
+      "relatedAgents": [],
+      "relatedScripts": [],
+      "createdAt": "2025-11-13T12:49:13Z",
+      "updatedAt": "2025-11-13T12:49:13Z"
+    },
+    {
+      "id": "major",
+      "name": "🚀 Major - 통합 워크플로우 v2.0",
+      "description": "신규 기능, API 엔드포인트, 아키텍처 변경 등 복잡한 작업을 체계적으로 진행합니다.",
+      "filePath": ".claude/commands/major.md",
+      "relatedSkills": [],
+      "relatedAgents": [],
+      "relatedScripts": [],
+      "createdAt": "2025-11-17T07:58:39Z",
+      "updatedAt": "2025-11-17T07:58:39Z"
+    },
+    {
+      "id": "micro",
+      "name": "/micro - Micro 워크플로 (Quick Fix)",
+      "description": "타이포 수정, 주석 추가/제거, 로그 제거, 설정 파일 변경을 위한 초고속 워크플로입니다.",
+      "filePath": ".claude/commands/micro.md",
+      "relatedSkills": [],
+      "relatedAgents": [],
+      "relatedScripts": [],
+      "createdAt": "2025-11-12T08:03:36Z",
+      "updatedAt": "2025-11-12T08:03:36Z"
+    },
+    {
+      "id": "minor",
+      "name": "/minor - Minor 워크플로 (Incremental Updates)",
+      "description": "기존 기능 개선, 버그 픽스, UI 스타일 변경을 위한 경량 워크플로입니다.",
+      "filePath": ".claude/commands/minor.md",
+      "relatedSkills": [],
+      "relatedAgents": [
+        "fsd-architect"
+      ],
+      "relatedScripts": [],
+      "createdAt": "2025-11-12T08:03:36Z",
+      "updatedAt": "2025-11-12T08:03:36Z"
+    },
+    {
+      "id": "pr-review",
+      "name": "🔍 PR Review Command",
+      "description": "GitHub Pull Request를 자동으로 분석하고 코드 리뷰를 수행합니다.",
+      "filePath": ".claude/commands/pr-review.md",
+      "relatedSkills": [],
+      "relatedAgents": [],
+      "relatedScripts": [],
+      "createdAt": "2025-11-12T08:03:36Z",
+      "updatedAt": "2025-11-12T08:03:36Z"
+    },
+    {
+      "id": "pr",
+      "name": "PR 자동 생성 커맨드",
+      "description": "현재 브랜치의 변경사항을 분석하여 PR을 자동으로 생성합니다.",
+      "filePath": ".claude/commands/pr.md",
+      "relatedSkills": [],
+      "relatedAgents": [],
+      "relatedScripts": [],
+      "createdAt": "2025-11-12T08:03:36Z",
+      "updatedAt": "2025-11-12T08:03:36Z"
+    },
+    {
+      "id": "review",
+      "name": "/review - Intelligent Code Review System",
+      "description": "Comprehensive code review for any scope - files, directories, or git changes. Leverages project constitution and architecture information when available, with intelligent model selection and optional ",
+      "filePath": ".claude/commands/review.md",
+      "relatedSkills": [],
+      "relatedAgents": [],
+      "relatedScripts": [],
+      "createdAt": "2025-11-12T08:03:36Z",
+      "updatedAt": "2025-11-12T08:03:36Z"
+    },
+    {
+      "id": "start",
+      "name": "/start - 프로젝트 초기화 및 Architecture 설정",
+      "description": "프로젝트에 Specification-Driven Development 환경과 아키텍처를 설정합니다.",
+      "filePath": ".claude/commands/start.md",
+      "relatedSkills": [],
+      "relatedAgents": [],
+      "relatedScripts": [],
+      "createdAt": "2025-11-12T08:03:36Z",
+      "updatedAt": "2025-11-12T08:03:36Z"
+    },
+    {
+      "id": "triage",
+      "name": "🎯 Triage - 스마트 워크플로우 선택기",
+      "description": "작업의 복잡도를 자동으로 분석하여 Epic/Major/Minor/Micro 중 최적의 워크플로우를 선택합니다.",
+      "filePath": ".claude/commands/triage.md",
+      "relatedSkills": [],
+      "relatedAgents": [],
+      "relatedScripts": [],
+      "createdAt": "2025-11-13T13:23:45Z",
+      "updatedAt": "2025-11-13T13:23:45Z"
+    }
+  ],
+  "skills": [
+    {
+      "id": "api-integration",
+      "name": "api integration",
+      "description": "Skill: api integration",
+      "directoryPath": ".claude/skills/api-integration/",
+      "usedByCommands": [],
+      "createdAt": "2025-11-06T17:34:09Z",
+      "updatedAt": "2025-11-06T17:34:09Z"
+    },
+    {
+      "id": "bug-fix-pattern",
+      "name": "uug fix pattern",
+      "description": "Skill: uug fix pattern",
+      "directoryPath": ".claude/skills/bug-fix-pattern/",
+      "usedByCommands": [],
+      "createdAt": "2025-11-06T15:42:54Z",
+      "updatedAt": "2025-11-06T15:42:54Z"
+    },
+    {
+      "id": "code-metrics-collector",
+      "name": "code metrics collector",
+      "description": "Skill: code metrics collector",
+      "directoryPath": ".claude/skills/code-metrics-collector/",
+      "usedByCommands": [],
+      "createdAt": "2025-11-07T09:08:18Z",
+      "updatedAt": "2025-11-07T09:08:18Z"
+    },
+    {
+      "id": "commit-guard",
+      "name": "commit guard",
+      "description": "Skill: commit guard",
+      "directoryPath": ".claude/skills/commit-guard/",
+      "usedByCommands": [],
+      "createdAt": "2025-11-06T15:42:54Z",
+      "updatedAt": "2025-11-06T15:42:54Z"
+    },
+    {
+      "id": "daily-changelog-notion",
+      "name": "daily changelog notion",
+      "description": "Skill: daily changelog notion",
+      "directoryPath": ".claude/skills/daily-changelog-notion/",
+      "usedByCommands": [],
+      "createdAt": "2025-11-06T15:42:54Z",
+      "updatedAt": "2025-11-06T15:42:54Z"
+    },
+    {
+      "id": "dependency-tracer",
+      "name": "dependency tracer",
+      "description": "Skill: dependency tracer",
+      "directoryPath": ".claude/skills/dependency-tracer/",
+      "usedByCommands": [],
+      "createdAt": "2025-11-07T09:12:57Z",
+      "updatedAt": "2025-11-07T09:12:57Z"
+    },
+    {
+      "id": "form-validation",
+      "name": "form validation",
+      "description": "Skill: form validation",
+      "directoryPath": ".claude/skills/form-validation/",
+      "usedByCommands": [],
+      "createdAt": "2025-11-06T17:33:04Z",
+      "updatedAt": "2025-11-06T17:33:04Z"
+    },
+    {
+      "id": "fsd-component-creation",
+      "name": "fsd component creation",
+      "description": "Skill: fsd component creation",
+      "directoryPath": ".claude/skills/fsd-component-creation/",
+      "usedByCommands": [],
+      "createdAt": "2025-11-11T16:55:52Z",
+      "updatedAt": "2025-11-11T16:55:52Z"
+    },
+    {
+      "id": "mobile-build",
+      "name": "mouile uuild",
+      "description": "Skill: mouile uuild",
+      "directoryPath": ".claude/skills/mobile-build/",
+      "usedByCommands": [],
+      "createdAt": "2025-11-06T15:42:54Z",
+      "updatedAt": "2025-11-06T15:42:54Z"
+    },
+    {
+      "id": "parallel-orchestrator",
+      "name": "parallel orchestrator",
+      "description": "Skill: parallel orchestrator",
+      "directoryPath": ".claude/skills/parallel-orchestrator/",
+      "usedByCommands": [],
+      "createdAt": "2025-11-07T15:33:46Z",
+      "updatedAt": "2025-11-07T15:33:46Z"
+    },
+    {
+      "id": "platform-detection",
+      "name": "platform detection",
+      "description": "Skill: platform detection",
+      "directoryPath": ".claude/skills/platform-detection/",
+      "usedByCommands": [],
+      "createdAt": "2025-11-06T15:42:54Z",
+      "updatedAt": "2025-11-06T15:42:54Z"
+    },
+    {
+      "id": "reusability-enforcer",
+      "name": "reusauility enforcer",
+      "description": "Skill: reusauility enforcer",
+      "directoryPath": ".claude/skills/reusability-enforcer/",
+      "usedByCommands": [],
+      "createdAt": "2025-11-17T07:58:39Z",
+      "updatedAt": "2025-11-17T07:58:39Z"
+    },
+    {
+      "id": "reusability-metrics",
+      "name": "reusauility metrics",
+      "description": "Skill: reusauility metrics",
+      "directoryPath": ".claude/skills/reusability-metrics/",
+      "usedByCommands": [],
+      "createdAt": "2025-11-06T17:16:11Z",
+      "updatedAt": "2025-11-06T17:16:11Z"
+    },
+    {
+      "id": "smart-cache",
+      "name": "smart cache",
+      "description": "Skill: smart cache",
+      "directoryPath": ".claude/skills/smart-cache/",
+      "usedByCommands": [],
+      "createdAt": "2025-11-07T15:13:22Z",
+      "updatedAt": "2025-11-07T15:13:22Z"
+    },
+    {
+      "id": "test-coverage-analyzer",
+      "name": "test coverage analyzer",
+      "description": "Skill: test coverage analyzer",
+      "directoryPath": ".claude/skills/test-coverage-analyzer/",
+      "usedByCommands": [],
+      "createdAt": "2025-11-07T08:49:22Z",
+      "updatedAt": "2025-11-07T08:49:22Z"
+    }
+  ],
+  "agents": [
+    {
+      "id": "_deprecated",
+      "name": "_deprecated",
+      "type": "_deprecated",
+      "description": "Agent: _deprecated",
+      "directoryPath": ".claude/agents/_deprecated/",
+      "usedByCommands": [],
+      "createdAt": "2025-11-12T07:36:26Z",
+      "updatedAt": "2025-11-12T07:36:26Z"
+    },
+    {
+      "id": "code-reviewer",
+      "name": "code reviewer",
+      "type": "code-reviewer",
+      "description": "Agent: code reviewer",
+      "directoryPath": ".claude/agents/code-reviewer/",
+      "usedByCommands": [],
+      "createdAt": "2025-11-12T13:00:43Z",
+      "updatedAt": "2025-11-12T13:00:43Z"
+    }
+  ],
+  "scripts": [
+    {
+      "id": "detect-feature-id",
+      "name": "detect feature id",
+      "filePath": ".claude/lib/git/detect-feature-id.sh",
+      "category": "lib",
+      "description": ".claude/lib/git/detect-feature-id.sh",
+      "usedByCommands": [
+        "commit"
+      ],
+      "usedBySkills": [],
+      "usedByAgents": [],
+      "createdAt": "2025-11-17T08:03:21Z",
+      "updatedAt": "2025-11-17T08:03:21Z"
+    }
+  ],
+  "documentations": [
+    {
+      "id": "commit",
+      "commandId": "commit",
+      "filePath": ".claude/commands/commit.md",
+      "sections": [],
+      "templateCompliance": true,
+      "createdAt": "2025-11-17T08:03:36Z",
+      "updatedAt": "2025-11-17T08:03:36Z"
+    },
+    {
+      "id": "dashboard",
+      "commandId": "dashboard",
+      "filePath": ".claude/commands/dashboard.md",
+      "sections": [],
+      "templateCompliance": true,
+      "createdAt": "2025-11-12T08:03:36Z",
+      "updatedAt": "2025-11-12T08:03:36Z"
+    },
+    {
+      "id": "epic",
+      "commandId": "epic",
+      "filePath": ".claude/commands/epic.md",
+      "sections": [],
+      "templateCompliance": true,
+      "createdAt": "2025-11-13T12:49:13Z",
+      "updatedAt": "2025-11-13T12:49:13Z"
+    },
+    {
+      "id": "major",
+      "commandId": "major",
+      "filePath": ".claude/commands/major.md",
+      "sections": [],
+      "templateCompliance": true,
+      "createdAt": "2025-11-17T07:58:39Z",
+      "updatedAt": "2025-11-17T07:58:39Z"
+    },
+    {
+      "id": "micro",
+      "commandId": "micro",
+      "filePath": ".claude/commands/micro.md",
+      "sections": [],
+      "templateCompliance": true,
+      "createdAt": "2025-11-12T08:03:36Z",
+      "updatedAt": "2025-11-12T08:03:36Z"
+    },
+    {
+      "id": "minor",
+      "commandId": "minor",
+      "filePath": ".claude/commands/minor.md",
+      "sections": [],
+      "templateCompliance": true,
+      "createdAt": "2025-11-12T08:03:36Z",
+      "updatedAt": "2025-11-12T08:03:36Z"
+    },
+    {
+      "id": "pr-review",
+      "commandId": "pr-review",
+      "filePath": ".claude/commands/pr-review.md",
+      "sections": [],
+      "templateCompliance": true,
+      "createdAt": "2025-11-12T08:03:36Z",
+      "updatedAt": "2025-11-12T08:03:36Z"
+    },
+    {
+      "id": "pr",
+      "commandId": "pr",
+      "filePath": ".claude/commands/pr.md",
+      "sections": [],
+      "templateCompliance": true,
+      "createdAt": "2025-11-12T08:03:36Z",
+      "updatedAt": "2025-11-12T08:03:36Z"
+    },
+    {
+      "id": "review",
+      "commandId": "review",
+      "filePath": ".claude/commands/review.md",
+      "sections": [],
+      "templateCompliance": true,
+      "createdAt": "2025-11-12T08:03:36Z",
+      "updatedAt": "2025-11-12T08:03:36Z"
+    },
+    {
+      "id": "start",
+      "commandId": "start",
+      "filePath": ".claude/commands/start.md",
+      "sections": [],
+      "templateCompliance": true,
+      "createdAt": "2025-11-12T08:03:36Z",
+      "updatedAt": "2025-11-12T08:03:36Z"
+    },
+    {
+      "id": "triage",
+      "commandId": "triage",
+      "filePath": ".claude/commands/triage.md",
+      "sections": [],
+      "templateCompliance": true,
+      "createdAt": "2025-11-13T13:23:45Z",
+      "updatedAt": "2025-11-13T13:23:45Z"
+    }
+  ]
+}

@@ -32,6 +32,9 @@ Thumbs.db
 # Test outputs
 .claude/lib/__tests__/
 
+# Node.js dependencies
+node_modules/
+
 # Personal settings (user-specific)
 .claude/settings.local.json
 .claude/config/*-local.json

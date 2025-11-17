@@ -1,0 +1,17 @@
+{
+  "name": "claude-workflow-registry",
+  "version": "1.0.0",
+  "description": "Command-Resource Registry Validation",
+  "type": "module",
+  "scripts": {
+    "validate": "node --loader ts-node/esm validate-registry-schema.ts"
+  },
+  "dependencies": {
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}

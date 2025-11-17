@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Claude Code Workflows Installer
-# Version: 3.1.2 - Patch Release (Directory Creation Fix)
+# Version: 3.2.0 - Minor Release (Epic 009 Workflow System Improvements)
 
 set -e
 
@@ -13,8 +13,8 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Version Configuration
-INSTALLER_VERSION="3.1.2"
-TARGET_VERSION="3.1.2"
+INSTALLER_VERSION="3.2.0"
+TARGET_VERSION="3.2.0"
 
 # Repository Configuration
 REPO_URL="https://github.com/Liamns/claude-workflows"

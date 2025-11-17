@@ -22,15 +22,17 @@
 
 set -e
 
+# Source common module for detect_sha256_tool function
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"
+source "$SCRIPT_DIR/common.sh"
+
 # ════════════════════════════════════════════════════════════════════════════
 # 설정
 # ════════════════════════════════════════════════════════════════════════════
-
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.."; pwd)"
 
 # 버전 정보 (install.sh와 동기화)
-VERSION="3.1.2"
+VERSION="3.2.0"
 
 # 기본 출력 파일 (설정하지 않으면 stdout)
 OUTPUT_FILE=""
@@ -135,21 +137,8 @@ while [[ $# -gt 0 ]]; do
 done
 
 # ════════════════════════════════════════════════════════════════════════════
-# 체크섬 도구 감지
+# 체크섬 도구 감지 (common.sh에서 제공)
 # ════════════════════════════════════════════════════════════════════════════
-
-detect_sha256_tool() {
-    if command -v shasum &> /dev/null; then
-        echo "shasum -a 256"
-    elif command -v sha256sum &> /dev/null; then
-        echo "sha256sum"
-    elif command -v openssl &> /dev/null; then
-        echo "openssl dgst -sha256"
-    else
-        echo "오류: SHA256 도구를 찾을 수 없습니다 (shasum, sha256sum, openssl)" >&2
-        exit 1
-    fi
-}
 
 SHA256_TOOL=$(detect_sha256_tool)
 log_verbose "Using SHA256 tool: $SHA256_TOOL"

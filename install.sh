@@ -1046,23 +1046,8 @@ install_workflows() {
             log_to_file "Validation completed with warnings"
         fi
 
-        # Run validation system if available (v2.5+)
-        if [ -f "$TARGET_DIR/.claude/lib/validate-system.sh" ] && [ "$EXISTING_VERSION" != "none" ]; then
-            echo ""
-            print_info "Running validation system..."
-            if bash "$TARGET_DIR/.claude/lib/validate-system.sh" --docs-only --quiet; then
-                print_success "Validation system check passed"
-            else
-                local validation_exit=$?
-                if [ $validation_exit -eq 2 ]; then
-                    print_warning "Validation system found warnings (continuing)"
-                else
-                    print_error "Validation system check failed"
-                    print_warning "You can check the report at: $TARGET_DIR/.claude/cache/validation-reports/latest.md"
-                    print_info "Installation is complete, but some validation issues were found"
-                fi
-            fi
-        fi
+        # Validation system removed in v3.3.1 (TODO cleanup completed)
+        # Validation scripts are kept in .claude/lib/ for reference but not used
 
     fi
 

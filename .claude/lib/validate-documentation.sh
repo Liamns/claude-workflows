@@ -169,16 +169,35 @@ validate_single_doc() {
 # Step 패턴 추출
 extract_steps_from_doc() {
     local doc_file="$1"
+
+    # 구버전 형식 (### Step N) 먼저 확인
     local steps_raw=$(grep -E "^### Step [0-9]+" "$doc_file" 2>/dev/null || echo "")
 
-    if [[ -z "$steps_raw" ]]; then
+    if [[ -n "$steps_raw" ]]; then
+        # 구버전 형식 발견
+        if command -v jq > /dev/null 2>&1; then
+            echo "$steps_raw" | sed 's/^### //' | jq -R . | jq -s '.'
+        else
+            echo "[]"
+        fi
+        return 0
+    fi
+
+    # 신버전 형식 (### Workflow Steps 섹션의 번호 리스트) 확인
+    # Implementation 섹션 내 Workflow Steps 또는 직접 번호 매긴 단계 찾기
+    # 두 가지 형식 지원:
+    # 1. 번호 리스트: "1. **Step**"
+    # 2. 볼드 헤딩: "**Step 1:**"
+    local workflow_steps=$(sed -n '/^### Workflow Steps/,/^###/p' "$doc_file" 2>/dev/null | grep -E "^[0-9]\.|^\*\*Step [0-9]+" || echo "")
+
+    if [[ -z "$workflow_steps" ]]; then
         echo "[]"
         return 0
     fi
 
     # JSON 배열로 변환
     if command -v jq > /dev/null 2>&1; then
-        echo "$steps_raw" | sed 's/^### //' | jq -R . | jq -s '.'
+        echo "$workflow_steps" | sed -E 's/^[0-9]+\. \*\*//' | sed 's/\*\*:.*//' | jq -R . | jq -s '.'
     else
         echo "[]"
     fi

@@ -1,0 +1,154 @@
+/**
+ * {{EventName}} Event Handler
+ *
+ * Microservices Architecture - Event-driven communication
+ * Handles async events between services (AMQP, Kafka, etc.)
+ *
+ * @package events
+ */
+
+import { EventEmitter } from 'events';
+
+// Event types
+export enum {{EventName}}Type {
+  CREATED = '{{event-name}}.created',
+  UPDATED = '{{event-name}}.updated',
+  DELETED = '{{event-name}}.deleted',
+  FAILED = '{{event-name}}.failed',
+}
+
+// Event payload interface
+export interface {{EventName}}Payload {
+  eventId: string;
+  eventType: {{EventName}}Type;
+  timestamp: string;
+  aggregateId: string;
+  version: number;
+  data: any;
+  metadata?: {
+    correlationId?: string;
+    causationId?: string;
+    userId?: string;
+  };
+}
+
+// Event Bus (can be replaced with RabbitMQ, Kafka, etc.)
+export class EventBus extends EventEmitter {
+  private static instance: EventBus;
+
+  private constructor() {
+    super();
+    this.setMaxListeners(100); // Increase max listeners for scalability
+  }
+
+  static getInstance(): EventBus {
+    if (!EventBus.instance) {
+      EventBus.instance = new EventBus();
+    }
+    return EventBus.instance;
+  }
+
+  publish(event: {{EventName}}Payload): void {
+    console.log(`[EventBus] Publishing event: ${event.eventType}`, event.eventId);
+    this.emit(event.eventType, event);
+    this.emit('*', event); // Wildcard for logging/monitoring
+  }
+
+  subscribe(eventType: {{EventName}}Type | '*', handler: (event: {{EventName}}Payload) => void | Promise<void>): void {
+    console.log(`[EventBus] Subscribing to: ${eventType}`);
+    this.on(eventType, async (event: {{EventName}}Payload) => {
+      try {
+        await handler(event);
+      } catch (error) {
+        console.error(`[EventBus] Handler error for ${eventType}:`, error);
+        // Publish failed event
+        this.publish({
+          eventId: this.generateEventId(),
+          eventType: {{EventName}}Type.FAILED,
+          timestamp: new Date().toISOString(),
+          aggregateId: event.aggregateId,
+          version: event.version,
+          data: { originalEvent: event, error: error.message },
+        });
+      }
+    });
+  }
+
+  unsubscribe(eventType: {{EventName}}Type | '*', handler: Function): void {
+    this.off(eventType, handler as any);
+  }
+
+  private generateEventId(): string {
+    return `evt-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  }
+}
+
+// Event Handler base class
+export abstract class {{EventName}}Handler {
+  protected eventBus: EventBus;
+
+  constructor() {
+    this.eventBus = EventBus.getInstance();
+    this.registerHandlers();
+  }
+
+  protected abstract registerHandlers(): void;
+
+  protected publishEvent(eventType: {{EventName}}Type, aggregateId: string, data: any, metadata?: any): void {
+    const event: {{EventName}}Payload = {
+      eventId: this.generateEventId(),
+      eventType,
+      timestamp: new Date().toISOString(),
+      aggregateId,
+      version: 1,
+      data,
+      metadata,
+    };
+
+    this.eventBus.publish(event);
+  }
+
+  private generateEventId(): string {
+    return `evt-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  }
+}
+
+// Example concrete handler
+export class {{EventName}}ServiceHandler extends {{EventName}}Handler {
+  protected registerHandlers(): void {
+    this.eventBus.subscribe({{EventName}}Type.CREATED, this.handleCreated.bind(this));
+    this.eventBus.subscribe({{EventName}}Type.UPDATED, this.handleUpdated.bind(this));
+    this.eventBus.subscribe({{EventName}}Type.DELETED, this.handleDeleted.bind(this));
+  }
+
+  private async handleCreated(event: {{EventName}}Payload): Promise<void> {
+    console.log('Handling CREATED event:', event.eventId);
+    // Process the created event
+    // Update read models, trigger side effects, etc.
+  }
+
+  private async handleUpdated(event: {{EventName}}Payload): Promise<void> {
+    console.log('Handling UPDATED event:', event.eventId);
+    // Process the updated event
+  }
+
+  private async handleDeleted(event: {{EventName}}Payload): Promise<void> {
+    console.log('Handling DELETED event:', event.eventId);
+    // Process the deleted event
+  }
+}
+
+// Usage example
+const handler = new {{EventName}}ServiceHandler();
+
+// Publish an event
+const eventBus = EventBus.getInstance();
+eventBus.publish({
+  eventId: 'evt-123',
+  eventType: {{EventName}}Type.CREATED,
+  timestamp: new Date().toISOString(),
+  aggregateId: 'agg-456',
+  version: 1,
+  data: { name: 'Example' },
+  metadata: { userId: 'user-789' },
+});

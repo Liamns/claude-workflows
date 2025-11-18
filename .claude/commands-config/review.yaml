@@ -1,0 +1,178 @@
+# Review Command Configuration
+# Code Review 명령어 설정 (workflow-gates.json에서 이동)
+
+extends: "_base.yaml"
+
+# ============================================================================
+# COMMAND INFO
+# ============================================================================
+
+command: "review"
+type: "utility"
+description: "종합적인 코드 리뷰 - 파일, 디렉토리, git diff 분석"
+
+# ============================================================================
+# TRIGGERS
+# ============================================================================
+
+triggers:
+  - "코드 리뷰 요청"
+  - "커밋 전 검증"
+  - "PR 외부 리뷰"
+
+# ============================================================================
+# USAGE PROCESS
+# ============================================================================
+
+process:
+  - "/review [target] - 기본 리뷰"
+  - "/review [target] --adv - 심층 분석"
+  - "/review --staged - 스테이징 변경사항"
+  - "/review --diff main...HEAD - 브랜치 차이"
+
+# ============================================================================
+# MODEL SELECTION
+# ============================================================================
+
+model_selection:
+  complexity_threshold:
+    haiku: [0, 5]
+    sonnet: [6, 11]
+    opus: [12, null]
+
+  auto_upgrade_triggers:
+    - "security_issues"
+    - "breaking_changes"
+    - "architecture_violations"
+
+# ============================================================================
+# CONTEXT7 INTEGRATION
+# ============================================================================
+
+context7:
+  activation_threshold: 10
+  token_budget: 3000
+  advanced_mode_always: true
+
+# ============================================================================
+# AGENTS
+# ============================================================================
+
+agents:
+  core:
+    reviewer-unified:
+      enabled: true
+      focus:
+        - "security"
+        - "performance"
+        - "quality"
+        - "impact"
+      model: "sonnet"
+      includes:
+        - "code-review"
+        - "security-scan"
+        - "impact-analysis"
+
+    architect-unified:
+      enabled: true
+      mode: "validate"
+      detect_breaking: true
+      architectures:
+        - "FSD"
+        - "Clean"
+        - "Hexagonal"
+        - "DDD"
+
+  advanced:
+    reviewer-unified:
+      enabled: "with_adv_flag"
+      use_context7: true
+      max_depth: 5
+      deep_scan: true
+
+# ============================================================================
+# SKILLS
+# ============================================================================
+
+skills:
+  reusability-enforcer:
+    enabled: true
+    enforce_article_x: true
+    target_reuse_rate: 60
+    max_duplication: 5
+
+  test-coverage-analyzer:
+    enabled: "conditional"
+    trigger: "test_files_changed"
+    target_coverage: 80
+
+  code-metrics-collector:
+    enabled: true
+    collect:
+      - "complexity"
+      - "duplication"
+      - "volume"
+
+  dependency-tracer:
+    enabled: "with_adv_flag"
+    detect_circular: true
+    analyze_bundle: true
+
+# ============================================================================
+# OUTPUT FORMATS
+# ============================================================================
+
+output_formats:
+  summary:
+    default: true
+    length: "1_page"
+
+  detailed:
+    flag: "--format detailed"
+    length: "3-5_pages"
+
+  json:
+    flag: "--format json"
+    use_case: "CI/CD"
+
+# ============================================================================
+# CONSTITUTION INTEGRATION
+# ============================================================================
+
+constitution_integration:
+  enabled: true
+  check_articles:
+    - "I"
+    - "III"
+    - "X"
+  fallback: "generic_best_practices"
+
+# ============================================================================
+# RECOMMENDATIONS
+# ============================================================================
+
+recommendations:
+  LGTM:
+    criteria:
+      - "no_critical"
+      - "no_high"
+      - "warnings < 5"
+
+  NEEDS_WORK:
+    criteria:
+      - "high_issues > 0"
+      - "warnings > 5"
+
+  BLOCKED:
+    criteria:
+      - "critical_issues > 0"
+      - "security_vulnerabilities"
+
+# ============================================================================
+# ESTIMATED REVIEW TIME
+# ============================================================================
+
+estimated_review_time:
+  basic: "30-45s"
+  standard: "60-90s"
+  advanced: "2-3m"

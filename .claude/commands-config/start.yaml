@@ -1,0 +1,77 @@
+# Start Command Configuration
+# 프로젝트 초기화 및 Architecture 설정
+
+extends: "_base.yaml"
+
+# ============================================================================
+# COMMAND INFO
+# ============================================================================
+
+command: "start"
+type: "utility"
+description: "프로젝트 초기화, 아키텍처 설정, Constitution 확인"
+
+# ============================================================================
+# PREREQUISITES
+# ============================================================================
+
+prerequisites:
+  - git
+
+# ============================================================================
+# ARCHITECTURE DETECTION
+# ============================================================================
+
+architecture_detection:
+  enabled: true
+  auto_detect: true
+
+  supported_architectures:
+    - name: "FSD"
+      patterns:
+        - "src/app/"
+        - "src/pages/"
+        - "src/widgets/"
+        - "src/features/"
+        - "src/entities/"
+        - "src/shared/"
+
+    - name: "Clean"
+      patterns:
+        - "src/domain/"
+        - "src/application/"
+        - "src/infrastructure/"
+        - "src/presentation/"
+
+    - name: "Hexagonal"
+      patterns:
+        - "src/core/"
+        - "src/adapters/"
+        - "src/ports/"
+
+# ============================================================================
+# INITIALIZATION
+# ============================================================================
+
+initialization:
+  create_directories:
+    - ".claude/"
+    - ".claude/lib/"
+    - ".claude/hooks/"
+    - ".specify/"
+
+  create_files:
+    - path: ".claude/constitution.md"
+      template: "constitution-template.md"
+
+    - path: ".specify/README.md"
+      template: "specify-readme.md"
+
+# ============================================================================
+# CONSTITUTION CHECK
+# ============================================================================
+
+constitution:
+  check_existing: true
+  create_if_missing: true
+  validate_articles: true

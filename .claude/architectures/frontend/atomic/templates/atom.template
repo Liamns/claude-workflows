@@ -1,0 +1,28 @@
+/**
+ * {{AtomName}} Atom
+ *
+ * Atomic Design - Smallest UI building block
+ * Cannot be broken down further
+ *
+ * @package components/atoms
+ */
+
+import React from 'react';
+
+export const {{AtomName}}: React.FC<{{AtomName}}Props> = ({
+  children,
+  variant = 'default',
+  ...props
+}) => {
+  return (
+    <div className={`atom-{{atom-name}} atom-{{atom-name}}--${variant}`} {...props}>
+      {children}
+    </div>
+  );
+};
+
+interface {{AtomName}}Props {
+  children?: React.ReactNode;
+  variant?: 'default' | 'primary' | 'secondary';
+  className?: string;
+}

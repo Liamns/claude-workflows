@@ -29,8 +29,10 @@ Thumbs.db
 .claude/.backup/
 .claude/command/.backup/
 
-# Test outputs
-.claude/lib/__tests__/
+# Test outputs (not test files themselves)
+.claude/lib/__tests__/*.log
+.claude/lib/__tests__/temp/
+.claude/lib/__tests__/.coverage/
 
 # Node.js dependencies
 node_modules/

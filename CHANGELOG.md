@@ -7,6 +7,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.3.1] - 2025-01-18
+
+### Added
+- **Architecture Templates System** - Complete template library for all 14 architectures
+  - **Backend Templates** (15 templates):
+    - Clean Architecture: entity, useCase, repository templates
+    - Hexagonal: port, adapter templates
+    - DDD: aggregate, valueObject templates
+    - Layered: controller, service templates
+    - Serverless: httpFunction template
+  - **Frontend Templates** (6 templates):
+    - FSD: entity, feature templates
+    - Atomic Design: atom template
+    - MVC: model template
+    - Micro Frontend: module, shell, remote templates
+  - **Fullstack Templates** (9 templates):
+    - Monorepo: workspace, package, shared-lib templates
+    - JAMstack: page, api-route, static-generator templates
+    - Microservices: service, gateway, event templates
+  - **Mobile Templates** (6 templates):
+    - MVVM: viewmodel, view, model templates
+    - Clean Architecture Mobile: useCase, repository, screen templates
+- **Architecture Registry Sync Tool** (`.claude/lib/sync-architecture-registry.sh`)
+  - Automatic registry.json verification and consistency checking
+  - Scans all architecture config files and validates against registry
+  - Detects missing architectures, path mismatches, and orphaned entries
+  - Usage: `bash .claude/lib/sync-architecture-registry.sh --verify-only`
+- **Extended Test Coverage** - Added 5 new test suites (30 total tests)
+  - `test-sync-architecture-registry.sh` - Registry sync validation (7 tests)
+  - `test-config-loader.sh` - Configuration loading and merging (7 tests)
+  - `test-cache-helper.sh` - Cache management operations (7 tests)
+  - `test-branch-state-handler.sh` - Git branch state management (8 tests)
+  - `test-git-operations.sh` - Git operations and workflows (10 tests)
+  - Coverage increased from 14 to 19 core library scripts
+
+### Changed
+- **Architecture System Reorganization**
+  - Consolidated architecture configs to `.claude/architectures/` directory
+  - Added 8 new architecture configurations:
+    - Frontend: MVC/MVVM, Micro Frontend
+    - Backend: Serverless
+    - Fullstack: Monorepo, JAMstack, Microservices
+    - Mobile: MVVM, Clean Architecture Mobile
+  - Updated all architecture references from `architectures/` to `.claude/architectures/`
+  - Fixed FSD layer dependencies (removed widgets layer references)
+  - Fixed Clean Architecture dependencies (presentation layer)
+  - Updated `_base.yaml` documentation paths for all 14 architectures
+  - All 13 commands now properly inherit architecture settings from `_base.yaml`
+- Updated README.md version from v2.5.0 to v3.3.0
+- Regenerated `.claude/.checksums.json` with all new template files
+
+### Fixed
+- Architecture path references in CHANGELOG.md, README.md, install.sh
+- Registry.json synchronization with actual config files
+- Added missing Atomic Design architecture to `_base.yaml` documentation
+
 ## [3.3.0] - 2025-01-18
 
 ### Added
@@ -363,7 +419,7 @@ import type { OrderType } from '@/features/order';
 import { OrderList } from '@/features/order';
 ```
 
-자세한 내용: `architectures/frontend/fsd/fsd-architecture.mdc`
+자세한 내용: `.claude/architectures/frontend/fsd/fsd-architecture.mdc`
 
 ### Compatibility
 - Supports upgrade from 2.5.x, 2.6.x → 2.7.0

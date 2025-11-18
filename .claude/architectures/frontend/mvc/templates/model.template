@@ -1,0 +1,18 @@
+/**
+ * {{ModelName}} Model
+ * MVC - Data and business logic
+ */
+
+export class {{ModelName}} {
+  constructor(private data: {{ModelName}}Data) {}
+
+  getData() { return this.data; }
+
+  async save() {
+    await api.save(this.data);
+  }
+}
+
+interface {{ModelName}}Data {
+  id: string;
+}

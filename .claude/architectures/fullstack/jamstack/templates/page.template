@@ -1,0 +1,74 @@
+/**
+ * {{PageName}} Page
+ *
+ * JAMstack Architecture - Static page with client-side hydration
+ * Pre-rendered at build time with optional dynamic data
+ *
+ * @package pages
+ */
+
+import React from 'react';
+import { GetStaticProps, GetStaticPaths } from 'next';
+
+interface {{PageName}}Props {
+  data: {{PageName}}Data;
+  generatedAt: string;
+}
+
+export default function {{PageName}}({ data, generatedAt }: {{PageName}}Props) {
+  return (
+    <div className="{{page-name}}">
+      <h1>{data.title}</h1>
+      <p>Generated at: {generatedAt}</p>
+
+      {/* Client-side interactive components */}
+      <div className="interactive-content">
+        {/* Content here */}
+      </div>
+    </div>
+  );
+}
+
+// Static Generation - runs at build time
+export const getStaticProps: GetStaticProps = async (context) => {
+  // Fetch data from CMS, API, or file system
+  const data = await fetchDataFromCMS();
+
+  return {
+    props: {
+      data,
+      generatedAt: new Date().toISOString(),
+    },
+    // Incremental Static Regeneration (ISR)
+    revalidate: 60, // Revalidate every 60 seconds
+  };
+};
+
+// For dynamic routes
+export const getStaticPaths: GetStaticPaths = async () => {
+  const items = await fetchAllItems();
+
+  return {
+    paths: items.map(item => ({
+      params: { id: item.id }
+    })),
+    fallback: 'blocking', // or false, or true
+  };
+};
+
+interface {{PageName}}Data {
+  title: string;
+  // Add data structure
+}
+
+async function fetchDataFromCMS(): Promise<{{PageName}}Data> {
+  // Fetch from headless CMS, Markdown files, etc.
+  return {
+    title: 'Example Title',
+  };
+}
+
+async function fetchAllItems() {
+  // Return all items for static path generation
+  return [];
+}

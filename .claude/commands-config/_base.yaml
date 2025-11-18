@@ -1,0 +1,764 @@
+# Base Configuration for All Commands
+# All command configs inherit from this unless overridden
+
+version: "1.0.0"
+schema_version: "1.0"
+description: "모든 슬래시 커맨드의 기본 설정"
+
+# ============================================================================
+# DEFAULT SETTINGS (모든 명령어에 적용되는 기본값)
+# ============================================================================
+
+defaults:
+  # 실행 설정
+  execution:
+    timeout: 300  # 5분 기본 타임아웃
+    shell: "bash"
+    error_handling: "fail_fast"  # fail_fast | continue | prompt
+
+  # 대화형 설정
+  interactive:
+    enabled: true
+    confirmation_required: false
+    progress_display: true
+
+  # 검증 설정
+  validation:
+    pre_checks: true   # 실행 전 검증
+    post_checks: true  # 실행 후 검증
+    type_check: true   # TypeScript 타입 체크
+
+  # Git 통합
+  git:
+    auto_detect_branch: true
+    auto_detect_changes: true
+    require_clean_state: false
+
+  # 출력 설정
+  output:
+    format: "markdown"
+    verbosity: "normal"  # quiet | normal | verbose | debug
+    log_file: ".claude/logs/command-execution.log"
+    show_timestamps: true
+
+# ============================================================================
+# SHARED UTILITIES (모든 명령어에서 사용 가능한 유틸리티)
+# ============================================================================
+
+shared_utilities:
+  - name: "config-loader"
+    path: ".claude/lib/config-loader.sh"
+    description: "YAML 설정 파일 로더"
+
+  - name: "command-runner"
+    path: ".claude/lib/command-runner.sh"
+    description: "통합 명령어 실행기"
+
+  - name: "interactive-prompt"
+    path: ".claude/lib/interactive-prompt.sh"
+    description: "대화형 프롬프트 유틸리티"
+
+  - name: "git-operations"
+    path: ".claude/lib/git-operations.sh"
+    description: "Git 작업 유틸리티"
+
+  - name: "validation"
+    path: ".claude/lib/validation-config.sh"
+    description: "검증 유틸리티"
+
+# ============================================================================
+# SHARED HOOKS (공통 훅)
+# ============================================================================
+
+shared_hooks:
+  pre_execution:
+    - type: "validation"
+      script: ".claude/hooks/validators/check-prerequisites.sh"
+      description: "필수 도구 확인"
+      fail_on_error: false
+
+  post_execution:
+    - type: "logging"
+      script: ".claude/hooks/post-command/log-execution.sh"
+      description: "실행 로그 기록"
+      fail_on_error: false
+
+# ============================================================================
+# COMMON PROMPTS (공통 프롬프트 설정)
+# ============================================================================
+
+prompts:
+  # 확인 프롬프트
+  confirmation:
+    default_timeout: 30  # 초
+    default_action: "cancel"  # cancel | proceed
+    style: "yes_no"  # yes_no | continue_cancel
+
+  # 선택 프롬프트
+  selection:
+    display_style: "numbered"  # numbered | lettered | checkbox
+    allow_multiple: false
+    search_enabled: false
+    show_preview: true
+
+# ============================================================================
+# ERROR MESSAGES (공통 에러 메시지)
+# ============================================================================
+
+error_messages:
+  missing_config: "⚠️  설정 파일을 찾을 수 없습니다: {file}"
+  invalid_yaml: "⚠️  잘못된 YAML 문법: {file}"
+  missing_prerequisite: "⚠️  필수 도구가 설치되지 않았습니다: {tool}"
+  validation_failed: "⚠️  검증 실패: {reason}"
+  timeout: "⚠️  시간 초과 ({timeout}초)"
+  permission_denied: "⚠️  권한이 없습니다: {resource}"
+
+# ============================================================================
+# SUCCESS MESSAGES (공통 성공 메시지)
+# ============================================================================
+
+success_messages:
+  execution_complete: "✅ 명령어 실행 완료"
+  validation_passed: "✅ 검증 통과"
+  file_created: "✅ 파일 생성: {file}"
+  file_updated: "✅ 파일 업데이트: {file}"
+
+# ============================================================================
+# LOGGING (로깅 설정)
+# ============================================================================
+
+logging:
+  enabled: true
+  level: "info"  # debug | info | warn | error
+  format: "[{timestamp}] [{level}] {command}: {message}"
+  max_file_size: "10MB"
+  max_files: 5
+  rotate: true
+
+# ============================================================================
+# PERFORMANCE (성능 설정)
+# ============================================================================
+
+performance:
+  enable_caching: true
+  cache_ttl: 3600  # 1시간
+  parallel_execution: false  # 기본값은 순차 실행
+  max_parallel_tasks: 3
+
+# ============================================================================
+# SECURITY (보안 설정)
+# ============================================================================
+
+security:
+  allow_shell_execution: true
+  restrict_file_access: false
+  allowed_directories:
+    - ".claude/"
+    - "src/"
+    - ".specify/"
+  blocked_patterns:
+    - "*.env"
+    - "*.key"
+    - "*.pem"
+    - "*secret*"
+    - "*password*"
+
+# ============================================================================
+# ARCHITECTURE DETECTION & ENFORCEMENT (아키텍처 자동 감지 및 강제)
+# ============================================================================
+
+architecture:
+  # 자동 감지 설정
+  auto_detection:
+    enabled: true
+    scan_on_init: true
+    cache_result: true
+    cache_duration: 3600  # 1시간
+
+  # 감지 우선순위 (여러 아키텍처가 혼재된 경우)
+  detection_priority:
+    - "FSD"
+    - "Clean"
+    - "Hexagonal"
+    - "DDD"
+    - "MVC"
+    - "Layered"
+    - "Custom"
+
+  # 아키텍처 강제 적용
+  enforcement:
+    enabled: true
+    strict_mode: false  # true: 규칙 위반 시 실행 중단 | false: 경고만 표시
+    auto_fix: true      # 자동 수정 시도
+    report_violations: true
+
+  # 지원 아키텍처 정의
+  supported_architectures:
+    # ========================================================================
+    # FSD (Feature-Sliced Design)
+    # ========================================================================
+    FSD:
+      name: "Feature-Sliced Design"
+      description: "도메인 중심의 계층형 아키텍처"
+
+      detection_patterns:
+        required_directories:
+          - "src/app"
+          - "src/pages"
+          - "src/features"
+          - "src/entities"
+          - "src/shared"
+        optional_directories:
+          - "src/processes"
+
+      layer_hierarchy:
+        - "app"       # 최상위 레이어
+        - "processes"
+        - "pages"
+        - "features"
+        - "entities"
+        - "shared"    # 최하위 레이어
+
+      rules:
+        dependency_direction: "top-down"  # 상위 레이어만 하위 레이어 import 가능
+        cross_layer_import: false         # 동일 레벨 간 import 금지
+
+        allowed_dependencies:
+          app: ["processes", "pages", "features", "entities", "shared"]
+          processes: ["pages", "features", "entities", "shared"]
+          pages: ["features", "entities", "shared"]
+          features: ["entities", "shared"]
+          entities: ["shared"]
+          shared: []
+
+        naming_conventions:
+          segment_pattern: "^[a-z][a-z0-9-]*$"  # kebab-case
+          slice_pattern: "^[a-z][a-z0-9-]*$"
+          file_pattern: "^[a-z][a-zA-Z0-9]*\\.(ts|tsx|js|jsx)$"  # camelCase or PascalCase
+
+        file_structure:
+          segment_files:
+            - "index.ts"      # Public API
+            - "model/"        # Business logic
+            - "ui/"           # UI components
+            - "api/"          # API calls
+            - "lib/"          # Utilities
+            - "config/"       # Configuration
+
+      validation_rules:
+        - type: "import_validation"
+          description: "상위 레이어는 하위 레이어만 import"
+          severity: "error"
+
+        - type: "public_api_validation"
+          description: "각 세그먼트는 index.ts를 통해 export"
+          severity: "warning"
+
+        - type: "cross_slice_import"
+          description: "동일 레이어 내 slice 간 직접 import 금지"
+          severity: "error"
+
+    # ========================================================================
+    # Clean Architecture
+    # ========================================================================
+    Clean:
+      name: "Clean Architecture"
+      description: "의존성 역전 원칙 기반 아키텍처"
+
+      detection_patterns:
+        required_directories:
+          - "src/domain"
+          - "src/application"
+          - "src/infrastructure"
+          - "src/presentation"
+
+      layer_hierarchy:
+        - "presentation"    # Outer
+        - "infrastructure"
+        - "application"
+        - "domain"          # Inner (Core)
+
+      rules:
+        dependency_direction: "inward"  # 외부 → 내부만 허용
+
+        allowed_dependencies:
+          presentation: ["application"]
+          infrastructure: ["application", "domain"]
+          application: ["domain"]
+          domain: []
+
+        naming_conventions:
+          entity_suffix: "Entity"
+          use_case_suffix: "UseCase"
+          repository_suffix: "Repository"
+          service_suffix: "Service"
+
+        file_structure:
+          domain:
+            - "entities/"
+            - "value-objects/"
+            - "repositories/"      # Interfaces only
+            - "services/"          # Domain services
+          application:
+            - "use-cases/"
+            - "dto/"
+            - "ports/"
+          infrastructure:
+            - "repositories/"      # Implementations
+            - "database/"
+            - "external-services/"
+          presentation:
+            - "controllers/"
+            - "views/"
+            - "presenters/"
+
+      validation_rules:
+        - type: "dependency_inversion"
+          description: "domain 레이어는 외부 의존성 없음"
+          severity: "error"
+
+        - type: "interface_segregation"
+          description: "Repository는 인터페이스로 정의"
+          severity: "error"
+
+    # ========================================================================
+    # Hexagonal Architecture (Ports & Adapters)
+    # ========================================================================
+    Hexagonal:
+      name: "Hexagonal Architecture"
+      description: "Ports & Adapters 패턴"
+
+      detection_patterns:
+        required_directories:
+          - "src/core"
+          - "src/ports"
+          - "src/adapters"
+
+      rules:
+        allowed_dependencies:
+          adapters: ["ports", "core"]
+          ports: ["core"]
+          core: []
+
+        naming_conventions:
+          port_suffix: "Port"
+          adapter_suffix: "Adapter"
+
+        file_structure:
+          core:
+            - "domain/"
+            - "services/"
+          ports:
+            - "input/"        # Primary/Driving ports
+            - "output/"       # Secondary/Driven ports
+          adapters:
+            - "input/"        # Controllers, CLI, etc.
+            - "output/"       # Database, API clients, etc.
+
+    # ========================================================================
+    # DDD (Domain-Driven Design)
+    # ========================================================================
+    DDD:
+      name: "Domain-Driven Design"
+      description: "도메인 주도 설계"
+
+      detection_patterns:
+        required_directories:
+          - "src/domain"
+        pattern_keywords:
+          - "aggregate"
+          - "bounded-context"
+          - "value-object"
+
+      rules:
+        naming_conventions:
+          aggregate_suffix: "Aggregate"
+          value_object_suffix: "VO"
+          domain_event_suffix: "Event"
+          repository_suffix: "Repository"
+
+        file_structure:
+          domain:
+            - "aggregates/"
+            - "value-objects/"
+            - "domain-events/"
+            - "repositories/"
+            - "services/"
+
+        bounded_context_isolation: true
+
+    # ========================================================================
+    # MVC (Model-View-Controller)
+    # ========================================================================
+    MVC:
+      name: "Model-View-Controller"
+      description: "전통적인 MVC 패턴"
+
+      detection_patterns:
+        required_directories:
+          - "src/models"
+          - "src/views"
+          - "src/controllers"
+
+      rules:
+        allowed_dependencies:
+          controllers: ["models", "views"]
+          views: ["models"]
+          models: []
+
+    # ========================================================================
+    # Layered Architecture
+    # ========================================================================
+    Layered:
+      name: "Layered Architecture"
+      description: "계층형 아키텍처"
+
+      detection_patterns:
+        required_directories:
+          - "src/api"
+          - "src/business"
+          - "src/data"
+
+      layer_hierarchy:
+        - "api"
+        - "business"
+        - "data"
+
+      rules:
+        dependency_direction: "top-down"
+
+  # 파일 작업 시 아키텍처 규칙 적용
+  file_operations:
+    # 파일 생성 시
+    on_create:
+      validate_location: true      # 올바른 레이어/디렉토리인지 검증
+      validate_naming: true        # 명명 규칙 준수 검증
+      suggest_location: true       # 잘못된 위치면 올바른 위치 제안
+      auto_create_index: true      # index.ts 자동 생성/업데이트 (FSD)
+
+    # 파일 수정 시
+    on_modify:
+      validate_imports: true       # import 구문 검증
+      check_dependencies: true     # 의존성 방향 검증
+      warn_on_violation: true      # 규칙 위반 시 경고
+
+    # Import 추가 시
+    on_import:
+      validate_direction: true     # 의존성 방향 검증
+      suggest_interface: true      # 직접 의존 대신 인터페이스 제안
+      check_circular: true         # 순환 참조 검사
+
+  # 자동 수정 (auto_fix: true일 때)
+  auto_fix_actions:
+    wrong_layer:
+      action: "move_file"
+      prompt_user: true
+
+    invalid_import:
+      action: "suggest_alternative"
+      prompt_user: true
+
+    missing_index:
+      action: "create_index"
+      prompt_user: false
+
+    wrong_naming:
+      action: "rename_file"
+      prompt_user: true
+
+  # 검증 보고서
+  validation_report:
+    enabled: true
+    output_format: "markdown"
+    include:
+      - "architecture_type"
+      - "violations_count"
+      - "violations_details"
+      - "suggestions"
+      - "compliance_score"    # 0-100%
+
+    severity_levels:
+      error: "❌"
+      warning: "⚠️"
+      info: "ℹ️"
+
+  # 아키텍처 문서 자동 참조
+  documentation:
+    auto_reference: true
+    registry_path: ".claude/architectures/registry.json"
+    base_path: ".claude/architectures/"
+
+    # 주요 아키텍처 문서 및 config 위치
+    available_docs:
+      FSD:
+        config: ".claude/architectures/frontend/fsd/config.json"
+        guide: ".claude/architectures/frontend/fsd/fsd-architecture.mdc"
+      Atomic:
+        config: ".claude/architectures/frontend/atomic/config.json"
+      Clean:
+        config: ".claude/architectures/backend/clean/config.json"
+      Hexagonal:
+        config: ".claude/architectures/backend/hexagonal/config.json"
+      DDD:
+        config: ".claude/architectures/backend/ddd/config.json"
+      Layered:
+        config: ".claude/architectures/backend/layered/config.json"
+      MVC:
+        config: ".claude/architectures/frontend/mvc/config.json"
+      MicroFrontend:
+        config: ".claude/architectures/frontend/micro-frontend/config.json"
+      Serverless:
+        config: ".claude/architectures/backend/serverless/config.json"
+      Monorepo:
+        config: ".claude/architectures/fullstack/monorepo/config.json"
+      JAMstack:
+        config: ".claude/architectures/fullstack/jamstack/config.json"
+      Microservices:
+        config: ".claude/architectures/fullstack/microservices/config.json"
+      MVVM:
+        config: ".claude/architectures/mobile/mvvm/config.json"
+      CleanMobile:
+        config: ".claude/architectures/mobile/clean/config.json"
+
+    # 일반 아키텍처 가이드
+    general_guide: ".claude/docs/ARCHITECTURE-GUIDE.md"
+
+# ============================================================================
+# CODE REUSABILITY ENFORCEMENT (코드 재사용성 강제)
+# ============================================================================
+
+reusability:
+  # 재사용성 검사 활성화
+  enforcement:
+    enabled: true
+    mandatory: true           # true: 재사용 가능한 코드 발견 시 반드시 사용
+    auto_search: true         # 코드 작성 전 자동으로 기존 코드 검색
+    show_suggestions: true    # 재사용 가능한 코드 제안 표시
+
+  # 검색 전략
+  search_strategy:
+    # 검색 범위
+    scope:
+      - "src/"
+      - "lib/"
+      - "shared/"
+      - "common/"
+      - "utils/"
+      - "helpers/"
+
+    # 검색 대상
+    search_for:
+      - type: "components"
+        patterns:
+          - "**/*Component.tsx"
+          - "**/*Component.ts"
+          - "**/components/**/*.tsx"
+        similarity_threshold: 0.75  # 75% 이상 유사하면 재사용 권장
+
+      - type: "hooks"
+        patterns:
+          - "**/use*.ts"
+          - "**/use*.tsx"
+          - "**/hooks/**/*.ts"
+        similarity_threshold: 0.80
+
+      - type: "utilities"
+        patterns:
+          - "**/utils/**/*.ts"
+          - "**/helpers/**/*.ts"
+          - "**/*Utils.ts"
+          - "**/*Helper.ts"
+        similarity_threshold: 0.70
+
+      - type: "services"
+        patterns:
+          - "**/services/**/*.ts"
+          - "**/*Service.ts"
+          - "**/api/**/*.ts"
+        similarity_threshold: 0.75
+
+      - type: "types"
+        patterns:
+          - "**/types/**/*.ts"
+          - "**/*.types.ts"
+          - "**/interfaces/**/*.ts"
+        similarity_threshold: 0.85
+
+      - type: "constants"
+        patterns:
+          - "**/constants/**/*.ts"
+          - "**/*Constants.ts"
+          - "**/config/**/*.ts"
+        similarity_threshold: 0.90
+
+    # 검색 방법
+    search_methods:
+      - "semantic_search"      # 의미 기반 검색 (이름, 설명)
+      - "pattern_matching"     # 코드 패턴 매칭
+      - "type_signature"       # 타입 시그니처 매칭
+      - "functionality"        # 기능 유사도 분석
+
+    # 제외 패턴
+    exclude_patterns:
+      - "**/node_modules/**"
+      - "**/*.test.ts"
+      - "**/*.spec.ts"
+      - "**/dist/**"
+      - "**/build/**"
+      - "**/__tests__/**"
+
+  # 검색 트리거
+  triggers:
+    # 새 파일 생성 전
+    before_create:
+      enabled: true
+      search_depth: "deep"      # shallow | medium | deep
+      min_matches: 1            # 최소 1개 이상 찾으면 제안
+
+    # 함수/컴포넌트 작성 전
+    before_write_function:
+      enabled: true
+      check_patterns:
+        - "similar_name"        # 유사한 이름의 함수
+        - "similar_signature"   # 유사한 파라미터/리턴 타입
+        - "similar_logic"       # 유사한 로직 구조
+
+    # Import 추가 시
+    before_import:
+      enabled: true
+      suggest_alternatives: true  # 더 적합한 import 제안
+
+  # 재사용 권장 규칙
+  reuse_rules:
+    # 유틸리티 함수
+    utility_functions:
+      min_line_count: 3         # 3줄 이상 중복 시 유틸리티로 분리
+      max_duplication: 2        # 2번 이상 중복 시 재사용 강제
+      suggest_location: "src/shared/lib/"
+
+    # UI 컴포넌트
+    ui_components:
+      min_jsx_lines: 5          # 5줄 이상 JSX 중복 시 컴포넌트로 분리
+      max_duplication: 2
+      suggest_location: "src/shared/ui/"
+
+    # 커스텀 훅
+    custom_hooks:
+      detect_patterns:
+        - "useState"
+        - "useEffect"
+        - "useCallback"
+      min_line_count: 5
+      suggest_location: "src/shared/hooks/"
+
+    # 타입 정의
+    type_definitions:
+      max_duplication: 1        # 한 번이라도 중복 시 공통 타입으로
+      suggest_location: "src/shared/types/"
+
+    # API 클라이언트
+    api_clients:
+      detect_patterns:
+        - "fetch"
+        - "axios"
+        - "api.get"
+        - "api.post"
+      max_duplication: 1
+      suggest_location: "src/shared/api/"
+
+  # 재사용성 메트릭
+  metrics:
+    enabled: true
+    track:
+      - "reuse_rate"            # 재사용률 (재사용된 코드 / 전체 코드)
+      - "duplication_rate"      # 중복률
+      - "shared_components"     # 공유 컴포넌트 수
+      - "shared_utilities"      # 공유 유틸리티 수
+
+    target_metrics:
+      reuse_rate: ">= 40%"      # 목표: 40% 이상 재사용
+      duplication_rate: "< 5%"  # 목표: 5% 미만 중복
+
+  # 재사용 제안 형식
+  suggestion_format:
+    display_style: "detailed"   # simple | detailed | interactive
+
+    include_info:
+      - "file_path"             # 기존 코드 위치
+      - "similarity_score"      # 유사도 점수
+      - "usage_count"           # 기존 사용 횟수
+      - "last_modified"         # 마지막 수정일
+      - "code_preview"          # 코드 미리보기
+      - "usage_examples"        # 사용 예시
+
+    prompt_options:
+      - label: "재사용하기"
+        action: "import_existing"
+      - label: "수정해서 사용"
+        action: "extend_existing"
+      - label: "새로 작성 (이유 필요)"
+        action: "create_new"
+        require_justification: true
+
+  # DRY (Don't Repeat Yourself) 검증
+  dry_validation:
+    enabled: true
+
+    checks:
+      - type: "duplicate_code"
+        threshold: 6            # 6줄 이상 중복 감지
+        severity: "warning"
+
+      - type: "similar_logic"
+        threshold: 0.80         # 80% 이상 유사한 로직
+        severity: "warning"
+
+      - type: "repeated_patterns"
+        patterns:
+          - "if-else chains > 3"
+          - "switch cases > 5"
+          - "repeated API calls"
+        severity: "info"
+
+  # 자동 리팩토링 제안
+  auto_refactoring:
+    enabled: true
+    suggest_only: true          # true: 제안만 | false: 자동 적용
+
+    strategies:
+      - name: "extract_utility"
+        description: "중복 로직을 유틸리티 함수로 추출"
+        min_occurrences: 2
+
+      - name: "extract_component"
+        description: "중복 UI를 컴포넌트로 추출"
+        min_occurrences: 2
+
+      - name: "extract_hook"
+        description: "중복 상태 로직을 커스텀 훅으로 추출"
+        min_occurrences: 2
+
+      - name: "consolidate_types"
+        description: "중복 타입 정의를 통합"
+        min_occurrences: 1
+
+  # 재사용 보고서
+  reporting:
+    enabled: true
+    format: "markdown"
+
+    sections:
+      - "search_results"        # 검색된 재사용 가능 코드
+      - "reuse_opportunities"   # 재사용 기회
+      - "duplication_warnings"  # 중복 경고
+      - "refactoring_suggestions"  # 리팩토링 제안
+      - "metrics_summary"       # 메트릭 요약
+
+    output_location: ".claude/reports/reusability/"
+
+  # 스킬 통합
+  skill_integration:
+    reusability_enforcer:
+      enabled: true
+      auto_invoke: true         # 코드 작성 전 자동 실행
+      path: ".claude/skills/reusability-enforcer"

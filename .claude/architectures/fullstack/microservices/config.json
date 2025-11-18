@@ -1,0 +1,265 @@
+{
+  "name": "Microservices Architecture",
+  "type": "fullstack",
+  "version": "1.0.0",
+  "description": "Distributed services architecture with independent deployment and scaling",
+
+  "structure": {
+    "directories": {
+      "services": "Individual microservices",
+      "api-gateway": "API gateway and routing",
+      "shared": "Shared libraries and contracts",
+      "infrastructure": "Infrastructure as Code",
+      "monitoring": "Observability and monitoring",
+      "docs": "API documentation and diagrams"
+    },
+    "namingConventions": {
+      "service": "kebab-case",
+      "endpoint": "kebab-case",
+      "event": "PascalCase"
+    },
+    "fileExtensions": {
+      "typescript": ["ts"],
+      "javascript": ["js"],
+      "python": ["py"],
+      "go": ["go"],
+      "java": ["java"]
+    }
+  },
+
+  "components": {
+    "services": {
+      "description": "Independent, deployable business capabilities",
+      "structure": {
+        "src": "Service source code",
+        "api": "REST/GraphQL/gRPC endpoints",
+        "domain": "Business logic",
+        "data": "Data access layer",
+        "events": "Event publishers/subscribers",
+        "tests": "Service tests",
+        "Dockerfile": "Container definition"
+      },
+      "rules": {
+        "singleResponsibility": true,
+        "independentDatabase": true,
+        "autonomousDeployment": true,
+        "looseCoupling": true
+      }
+    },
+    "apiGateway": {
+      "description": "Single entry point for all client requests",
+      "responsibilities": [
+        "Request routing",
+        "Authentication and authorization",
+        "Rate limiting and throttling",
+        "Request/response transformation",
+        "Protocol translation"
+      ],
+      "tools": ["Kong", "Nginx", "AWS API Gateway", "Traefik"]
+    },
+    "serviceMesh": {
+      "description": "Infrastructure layer for service-to-service communication",
+      "features": [
+        "Service discovery",
+        "Load balancing",
+        "Circuit breaking",
+        "Distributed tracing",
+        "Mutual TLS"
+      ],
+      "tools": ["Istio", "Linkerd", "Consul"]
+    },
+    "messageQueue": {
+      "description": "Asynchronous communication between services",
+      "patterns": ["Pub/Sub", "Request/Reply", "Competing Consumers"],
+      "tools": ["RabbitMQ", "Apache Kafka", "AWS SQS/SNS", "NATS"]
+    }
+  },
+
+  "patterns": {
+    "databasePerService": {
+      "description": "Each service owns its database",
+      "benefits": ["Service independence", "Technology choice freedom"],
+      "challenges": ["Data consistency", "Cross-service queries"]
+    },
+    "saga": {
+      "description": "Distributed transaction management",
+      "types": ["Choreography-based", "Orchestration-based"],
+      "whenToUse": "Multi-service transactions requiring eventual consistency"
+    },
+    "cqrs": {
+      "description": "Command Query Responsibility Segregation",
+      "whenToUse": "Different read/write patterns, complex domain logic"
+    },
+    "eventSourcing": {
+      "description": "Store events instead of state",
+      "benefits": ["Complete audit trail", "Time travel", "Event replay"],
+      "whenToUse": "Complex domain, audit requirements"
+    },
+    "circuitBreaker": {
+      "description": "Prevent cascading failures",
+      "states": ["Closed", "Open", "Half-Open"],
+      "tools": ["Hystrix", "Resilience4j", "Polly"]
+    }
+  },
+
+  "communication": {
+    "synchronous": {
+      "rest": {
+        "description": "HTTP-based RESTful APIs",
+        "whenToUse": "Simple CRUD, public APIs",
+        "benefits": ["Simple", "Cacheable", "Stateless"]
+      },
+      "grpc": {
+        "description": "High-performance RPC framework",
+        "whenToUse": "Internal service communication, streaming",
+        "benefits": ["Fast", "Strongly typed", "Bidirectional streaming"]
+      },
+      "graphql": {
+        "description": "Flexible query language",
+        "whenToUse": "Complex data requirements, mobile apps",
+        "benefits": ["Flexible queries", "No over-fetching", "Strong typing"]
+      }
+    },
+    "asynchronous": {
+      "messageQueue": {
+        "description": "Queue-based messaging",
+        "patterns": ["Point-to-point", "Pub/Sub"],
+        "benefits": ["Decoupling", "Buffering", "Reliability"]
+      },
+      "eventStreaming": {
+        "description": "Event stream processing",
+        "tools": ["Apache Kafka", "AWS Kinesis"],
+        "benefits": ["Real-time", "Scalable", "Event replay"]
+      }
+    }
+  },
+
+  "dependencies": {
+    "allowed": {
+      "services": ["shared", "messageQueue"],
+      "apiGateway": ["services"],
+      "shared": []
+    },
+    "forbidden": {
+      "services": ["services"],
+      "shared": ["services", "apiGateway"]
+    },
+    "circular": false,
+    "principle": "Smart endpoints, dumb pipes"
+  },
+
+  "qualityRules": {
+    "serviceIndependence": {
+      "description": "Services must be independently deployable",
+      "severity": "error"
+    },
+    "dataOwnership": {
+      "description": "Each service owns its data, no shared databases",
+      "severity": "error"
+    },
+    "observability": {
+      "description": "Comprehensive logging, metrics, and tracing",
+      "severity": "error",
+      "pillars": ["Logs", "Metrics", "Traces"]
+    },
+    "resiliency": {
+      "description": "Implement circuit breakers, retries, timeouts",
+      "severity": "error",
+      "patterns": ["Circuit Breaker", "Retry", "Timeout", "Bulkhead"]
+    },
+    "apiVersioning": {
+      "description": "Versioned APIs for backward compatibility",
+      "severity": "warning"
+    }
+  },
+
+  "observability": {
+    "logging": {
+      "strategy": "Centralized logging",
+      "tools": ["ELK Stack", "Loki", "CloudWatch"],
+      "format": "Structured JSON logs"
+    },
+    "metrics": {
+      "strategy": "Time-series metrics collection",
+      "tools": ["Prometheus", "Grafana", "Datadog"],
+      "types": ["RED metrics", "USE metrics", "Business metrics"]
+    },
+    "tracing": {
+      "strategy": "Distributed tracing",
+      "tools": ["Jaeger", "Zipkin", "OpenTelemetry"],
+      "benefits": ["Request flow visualization", "Performance bottleneck identification"]
+    }
+  },
+
+  "deployment": {
+    "strategies": {
+      "blueGreen": "Zero-downtime deployment with two environments",
+      "canary": "Gradual rollout to subset of users",
+      "rollingUpdate": "Sequential update of instances"
+    },
+    "containerization": {
+      "tools": ["Docker", "containerd"],
+      "benefits": ["Consistency", "Isolation", "Portability"]
+    },
+    "orchestration": {
+      "kubernetes": "Container orchestration platform",
+      "features": ["Auto-scaling", "Self-healing", "Service discovery", "Rolling updates"]
+    }
+  },
+
+  "bestPractices": [
+    "Design services around business capabilities",
+    "Implement API gateway for external access",
+    "Use asynchronous messaging for inter-service communication",
+    "Implement distributed tracing and monitoring",
+    "Use circuit breakers to prevent cascading failures",
+    "Implement API versioning from day one",
+    "Automate deployment with CI/CD",
+    "Use service mesh for advanced networking",
+    "Implement centralized configuration",
+    "Design for failure and resiliency"
+  ],
+
+  "templates": {
+    "service": ".claude/architectures/fullstack/microservices/templates/service.template",
+    "apiGateway": ".claude/architectures/fullstack/microservices/templates/gateway.template",
+    "eventSchema": ".claude/architectures/fullstack/microservices/templates/event.template"
+  },
+
+  "references": [
+    {
+      "title": "Microservices.io - Patterns",
+      "url": "https://microservices.io/"
+    },
+    {
+      "title": "Kubernetes Documentation",
+      "url": "https://kubernetes.io/"
+    },
+    {
+      "title": "Microservice Patterns by Chris Richardson",
+      "url": "https://microservices.io/patterns/"
+    },
+    {
+      "title": "Building Microservices by Sam Newman",
+      "url": "https://samnewman.io/books/building_microservices/"
+    }
+  ],
+
+  "examples": [
+    {
+      "name": "E-commerce Platform",
+      "description": "User service, Product catalog, Order processing, Payment gateway",
+      "files": ["services/user/", "services/catalog/", "services/order/", "services/payment/", "api-gateway/"]
+    },
+    {
+      "name": "Social Media Platform",
+      "description": "Auth service, Post service, Feed service, Notification service",
+      "files": ["services/auth/", "services/posts/", "services/feed/", "services/notifications/"]
+    },
+    {
+      "name": "IoT Platform",
+      "description": "Device management, Data ingestion, Analytics, Alerting",
+      "files": ["services/devices/", "services/ingestion/", "services/analytics/", "services/alerts/"]
+    }
+  ]
+}

@@ -1,0 +1,140 @@
+/**
+ * {{ServiceName}} Microservice
+ *
+ * Microservices Architecture - Independent service
+ * Self-contained with own database and business logic
+ *
+ * @package services/{{service-name}}
+ */
+
+import express from 'express';
+import { createServer } from 'http';
+
+export class {{ServiceName}}Service {
+  private app: express.Application;
+  private server: any;
+  private port: number;
+
+  constructor(port: number = 3000) {
+    this.app = express();
+    this.port = port;
+    this.setupMiddleware();
+    this.setupRoutes();
+    this.setupHealthCheck();
+  }
+
+  private setupMiddleware() {
+    this.app.use(express.json());
+    this.app.use(express.urlencoded({ extended: true }));
+
+    // Request logging
+    this.app.use((req, res, next) => {
+      console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+      next();
+    });
+  }
+
+  private setupRoutes() {
+    // Business logic routes
+    this.app.get('/api/{{service-name}}', this.getAll.bind(this));
+    this.app.get('/api/{{service-name}}/:id', this.getById.bind(this));
+    this.app.post('/api/{{service-name}}', this.create.bind(this));
+    this.app.put('/api/{{service-name}}/:id', this.update.bind(this));
+    this.app.delete('/api/{{service-name}}/:id', this.delete.bind(this));
+  }
+
+  private setupHealthCheck() {
+    // Health check endpoint for service discovery
+    this.app.get('/health', (req, res) => {
+      res.json({
+        status: 'UP',
+        service: '{{service-name}}',
+        timestamp: new Date().toISOString(),
+      });
+    });
+
+    // Readiness check
+    this.app.get('/ready', async (req, res) => {
+      try {
+        await this.checkDependencies();
+        res.json({ ready: true });
+      } catch (error) {
+        res.status(503).json({ ready: false, error: error.message });
+      }
+    });
+  }
+
+  private async getAll(req: express.Request, res: express.Response) {
+    try {
+      // Implementation
+      res.json({ items: [] });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  private async getById(req: express.Request, res: express.Response) {
+    try {
+      const { id } = req.params;
+      // Implementation
+      res.json({ id });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  private async create(req: express.Request, res: express.Response) {
+    try {
+      const data = req.body;
+      // Implementation
+      res.status(201).json({ created: true });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  private async update(req: express.Request, res: express.Response) {
+    try {
+      const { id } = req.params;
+      const data = req.body;
+      // Implementation
+      res.json({ updated: true });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  private async delete(req: express.Request, res: express.Response) {
+    try {
+      const { id } = req.params;
+      // Implementation
+      res.json({ deleted: true });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  private async checkDependencies(): Promise<void> {
+    // Check database connection, external services, etc.
+  }
+
+  async start() {
+    this.server = createServer(this.app);
+    this.server.listen(this.port, () => {
+      console.log(`{{ServiceName}} service listening on port ${this.port}`);
+    });
+  }
+
+  async stop() {
+    if (this.server) {
+      this.server.close();
+    }
+  }
+}
+
+// Bootstrap
+const service = new {{ServiceName}}Service(
+  parseInt(process.env.PORT || '3000')
+);
+
+service.start();

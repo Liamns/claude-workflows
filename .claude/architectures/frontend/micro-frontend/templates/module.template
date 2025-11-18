@@ -1,0 +1,35 @@
+/**
+ * {{ModuleName}} Micro Frontend Module
+ *
+ * Micro Frontend Architecture - Independent deployable module
+ * Can be loaded remotely via Module Federation
+ *
+ * @package micro-frontends/{{module-name}}
+ */
+
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+
+// Module exports for remote consumption
+export { {{ModuleName}}App } from './App';
+export { routes as {{moduleName}}Routes } from './routes';
+
+// Standalone bootstrap for development
+const mount = (el: HTMLElement) => {
+  const root = createRoot(el);
+  root.render(
+    <React.StrictMode>
+      <{{ModuleName}}App />
+    </React.StrictMode>
+  );
+};
+
+// Development mode - mount immediately
+if (process.env.NODE_ENV === 'development') {
+  const devRoot = document.getElementById('{{module-name}}-dev-root');
+  if (devRoot) {
+    mount(devRoot);
+  }
+}
+
+export { mount };

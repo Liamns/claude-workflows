@@ -1,0 +1,90 @@
+/**
+ * {{ApiName}} API Route
+ *
+ * JAMstack Architecture - Serverless API endpoint
+ * Runs as serverless function (Vercel, Netlify Functions, etc.)
+ *
+ * @package pages/api
+ */
+
+import type { NextApiRequest, NextApiResponse } from 'next';
+
+type {{ApiName}}Response = {
+  success: boolean;
+  data?: any;
+  error?: string;
+};
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<{{ApiName}}Response>
+) {
+  // CORS headers (if needed)
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+
+  // Handle preflight
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  try {
+    switch (req.method) {
+      case 'GET':
+        return handleGet(req, res);
+      case 'POST':
+        return handlePost(req, res);
+      default:
+        return res.status(405).json({
+          success: false,
+          error: 'Method not allowed'
+        });
+    }
+  } catch (error) {
+    console.error('API Error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+}
+
+async function handleGet(
+  req: NextApiRequest,
+  res: NextApiResponse<{{ApiName}}Response>
+) {
+  const { query } = req;
+
+  // Fetch data from database, external API, etc.
+  const data = await fetchData(query);
+
+  return res.status(200).json({
+    success: true,
+    data
+  });
+}
+
+async function handlePost(
+  req: NextApiRequest,
+  res: NextApiResponse<{{ApiName}}Response>
+) {
+  const body = req.body;
+
+  // Process and store data
+  const result = await processData(body);
+
+  return res.status(201).json({
+    success: true,
+    data: result
+  });
+}
+
+async function fetchData(query: any) {
+  // Implementation
+  return {};
+}
+
+async function processData(body: any) {
+  // Implementation
+  return {};
+}

@@ -1,0 +1,38 @@
+/**
+ * {{EntityName}} Entity
+ *
+ * Domain entity representing core business logic
+ * Part of: Domain Layer (Clean Architecture)
+ *
+ * @package domain/entities
+ */
+
+export interface {{EntityName}}Props {
+  id: string;
+  // Add entity properties here
+}
+
+export class {{EntityName}} {
+  private constructor(
+    private readonly props: {{EntityName}}Props
+  ) {}
+
+  // Factory method
+  static create(props: Omit<{{EntityName}}Props, 'id'>): {{EntityName}} {
+    const id = generateId(); // Use your ID generation logic
+    return new {{EntityName}}({ ...props, id });
+  }
+
+  // Getters
+  get id(): string {
+    return this.props.id;
+  }
+
+  // Business logic methods
+  // Add domain methods here
+
+  // Validation
+  private validate(): void {
+    // Add validation logic
+  }
+}

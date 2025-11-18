@@ -1,0 +1,47 @@
+/**
+ * {{AggregateName}} Aggregate Root
+ *
+ * DDD - Aggregate pattern
+ * Encapsulates a cluster of domain objects
+ *
+ * @package domain/aggregates
+ */
+
+import { AggregateRoot } from '../base/AggregateRoot';
+import { {{DomainEvent}} } from '../events/{{DomainEvent}}';
+
+export class {{AggregateName}} extends AggregateRoot {
+  private constructor(
+    private id: string,
+    private props: {{AggregateName}}Props
+  ) {
+    super();
+  }
+
+  // Factory method
+  static create(props: {{AggregateName}}Props): {{AggregateName}} {
+    const aggregate = new {{AggregateName}}(generateId(), props);
+    aggregate.addDomainEvent(new {{AggregateName}}Created(aggregate.id));
+    return aggregate;
+  }
+
+  // Business methods that may emit domain events
+  performAction(): void {
+    // Business logic
+    this.addDomainEvent(new {{Action}}Performed(this.id));
+  }
+
+  // Invariants enforcement
+  private ensureInvariants(): void {
+    // Validate aggregate consistency
+  }
+
+  // Getters
+  get aggregateId(): string {
+    return this.id;
+  }
+}
+
+interface {{AggregateName}}Props {
+  // Aggregate properties
+}

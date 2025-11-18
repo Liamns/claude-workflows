@@ -1,0 +1,41 @@
+/**
+ * {{LibraryName}} Shared Library
+ *
+ * Monorepo Architecture - Shared utilities/components
+ * Used across multiple packages in the monorepo
+ *
+ * @package packages/shared-{{library-name}}
+ */
+
+// src/index.ts
+export * from './utils';
+export * from './types';
+export * from './constants';
+
+// src/utils/index.ts
+export const formatDate = (date: Date): string => {
+  return date.toISOString();
+};
+
+export const logger = {
+  info: (message: string) => console.log(`[INFO] ${message}`),
+  error: (message: string) => console.error(`[ERROR] ${message}`),
+  warn: (message: string) => console.warn(`[WARN] ${message}`),
+};
+
+// src/types/index.ts
+export interface CommonResponse<T = any> {
+  success: boolean;
+  data?: T;
+  error?: string;
+  timestamp: string;
+}
+
+export type Result<T, E = Error> =
+  | { ok: true; value: T }
+  | { ok: false; error: E };
+
+// src/constants/index.ts
+export const API_VERSION = 'v1';
+export const DEFAULT_TIMEOUT = 5000;
+export const MAX_RETRIES = 3;

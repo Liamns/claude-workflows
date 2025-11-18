@@ -1,0 +1,74 @@
+# Major Workflow Configuration
+# 신규 기능 추가, 아키텍처 변경 (2일 이상)
+
+extends: "_base.yaml"
+
+# ============================================================================
+# COMMAND INFO
+# ============================================================================
+
+command: "major"
+type: "workflow"
+workflow_definition: "workflow-gates.json#/workflows/major"
+
+description: "신규 기능 추가, 아키텍처 변경, API 엔드포인트 추가"
+
+# ============================================================================
+# PREREQUISITES
+# ============================================================================
+
+prerequisites:
+  - git
+  - node
+  - yarn
+
+# ============================================================================
+# WORKFLOW SETTINGS
+# ============================================================================
+
+workflow:
+  quality_level: "highest"
+  estimated_token_savings: "60%"
+
+  # Quality gates
+  gates:
+    pre_implementation:
+      - "reusability-search"
+      - "spec-quality"
+      - "test-plan"
+
+    during_implementation:
+      - "reusability-check"
+      - "architect-unified"
+      - "test-first"
+      - "type-safety"
+
+    post_implementation:
+      - "reusability-metrics"
+      - "code-review"
+      - "all-tests-pass"
+      - "build-success"
+
+# ============================================================================
+# AGENTS & SKILLS
+# ============================================================================
+
+agents:
+  - "architect-unified"
+  - "implementer-unified"
+  - "reviewer-unified"
+
+skills:
+  - "reusability-enforcer"
+  - "reusability-metrics"
+
+# ============================================================================
+# SPEC FILES
+# ============================================================================
+
+spec_files:
+  directory: ".specify/"
+  files:
+    - "spec.md"
+    - "plan.md"
+    - "tasks.md"

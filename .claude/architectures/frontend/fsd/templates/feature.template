@@ -1,0 +1,34 @@
+/**
+ * {{FeatureName}} Feature
+ *
+ * FSD - Feature layer
+ * User interaction and business features
+ *
+ * @package features/{{feature-name}}
+ */
+
+import React from 'react';
+import { use{{EntityName}} } from '@/entities/{{entity-name}}';
+
+export const {{FeatureName}}: React.FC<{{FeatureName}}Props> = ({ ...props }) => {
+  const { data, isLoading, actions } = use{{EntityName}}();
+
+  const handleAction = async () => {
+    await actions.performAction();
+  };
+
+  if (isLoading) return <div>Loading...</div>;
+
+  return (
+    <div className="{{feature-name}}">
+      {/* Feature UI */}
+      <button onClick={handleAction}>
+        Action
+      </button>
+    </div>
+  );
+};
+
+interface {{FeatureName}}Props {
+  // Props from pages layer only
+}

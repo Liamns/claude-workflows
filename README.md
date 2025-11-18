@@ -205,7 +205,7 @@ Shift+Tab  # Plan Mode 활성화
 ├── skills/        # 자동 활성화 스킬
 └── config/        # 설정 파일
 
-architectures/     # 아키텍처 템플릿
+.claude/architectures/     # 아키텍처 템플릿
 workflow-gates.json # 품질 게이트 설정
 ```
 
@@ -327,4 +327,4 @@ MIT License - 자유롭게 사용, 수정, 배포 가능
 
 ---
 
-**v2.5.0** | [GitHub](https://github.com/Liamns/claude-workflows) | Made with ❤️ for Claude Code
+**v3.3.0** | [GitHub](https://github.com/Liamns/claude-workflows) | Made with ❤️ for Claude Code

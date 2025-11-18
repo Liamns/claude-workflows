@@ -1,7 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft-07/schema#",
-  "version": "3.2.0",
+  "version": "3.3.1",
   "description": "워크플로우별 품질 게이트 설정",
+  "note": "이 파일은 Workflow 명령어(epic, major, minor, micro)의 품질 게이트만 정의합니다. Utility 명령어 설정은 .claude/commands-config/*.yaml에 정의됩니다.",
   "workflows": {
     "major": {
       "name": "Major (Unified Workflow)",
@@ -293,160 +294,135 @@
       },
       "estimated_token_savings": "85%",
       "quality_level": "standard"
-    }
-  },
-  "review": {
-    "name": "Code Review",
-    "description": "종합적인 코드 리뷰 - 파일, 디렉토리, git diff 분석",
-    "triggers": [
-      "코드 리뷰 요청",
-      "커밋 전 검증",
-      "PR 외부 리뷰"
-    ],
-    "process": [
-      "/review [target] - 기본 리뷰",
-      "/review [target] --adv - 심층 분석",
-      "/review --staged - 스테이징 변경사항",
-      "/review --diff main...HEAD - 브랜치 차이"
-    ],
-    "model_selection": {
-      "complexity_threshold": {
-        "haiku": [
-          0,
-          5
-        ],
-        "sonnet": [
-          6,
-          11
-        ],
-        "opus": [
-          12,
-          null
-        ]
-      },
-      "auto_upgrade_triggers": [
-        "security_issues",
-        "breaking_changes",
-        "architecture_violations"
-      ]
     },
-    "context7": {
-      "activation_threshold": 10,
-      "token_budget": 3000,
-      "advanced_mode_always": true
-    },
-    "agents": {
-      "core": {
-        "reviewer-unified": {
-          "enabled": true,
-          "focus": [
-            "security",
-            "performance",
-            "quality",
-            "impact"
-          ],
-          "model": "sonnet",
-          "includes": [
-            "code-review",
-            "security-scan",
-            "impact-analysis"
-          ]
-        },
-        "architect-unified": {
-          "enabled": true,
-          "mode": "validate",
-          "detect_breaking": true,
-          "architectures": [
-            "FSD",
-            "Clean",
-            "Hexagonal",
-            "DDD"
-          ]
-        }
-      },
-      "advanced": {
-        "reviewer-unified": {
-          "enabled": "with_adv_flag",
-          "use_context7": true,
-          "max_depth": 5,
-          "deep_scan": true
-        }
-      }
-    },
-    "skills": {
-      "reusability-enforcer": {
-        "enabled": true,
-        "enforce_article_x": true,
-        "target_reuse_rate": 60,
-        "max_duplication": 5
-      },
-      "test-coverage-analyzer": {
-        "enabled": "conditional",
-        "trigger": "test_files_changed",
-        "target_coverage": 80
-      },
-      "code-metrics-collector": {
-        "enabled": true,
-        "collect": [
-          "complexity",
-          "duplication",
-          "volume"
-        ]
-      },
-      "dependency-tracer": {
-        "enabled": "with_adv_flag",
-        "detect_circular": true,
-        "analyze_bundle": true
-      }
-    },
-    "output_formats": {
-      "summary": {
-        "default": true,
-        "length": "1_page"
-      },
-      "detailed": {
-        "flag": "--format detailed",
-        "length": "3-5_pages"
-      },
-      "json": {
-        "flag": "--format json",
-        "use_case": "CI/CD"
-      }
-    },
-    "constitution_integration": {
-      "enabled": true,
-      "check_articles": [
-        "I",
-        "III",
-        "X"
+    "epic": {
+      "name": "Epic (Large Initiative)",
+      "description": "여러 major를 포함하는 대규모 프로젝트, 1개월 이상 소요",
+      "triggers": [
+        "1개월 이상 소요 예상",
+        "여러 팀 협업 필요",
+        "5개 이상의 major 작업 포함",
+        "전사적 영향 또는 아키텍처 대변경"
       ],
-      "fallback": "generic_best_practices"
-    },
-    "recommendations": {
-      "LGTM": {
-        "criteria": [
-          "no_critical",
-          "no_high",
-          "warnings < 5"
-        ]
+      "process": [
+        "/epic [epic-name]",
+        "Epic 범위 및 목표 정의",
+        "하위 major/minor 작업 세분화",
+        "마일스톤 및 일정 수립",
+        "진행 상황 추적 및 조정"
+      ],
+      "gates": {
+        "pre-implementation": {
+          "epic-planning": {
+            "enabled": true,
+            "required": true,
+            "description": "Epic 계획 수립",
+            "criteria": [
+              "Epic 목표 및 범위 명확히 정의",
+              "성공 기준 (Success Criteria) 수립",
+              "주요 마일스톤 식별",
+              "의존성 및 위험 요소 파악"
+            ]
+          },
+          "stakeholder-approval": {
+            "enabled": true,
+            "required": true,
+            "description": "이해관계자 승인",
+            "criteria": [
+              "프로젝트 범위 합의",
+              "리소스 배정 승인",
+              "우선순위 확인"
+            ]
+          },
+          "work-breakdown": {
+            "enabled": true,
+            "required": true,
+            "description": "작업 분해 구조",
+            "criteria": [
+              "Major 작업 단위로 분해",
+              "각 작업별 예상 시간 산정",
+              "작업 간 의존성 매핑"
+            ]
+          },
+          "technical-feasibility": {
+            "enabled": true,
+            "required": true,
+            "description": "기술적 실현 가능성 검증",
+            "criteria": [
+              "기술 스택 선정",
+              "PoC 또는 Spike 완료",
+              "아키텍처 검토"
+            ]
+          }
+        },
+        "during-implementation": {
+          "milestone-tracking": {
+            "enabled": true,
+            "required": true,
+            "description": "마일스톤 진행 상황 추적",
+            "criteria": [
+              "주간 진행률 리포트",
+              "마일스톤 달성 여부 확인",
+              "블로커 및 리스크 관리"
+            ]
+          },
+          "cross-team-sync": {
+            "enabled": true,
+            "required": true,
+            "description": "팀 간 동기화",
+            "criteria": [
+              "정기적 동기화 미팅",
+              "통합 이슈 해결",
+              "커뮤니케이션 채널 유지"
+            ]
+          },
+          "quality-gates-inherited": {
+            "enabled": true,
+            "required": true,
+            "description": "하위 Major 작업의 품질 게이트 준수",
+            "criteria": [
+              "각 Major 작업이 major workflow gates 통과",
+              "통합 테스트 통과",
+              "전체 아키텍처 일관성 유지"
+            ]
+          }
+        },
+        "post-implementation": {
+          "epic-review": {
+            "enabled": true,
+            "required": true,
+            "description": "Epic 완료 후 회고",
+            "criteria": [
+              "목표 달성 여부 평가",
+              "성공 요인 및 개선점 도출",
+              "교훈 문서화"
+            ]
+          },
+          "documentation-update": {
+            "enabled": true,
+            "required": true,
+            "description": "문서 업데이트",
+            "agent": "documenter-unified",
+            "criteria": [
+              "아키텍처 문서 업데이트",
+              "README 및 가이드 갱신",
+              "Changelog 작성"
+            ]
+          },
+          "performance-validation": {
+            "enabled": true,
+            "required": true,
+            "description": "성능 검증",
+            "criteria": [
+              "성능 목표 달성 확인",
+              "부하 테스트 통과",
+              "모니터링 설정 완료"
+            ]
+          }
+        }
       },
-      "NEEDS_WORK": {
-        "criteria": [
-          "high_issues > 0",
-          "warnings > 5"
-        ]
-      },
-      "BLOCKED": {
-        "criteria": [
-          "critical_issues > 0",
-          "security_vulnerabilities"
-        ]
-      }
-    },
-    "estimated_review_time": {
-      "basic": "30-45s",
-      "standard": "60-90s",
-      "advanced": "2-3m"
+      "estimated_token_savings": "40%",
+      "quality_level": "highest"
     }
   },
   "common_gates": {

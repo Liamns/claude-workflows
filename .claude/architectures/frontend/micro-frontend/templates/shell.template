@@ -1,0 +1,36 @@
+/**
+ * {{ShellName}} Shell Application
+ *
+ * Micro Frontend Architecture - Host/Container application
+ * Orchestrates multiple micro frontends
+ *
+ * @package shell
+ */
+
+import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+// Dynamic imports for micro frontends
+const {{MicroFrontend1}} = React.lazy(() => import('{{remote1}}/{{ModuleName}}'));
+const {{MicroFrontend2}} = React.lazy(() => import('{{remote2}}/{{ModuleName}}'));
+
+export const {{ShellName}}: React.FC = () => {
+  return (
+    <BrowserRouter>
+      <div className="shell-container">
+        <header className="shell-header">
+          {/* Global navigation */}
+        </header>
+
+        <main className="shell-content">
+          <React.Suspense fallback={<div>Loading module...</div>}>
+            <Routes>
+              <Route path="/module1/*" element={<{{MicroFrontend1}} />} />
+              <Route path="/module2/*" element={<{{MicroFrontend2}} />} />
+            </Routes>
+          </React.Suspense>
+        </main>
+      </div>
+    </BrowserRouter>
+  );
+};

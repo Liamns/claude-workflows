@@ -1,0 +1,40 @@
+/**
+ * {{ValueObjectName}} Value Object
+ *
+ * DDD - Immutable value object
+ * Represents a descriptive aspect of the domain
+ *
+ * @package domain/value-objects
+ */
+
+export class {{ValueObjectName}} {
+  private readonly value: string | number;
+
+  private constructor(value: string | number) {
+    this.validate(value);
+    this.value = value;
+  }
+
+  static create(value: string | number): {{ValueObjectName}} {
+    return new {{ValueObjectName}}(value);
+  }
+
+  getValue(): string | number {
+    return this.value;
+  }
+
+  equals(other: {{ValueObjectName}}): boolean {
+    return this.value === other.value;
+  }
+
+  private validate(value: string | number): void {
+    if (!value) {
+      throw new Error('{{ValueObjectName}} cannot be empty');
+    }
+    // Add specific validation
+  }
+
+  toString(): string {
+    return String(this.value);
+  }
+}

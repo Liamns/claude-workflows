@@ -1,0 +1,116 @@
+/**
+ * {{ModelName}} Model
+ *
+ * MVVM Architecture - Model layer
+ * Business data and logic, independent of UI
+ *
+ * @package models
+ */
+
+// Domain Model
+export class {{ModelName}} {
+  constructor(
+    public readonly id: string,
+    public name: string,
+    public description: string,
+    public createdAt: Date,
+    public updatedAt: Date
+  ) {}
+
+  // Business logic methods
+  update(data: Partial<{{ModelName}}UpdateData>): void {
+    if (data.name !== undefined) {
+      this.validateName(data.name);
+      this.name = data.name;
+    }
+
+    if (data.description !== undefined) {
+      this.description = data.description;
+    }
+
+    this.updatedAt = new Date();
+  }
+
+  private validateName(name: string): void {
+    if (!name || name.trim().length === 0) {
+      throw new Error('Name cannot be empty');
+    }
+
+    if (name.length > 100) {
+      throw new Error('Name is too long');
+    }
+  }
+
+  // Domain rules
+  canBeDeleted(): boolean {
+    // Add business rules
+    return true;
+  }
+
+  // Serialization
+  toJSON(): {{ModelName}}JSON {
+    return {
+      id: this.id,
+      name: this.name,
+      description: this.description,
+      createdAt: this.createdAt.toISOString(),
+      updatedAt: this.updatedAt.toISOString(),
+    };
+  }
+
+  static fromJSON(json: {{ModelName}}JSON): {{ModelName}} {
+    return new {{ModelName}}(
+      json.id,
+      json.name,
+      json.description,
+      new Date(json.createdAt),
+      new Date(json.updatedAt)
+    );
+  }
+}
+
+// Update DTO
+export interface {{ModelName}}UpdateData {
+  name?: string;
+  description?: string;
+}
+
+// JSON representation
+export interface {{ModelName}}JSON {
+  id: string;
+  name: string;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Factory for creating models
+export class {{ModelName}}Factory {
+  static create(data: {{ModelName}}CreateData): {{ModelName}} {
+    return new {{ModelName}}(
+      this.generateId(),
+      data.name,
+      data.description || '',
+      new Date(),
+      new Date()
+    );
+  }
+
+  private static generateId(): string {
+    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  }
+}
+
+// Creation DTO
+export interface {{ModelName}}CreateData {
+  name: string;
+  description?: string;
+}
+
+// Repository interface (to be implemented in data layer)
+export interface I{{ModelName}}Repository {
+  findAll(): Promise<{{ModelName}}[]>;
+  findById(id: string): Promise<{{ModelName}} | null>;
+  save(model: {{ModelName}}): Promise<void>;
+  delete(id: string): Promise<void>;
+}

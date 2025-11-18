@@ -1,0 +1,46 @@
+/**
+ * {{FunctionName}} HTTP Function
+ *
+ * Serverless Architecture - HTTP triggered function
+ * AWS Lambda / Azure Functions / Google Cloud Functions
+ *
+ * @package functions
+ */
+
+export const handler = async (event: any, context: any) => {
+  console.log('Event:', JSON.stringify(event, null, 2));
+
+  try {
+    // Parse input
+    const input = parseInput(event);
+
+    // Execute business logic
+    const result = await executeBusinessLogic(input);
+
+    // Return response
+    return {
+      statusCode: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify(result)
+    };
+  } catch (error) {
+    console.error('Error:', error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: error.message })
+    };
+  }
+};
+
+function parseInput(event: any): any {
+  // Parse HTTP event (API Gateway, etc.)
+  return event.body ? JSON.parse(event.body) : event;
+}
+
+async function executeBusinessLogic(input: any): Promise<any> {
+  // Implement business logic
+  return { message: 'Success', data: input };
+}

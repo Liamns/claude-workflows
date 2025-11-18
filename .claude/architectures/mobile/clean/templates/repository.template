@@ -1,0 +1,168 @@
+/**
+ * {{RepositoryName}} Repository
+ *
+ * Clean Architecture Mobile - Repository (Data Layer)
+ * Implements domain repository interfaces and handles data sources
+ *
+ * @package data/repositories
+ */
+
+import { {{EntityName}}, I{{EntityName}}Repository } from '../../domain';
+import { {{EntityName}}Mapper } from '../mappers/{{EntityName}}Mapper';
+
+// Repository implementation
+export class {{RepositoryName}} implements I{{EntityName}}Repository {
+  constructor(
+    private readonly localDataSource: I{{EntityName}}LocalDataSource,
+    private readonly remoteDataSource: I{{EntityName}}RemoteDataSource,
+    private readonly mapper: {{EntityName}}Mapper
+  ) {}
+
+  async findById(id: string): Promise<{{EntityName}} | null> {
+    try {
+      // Try local cache first
+      const localData = await this.localDataSource.getById(id);
+      if (localData && !this.isStale(localData)) {
+        return this.mapper.toDomain(localData);
+      }
+
+      // Fetch from remote
+      const remoteData = await this.remoteDataSource.getById(id);
+
+      // Cache locally
+      await this.localDataSource.save(remoteData);
+
+      return this.mapper.toDomain(remoteData);
+    } catch (error) {
+      // Fallback to cached data on network error
+      const cachedData = await this.localDataSource.getById(id);
+      if (cachedData) {
+        return this.mapper.toDomain(cachedData);
+      }
+
+      throw error;
+    }
+  }
+
+  async findAll(): Promise<{{EntityName}}[]> {
+    try {
+      // Fetch from remote
+      const remoteData = await this.remoteDataSource.getAll();
+
+      // Update local cache
+      await this.localDataSource.saveAll(remoteData);
+
+      return remoteData.map(data => this.mapper.toDomain(data));
+    } catch (error) {
+      // Fallback to cached data on network error
+      const cachedData = await this.localDataSource.getAll();
+      return cachedData.map(data => this.mapper.toDomain(data));
+    }
+  }
+
+  async save(entity: {{EntityName}}): Promise<void> {
+    const dto = this.mapper.toDTO(entity);
+
+    // Save to remote first
+    await this.remoteDataSource.save(dto);
+
+    // Then update local cache
+    await this.localDataSource.save(dto);
+  }
+
+  async delete(id: string): Promise<void> {
+    // Delete from remote
+    await this.remoteDataSource.delete(id);
+
+    // Delete from local cache
+    await this.localDataSource.delete(id);
+  }
+
+  private isStale(data: {{EntityName}}DTO): boolean {
+    const ONE_HOUR = 60 * 60 * 1000;
+    const now = Date.now();
+    const dataTimestamp = new Date(data.cachedAt || 0).getTime();
+
+    return (now - dataTimestamp) > ONE_HOUR;
+  }
+}
+
+// Data Transfer Object
+export interface {{EntityName}}DTO {
+  id: string;
+  // Data properties
+  cachedAt?: string;
+}
+
+// Local data source interface (SQLite, AsyncStorage, etc.)
+export interface I{{EntityName}}LocalDataSource {
+  getById(id: string): Promise<{{EntityName}}DTO | null>;
+  getAll(): Promise<{{EntityName}}DTO[]>;
+  save(data: {{EntityName}}DTO): Promise<void>;
+  saveAll(data: {{EntityName}}DTO[]): Promise<void>;
+  delete(id: string): Promise<void>;
+  clear(): Promise<void>;
+}
+
+// Remote data source interface (REST API, GraphQL, etc.)
+export interface I{{EntityName}}RemoteDataSource {
+  getById(id: string): Promise<{{EntityName}}DTO>;
+  getAll(): Promise<{{EntityName}}DTO[]>;
+  save(data: {{EntityName}}DTO): Promise<{{EntityName}}DTO>;
+  delete(id: string): Promise<void>;
+}
+
+// Example local data source implementation
+export class {{EntityName}}LocalDataSource implements I{{EntityName}}LocalDataSource {
+  private storageKey = '@{{entity-name}}s';
+
+  async getById(id: string): Promise<{{EntityName}}DTO | null> {
+    const all = await this.getAll();
+    return all.find(item => item.id === id) || null;
+  }
+
+  async getAll(): Promise<{{EntityName}}DTO[]> {
+    try {
+      // Using AsyncStorage (React Native)
+      const data = await AsyncStorage.getItem(this.storageKey);
+      return data ? JSON.parse(data) : [];
+    } catch (error) {
+      console.error('Local storage error:', error);
+      return [];
+    }
+  }
+
+  async save(data: {{EntityName}}DTO): Promise<void> {
+    const all = await this.getAll();
+    const index = all.findIndex(item => item.id === data.id);
+
+    data.cachedAt = new Date().toISOString();
+
+    if (index >= 0) {
+      all[index] = data;
+    } else {
+      all.push(data);
+    }
+
+    await AsyncStorage.setItem(this.storageKey, JSON.stringify(all));
+  }
+
+  async saveAll(data: {{EntityName}}DTO[]): Promise<void> {
+    const timestamped = data.map(item => ({
+      ...item,
+      cachedAt: new Date().toISOString(),
+    }));
+
+    await AsyncStorage.setItem(this.storageKey, JSON.stringify(timestamped));
+  }
+
+  async delete(id: string): Promise<void> {
+    const all = await this.getAll();
+    const filtered = all.filter(item => item.id !== id);
+    await AsyncStorage.setItem(this.storageKey, JSON.stringify(filtered));
+  }
+
+  async clear(): Promise<void> {
+    await AsyncStorage.removeItem(this.storageKey);
+  }
+}

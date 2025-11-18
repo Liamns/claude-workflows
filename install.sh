@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Claude Code Workflows Installer
-# Version: 3.2.0 - Minor Release (Epic 009 Workflow System Improvements)
+# Version: 3.3.1 - Architecture Templates & Documentation Enhancement
 
 set -e
 
@@ -12,9 +12,17 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Version Configuration
-INSTALLER_VERSION="3.2.0"
-TARGET_VERSION="3.2.0"
+# Version Configuration - Read from .claude/.version if available
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -f "$SCRIPT_DIR/.claude/.version" ]; then
+    VERSION_FROM_FILE=$(cat "$SCRIPT_DIR/.claude/.version" | tr -d '[:space:]')
+    INSTALLER_VERSION="$VERSION_FROM_FILE"
+    TARGET_VERSION="$VERSION_FROM_FILE"
+else
+    # Fallback to hardcoded version
+    INSTALLER_VERSION="3.3.1"
+    TARGET_VERSION="3.3.1"
+fi
 
 # Repository Configuration
 REPO_URL="https://github.com/Liamns/claude-workflows"
@@ -42,7 +50,7 @@ print_header() {
     echo -e "${BLUE}╔════════════════════════════════════════╗${NC}"
     echo -e "${BLUE}║   Claude Code Workflows Installer     ║${NC}"
     echo -e "${BLUE}║   Version ${INSTALLER_VERSION}                        ║${NC}"
-    echo -e "${BLUE}║   Patch - Directory Creation Fix     ║${NC}"
+    echo -e "${BLUE}║   Architecture Templates & Docs       ║${NC}"
     echo -e "${BLUE}╚════════════════════════════════════════╝${NC}"
     echo ""
 }
@@ -828,7 +836,7 @@ install_workflows() {
         fi
         print_success "Architecture system installed (FSD, Atomic, Clean, Hexagonal, DDD 등)"
     else
-        print_warning "architectures/ directory not found in repository"
+        print_warning ".claude/architectures/ directory not found in repository"
     fi
 
     # Copy model optimization configs (v2.2.0, excluding deprecated and backup)
@@ -1079,7 +1087,7 @@ install_workflows() {
     echo "   │   ├── metrics/"
     echo "   │   └── workflow-history/"
     echo "   ├── docs/            (PROJECT-CONTEXT, 가이드 문서)"
-    echo "   ├── architectures/   (Multi-Architecture Support)"
+    echo "   ├── .claude/architectures/   (Multi-Architecture Support)"
     echo "   │   ├── frontend/    (FSD, Atomic Design)"
     echo "   │   ├── backend/     (Clean, Hexagonal, DDD)"
     echo "   │   └── fullstack/   (Monorepo, JAMstack)"

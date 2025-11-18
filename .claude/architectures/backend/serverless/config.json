@@ -1,0 +1,222 @@
+{
+  "name": "Serverless Architecture",
+  "type": "backend",
+  "version": "1.0.0",
+  "description": "Function-as-a-Service and event-driven serverless patterns",
+
+  "structure": {
+    "directories": {
+      "functions": "Individual serverless functions",
+      "layers": "Shared code and dependencies",
+      "events": "Event schemas and definitions",
+      "infrastructure": "IaC templates (SAM, Serverless, CDK)",
+      "shared": "Shared utilities and libraries",
+      "tests": "Function tests"
+    },
+    "namingConventions": {
+      "function": "kebab-case",
+      "handler": "camelCase",
+      "event": "PascalCase"
+    },
+    "fileExtensions": {
+      "typescript": ["ts"],
+      "javascript": ["js"],
+      "python": ["py"],
+      "go": ["go"],
+      "java": ["java"],
+      "csharp": ["cs"]
+    }
+  },
+
+  "components": {
+    "functions": {
+      "description": "Stateless compute functions triggered by events",
+      "structure": {
+        "handler": "Function entry point",
+        "business-logic": "Core logic separated from handler",
+        "dependencies": "External service clients",
+        "tests": "Unit and integration tests"
+      },
+      "rules": {
+        "stateless": true,
+        "singlePurpose": true,
+        "coldStartOptimized": true,
+        "timeoutAware": true
+      }
+    },
+    "layers": {
+      "description": "Shared code and runtime dependencies",
+      "canImport": [],
+      "rules": {
+        "versionControl": true,
+        "minimalSize": true,
+        "cacheable": true
+      }
+    },
+    "events": {
+      "description": "Event schemas and contracts",
+      "types": ["HTTP", "SQS", "SNS", "S3", "DynamoDB Streams", "EventBridge", "Scheduled"],
+      "rules": {
+        "schemaValidation": true,
+        "versionedContracts": true
+      }
+    }
+  },
+
+  "patterns": {
+    "apiGateway": {
+      "description": "HTTP API endpoints backed by Lambda functions",
+      "whenToUse": "REST APIs, GraphQL APIs, HTTP webhooks",
+      "components": ["API Gateway", "Lambda", "Authorizers"]
+    },
+    "eventDriven": {
+      "description": "Asynchronous event processing",
+      "whenToUse": "Background jobs, data processing, ETL",
+      "components": ["SQS", "SNS", "EventBridge", "Lambda"]
+    },
+    "streamProcessing": {
+      "description": "Real-time data stream processing",
+      "whenToUse": "Analytics, monitoring, real-time transformations",
+      "components": ["Kinesis", "DynamoDB Streams", "Lambda"]
+    },
+    "scheduled": {
+      "description": "Cron-like scheduled executions",
+      "whenToUse": "Batch jobs, cleanup tasks, reporting",
+      "components": ["EventBridge", "Lambda"]
+    }
+  },
+
+  "dependencies": {
+    "allowed": {
+      "functions": ["layers", "shared", "events"],
+      "layers": ["shared"],
+      "events": [],
+      "shared": []
+    },
+    "forbidden": {
+      "layers": ["functions"],
+      "shared": ["functions", "layers"],
+      "events": ["functions", "layers"]
+    },
+    "circular": false
+  },
+
+  "qualityRules": {
+    "statelessness": {
+      "description": "Functions must be completely stateless",
+      "severity": "error"
+    },
+    "coldStartOptimization": {
+      "description": "Minimize cold start time (< 1s for critical paths)",
+      "severity": "warning",
+      "checks": [
+        "Minimize dependencies",
+        "Use lazy loading",
+        "Consider provisioned concurrency"
+      ]
+    },
+    "timeoutConfiguration": {
+      "description": "Set appropriate timeout based on function purpose",
+      "severity": "error",
+      "recommendations": {
+        "api": "< 30s",
+        "async": "< 15min",
+        "default": "< 5min"
+      }
+    },
+    "errorHandling": {
+      "description": "Implement proper error handling and dead letter queues",
+      "severity": "error"
+    },
+    "observability": {
+      "description": "Structured logging and distributed tracing",
+      "severity": "warning",
+      "tools": ["CloudWatch", "X-Ray", "OpenTelemetry"]
+    },
+    "securityPrinciples": {
+      "description": "Least privilege IAM, secrets management, VPC when needed",
+      "severity": "error"
+    }
+  },
+
+  "bestPractices": {
+    "codeOrganization": [
+      "One function per file",
+      "Separate handler from business logic",
+      "Use dependency injection for testability"
+    ],
+    "performance": [
+      "Reuse connections outside handler",
+      "Use environment variables for config",
+      "Implement connection pooling",
+      "Cache frequently accessed data"
+    ],
+    "deployment": [
+      "Use Infrastructure as Code",
+      "Implement gradual deployments (canary/blue-green)",
+      "Version all functions",
+      "Tag resources for cost tracking"
+    ]
+  },
+
+  "frameworks": {
+    "serverless": {
+      "name": "Serverless Framework",
+      "description": "Multi-cloud serverless framework",
+      "configFile": "serverless.yml"
+    },
+    "sam": {
+      "name": "AWS SAM",
+      "description": "AWS-specific serverless framework",
+      "configFile": "template.yaml"
+    },
+    "cdk": {
+      "name": "AWS CDK",
+      "description": "Infrastructure as Code using programming languages",
+      "configFile": "cdk.json"
+    }
+  },
+
+  "templates": {
+    "httpFunction": ".claude/architectures/backend/serverless/templates/httpFunction.template",
+    "eventFunction": ".claude/architectures/backend/serverless/templates/eventFunction.template",
+    "layer": ".claude/architectures/backend/serverless/templates/layer.template"
+  },
+
+  "references": [
+    {
+      "title": "Serverless Framework Official Site",
+      "url": "https://www.serverless.com/"
+    },
+    {
+      "title": "AWS SAM Documentation",
+      "url": "https://aws.amazon.com/serverless/sam/"
+    },
+    {
+      "title": "AWS Lambda Best Practices",
+      "url": "https://docs.aws.amazon.com/lambda/latest/dg/best-practices.html"
+    },
+    {
+      "title": "AWS Well-Architected - Serverless",
+      "url": "https://aws.amazon.com/architecture/well-architected/serverless/"
+    }
+  ],
+
+  "examples": [
+    {
+      "name": "REST API",
+      "description": "API Gateway + Lambda for REST endpoints with DynamoDB",
+      "files": ["functions/users/", "functions/posts/", "infrastructure/api-gateway.yaml"]
+    },
+    {
+      "name": "Event Processing Pipeline",
+      "description": "S3 upload triggers Lambda for image processing, results to SQS",
+      "files": ["functions/image-processor/", "functions/thumbnail-generator/"]
+    },
+    {
+      "name": "Scheduled Batch Job",
+      "description": "EventBridge cron triggers Lambda for daily data sync",
+      "files": ["functions/daily-sync/", "infrastructure/eventbridge.yaml"]
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+# Minor Workflow Configuration
+# 버그 픽스, 기존 기능 개선 (1일 이하)
+
+extends: "_base.yaml"
+
+# ============================================================================
+# COMMAND INFO
+# ============================================================================
+
+command: "minor"
+type: "workflow"
+workflow_definition: "workflow-gates.json#/workflows/minor"
+
+description: "버그 픽스, 기존 기능 개선, UI 스타일 변경"
+
+# ============================================================================
+# PREREQUISITES
+# ============================================================================
+
+prerequisites:
+  - git
+  - yarn
+
+# ============================================================================
+# WORKFLOW SETTINGS
+# ============================================================================
+
+workflow:
+  quality_level: "high"
+  estimated_token_savings: "75%"
+
+  # Lightweight gates
+  gates:
+    pre_implementation:
+      - "issue-identification"
+
+    during_implementation:
+      - "minimal-change"
+      - "architect-unified"
+      - "type-check"
+
+    post_implementation:
+      - "related-tests"
+
+# ============================================================================
+# AGENTS & SKILLS
+# ============================================================================
+
+agents:
+  - "architect-unified"
+  - "implementer-unified"
+
+skills:
+  - "bug-fix-pattern"
+  - "reusability-enforcer"

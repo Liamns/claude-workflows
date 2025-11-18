@@ -1,0 +1,274 @@
+{
+  "name": "MVVM for Mobile",
+  "type": "mobile",
+  "version": "1.0.0",
+  "description": "Model-View-ViewModel pattern for mobile applications",
+
+  "structure": {
+    "directories": {
+      "models": "Data models and business entities",
+      "views": "UI screens and components",
+      "viewmodels": "View state and presentation logic",
+      "services": "API clients and data services",
+      "repositories": "Data access abstraction",
+      "utils": "Shared utilities",
+      "navigation": "Navigation configuration",
+      "assets": "Images, fonts, and static resources"
+    },
+    "namingConventions": {
+      "model": "PascalCase",
+      "view": "PascalCase + Screen/Component suffix",
+      "viewModel": "PascalCase + ViewModel suffix",
+      "service": "PascalCase + Service suffix",
+      "repository": "PascalCase + Repository suffix"
+    },
+    "fileExtensions": {
+      "reactNative": ["tsx", "ts", "jsx", "js"],
+      "flutter": ["dart"],
+      "ionic": ["tsx", "ts"]
+    }
+  },
+
+  "layers": {
+    "view": {
+      "description": "UI layer with screens and components",
+      "responsibilities": [
+        "Render UI based on ViewModel state",
+        "Capture user interactions",
+        "Navigate between screens",
+        "Display loading/error states"
+      ],
+      "dependencies": ["viewmodels"],
+      "rules": {
+        "noBusinessLogic": true,
+        "observeViewModel": true,
+        "declarativeUI": true,
+        "noDirectModelAccess": true
+      }
+    },
+    "viewmodel": {
+      "description": "Presentation logic and view state",
+      "responsibilities": [
+        "Expose observable state",
+        "Handle user actions",
+        "Coordinate with services/repositories",
+        "Transform data for UI",
+        "Manage loading/error states"
+      ],
+      "dependencies": ["models", "services", "repositories"],
+      "rules": {
+        "noUIComponents": true,
+        "observableState": true,
+        "testable": true,
+        "lifecycleAware": true
+      }
+    },
+    "model": {
+      "description": "Domain models and business entities",
+      "dependencies": [],
+      "rules": {
+        "pureData": true,
+        "immutable": true,
+        "validation": true,
+        "noUILogic": true
+      }
+    },
+    "repository": {
+      "description": "Data access abstraction layer",
+      "responsibilities": [
+        "Coordinate local and remote data",
+        "Implement caching strategy",
+        "Handle data synchronization",
+        "Abstract data sources"
+      ],
+      "dependencies": ["models", "services"],
+      "rules": {
+        "singleSource": true,
+        "caching": true,
+        "offlineFirst": true
+      }
+    },
+    "service": {
+      "description": "External service integrations",
+      "types": ["API clients", "Database", "Storage", "Analytics", "Push notifications"],
+      "dependencies": ["models"],
+      "rules": {
+        "interfaceFirst": true,
+        "asyncOperations": true,
+        "errorHandling": true
+      }
+    }
+  },
+
+  "stateManagement": {
+    "reactNative": {
+      "options": [
+        "MobX - Observable state with decorators",
+        "Redux + Redux Toolkit - Centralized state",
+        "Zustand - Lightweight state",
+        "Recoil - Atomic state",
+        "React Context + Hooks - Built-in solution"
+      ]
+    },
+    "flutter": {
+      "options": [
+        "Provider - Recommended by Flutter",
+        "Riverpod - Modern Provider",
+        "BLoC - Business Logic Component",
+        "GetX - All-in-one solution",
+        "MobX - Observable state"
+      ]
+    },
+    "patterns": {
+      "observable": "ViewModel exposes observable properties",
+      "commands": "User actions trigger ViewModel commands",
+      "dataBinding": "View automatically updates when ViewModel changes"
+    }
+  },
+
+  "dependencies": {
+    "allowed": {
+      "views": ["viewmodels"],
+      "viewmodels": ["models", "repositories", "services"],
+      "repositories": ["models", "services"],
+      "services": ["models"],
+      "models": []
+    },
+    "forbidden": {
+      "models": ["views", "viewmodels", "repositories", "services"],
+      "services": ["views", "viewmodels", "repositories"],
+      "repositories": ["views", "viewmodels"],
+      "viewmodels": ["views"]
+    },
+    "circular": false
+  },
+
+  "qualityRules": {
+    "viewModelTestability": {
+      "description": "ViewModels must be testable without UI framework",
+      "severity": "error"
+    },
+    "separationOfConcerns": {
+      "description": "Clear separation between View, ViewModel, and Model",
+      "severity": "error"
+    },
+    "observability": {
+      "description": "ViewModel state must be observable",
+      "severity": "error"
+    },
+    "offlineFirst": {
+      "description": "Design for offline-first operation",
+      "severity": "warning"
+    },
+    "performance": {
+      "description": "Optimize for mobile performance",
+      "severity": "warning",
+      "checks": [
+        "Minimize re-renders",
+        "Optimize image loading",
+        "Implement list virtualization",
+        "Use code splitting"
+      ]
+    }
+  },
+
+  "mobilePatterns": {
+    "navigation": {
+      "stack": "Screen hierarchy with back navigation",
+      "tabs": "Bottom tab navigation",
+      "drawer": "Side menu navigation",
+      "modal": "Overlay screens"
+    },
+    "dataSync": {
+      "strategies": [
+        "Optimistic updates",
+        "Background sync",
+        "Conflict resolution",
+        "Queue for offline actions"
+      ]
+    },
+    "caching": {
+      "strategies": [
+        "Memory cache for session data",
+        "Disk cache for persistent data",
+        "Image caching",
+        "API response caching"
+      ]
+    }
+  },
+
+  "bestPractices": [
+    "Use dependency injection for ViewModels",
+    "Implement proper lifecycle management",
+    "Handle orientation changes gracefully",
+    "Optimize for different screen sizes",
+    "Implement proper error handling and user feedback",
+    "Use reactive programming for data flows",
+    "Implement offline-first architecture",
+    "Cache data appropriately",
+    "Test ViewModels independently",
+    "Use platform-specific UI when needed"
+  ],
+
+  "frameworks": {
+    "reactNative": {
+      "description": "React framework for mobile",
+      "stateManagement": ["MobX", "Redux", "Zustand"],
+      "navigation": "React Navigation"
+    },
+    "flutter": {
+      "description": "Google's UI toolkit",
+      "stateManagement": ["Provider", "Riverpod", "BLoC"],
+      "navigation": "Navigator 2.0"
+    },
+    "ionic": {
+      "description": "Hybrid mobile framework",
+      "stateManagement": ["React/Vue/Angular patterns"],
+      "navigation": "Ionic Router"
+    }
+  },
+
+  "templates": {
+    "view": ".claude/architectures/mobile/mvvm/templates/view.template",
+    "viewmodel": ".claude/architectures/mobile/mvvm/templates/viewmodel.template",
+    "model": ".claude/architectures/mobile/mvvm/templates/model.template",
+    "repository": ".claude/architectures/mobile/mvvm/templates/repository.template"
+  },
+
+  "references": [
+    {
+      "title": "React Native Documentation",
+      "url": "https://reactnative.dev/"
+    },
+    {
+      "title": "Flutter Official Site",
+      "url": "https://flutter.dev/"
+    },
+    {
+      "title": "MVVM Pattern - Microsoft",
+      "url": "https://docs.microsoft.com/en-us/xamarin/xamarin-forms/enterprise-application-patterns/mvvm"
+    },
+    {
+      "title": "MobX for React Native",
+      "url": "https://mobx.js.org/react-integration.html"
+    }
+  ],
+
+  "examples": [
+    {
+      "name": "Social Media Feed",
+      "description": "Infinite scroll feed with pull-to-refresh, ViewModel manages pagination and state",
+      "files": ["viewmodels/FeedViewModel.ts", "views/FeedScreen.tsx", "models/Post.ts", "repositories/PostRepository.ts"]
+    },
+    {
+      "name": "User Authentication Flow",
+      "description": "Login/register screens with form validation, token management",
+      "files": ["viewmodels/AuthViewModel.ts", "views/LoginScreen.tsx", "services/AuthService.ts"]
+    },
+    {
+      "name": "Shopping Cart",
+      "description": "Cart management with optimistic updates and offline support",
+      "files": ["viewmodels/CartViewModel.ts", "views/CartScreen.tsx", "models/CartItem.ts", "repositories/CartRepository.ts"]
+    }
+  ]
+}

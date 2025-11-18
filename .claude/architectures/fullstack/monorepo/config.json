@@ -1,0 +1,199 @@
+{
+  "name": "Monorepo Architecture",
+  "type": "fullstack",
+  "version": "1.0.0",
+  "description": "Unified repository for multiple projects with shared dependencies",
+
+  "structure": {
+    "directories": {
+      "apps": "Individual applications (web, mobile, api)",
+      "packages": "Shared libraries and utilities",
+      "tools": "Build tools and scripts",
+      "docs": "Documentation",
+      "config": "Shared configuration files"
+    },
+    "namingConventions": {
+      "app": "kebab-case",
+      "package": "@scope/package-name",
+      "workspace": "kebab-case"
+    },
+    "fileExtensions": {
+      "typescript": ["ts", "tsx"],
+      "javascript": ["js", "jsx"],
+      "config": ["json", "yaml", "yml"]
+    }
+  },
+
+  "workspaces": {
+    "apps": {
+      "description": "End-user applications",
+      "examples": ["web", "mobile", "api", "admin", "docs"],
+      "canImport": ["packages"],
+      "rules": {
+        "noAppDependencies": true,
+        "independentDeployment": true
+      }
+    },
+    "packages": {
+      "description": "Shared libraries and components",
+      "types": [
+        "ui - UI component library",
+        "utils - Utility functions",
+        "config - Shared configurations",
+        "types - TypeScript type definitions",
+        "eslint-config - Linting rules",
+        "tsconfig - TypeScript configs"
+      ],
+      "canImport": ["packages"],
+      "rules": {
+        "versionControl": true,
+        "publicAPI": true,
+        "noCircularDeps": true
+      }
+    }
+  },
+
+  "tooling": {
+    "packageManager": {
+      "options": ["pnpm", "yarn", "npm"],
+      "features": ["workspace support", "hoisting", "dependency deduplication"]
+    },
+    "buildSystem": {
+      "turborepo": {
+        "description": "High-performance build system",
+        "features": ["Remote caching", "Parallel execution", "Incremental builds"],
+        "configFile": "turbo.json"
+      },
+      "nx": {
+        "description": "Smart monorepo build system",
+        "features": ["Affected commands", "Computation caching", "Task graphs"],
+        "configFile": "nx.json"
+      },
+      "lerna": {
+        "description": "Classic monorepo management",
+        "features": ["Version management", "Publishing", "Task runner"],
+        "configFile": "lerna.json"
+      }
+    },
+    "cicd": {
+      "strategies": [
+        "Affected-only builds - Build only changed packages",
+        "Parallel execution - Run tasks in parallel",
+        "Distributed caching - Share build artifacts",
+        "Matrix testing - Test across environments"
+      ]
+    }
+  },
+
+  "dependencies": {
+    "allowed": {
+      "apps": ["packages"],
+      "packages": ["packages"],
+      "tools": []
+    },
+    "forbidden": {
+      "apps": ["apps"],
+      "packages": ["apps"],
+      "tools": ["apps", "packages"]
+    },
+    "circular": false,
+    "internal": {
+      "protocol": "workspace:*",
+      "versionStrategy": "fixed or independent"
+    }
+  },
+
+  "qualityRules": {
+    "dependencyGraph": {
+      "description": "Maintain acyclic dependency graph",
+      "severity": "error",
+      "tools": ["nx graph", "madge"]
+    },
+    "versionConsistency": {
+      "description": "Consistent versions for shared dependencies",
+      "severity": "warning",
+      "strategies": ["syncpack", "manypkg"]
+    },
+    "buildOptimization": {
+      "description": "Optimize build times with caching and parallelization",
+      "severity": "warning",
+      "metrics": ["Build time", "Cache hit rate", "Affected packages"]
+    },
+    "codeSharing": {
+      "description": "Maximize code reuse through shared packages",
+      "severity": "info",
+      "checks": ["Duplicate code detection", "Shared component usage"]
+    }
+  },
+
+  "strategies": {
+    "versioning": {
+      "fixed": "All packages share the same version (e.g., Babel)",
+      "independent": "Each package has its own version (e.g., Lerna default)"
+    },
+    "publishing": {
+      "registry": "npm, private registry, or artifact storage",
+      "automation": "Automated publishing on merge to main",
+      "changesets": "Track and manage version bumps"
+    },
+    "codeOwnership": {
+      "CODEOWNERS": "Define package/app ownership",
+      "teams": "Organize by team boundaries",
+      "access": "Control who can modify which packages"
+    }
+  },
+
+  "bestPractices": [
+    "Use workspace protocol for internal dependencies",
+    "Implement consistent tooling (ESLint, Prettier, TypeScript)",
+    "Set up remote caching for CI/CD",
+    "Create shared configurations as packages",
+    "Document inter-package dependencies",
+    "Use affected commands to optimize CI",
+    "Implement automated versioning and publishing",
+    "Maintain clear package boundaries"
+  ],
+
+  "templates": {
+    "app": ".claude/architectures/fullstack/monorepo/templates/app.template",
+    "package": ".claude/architectures/fullstack/monorepo/templates/package.template",
+    "turboConfig": ".claude/architectures/fullstack/monorepo/templates/turbo.template"
+  },
+
+  "references": [
+    {
+      "title": "Turborepo Official Docs",
+      "url": "https://turbo.build/repo"
+    },
+    {
+      "title": "Nx Monorepo Framework",
+      "url": "https://nx.dev/"
+    },
+    {
+      "title": "pnpm Workspaces",
+      "url": "https://pnpm.io/workspaces"
+    },
+    {
+      "title": "Monorepo Tools Comparison",
+      "url": "https://monorepo.tools/"
+    }
+  ],
+
+  "examples": [
+    {
+      "name": "Web + Mobile + API",
+      "description": "React web app, React Native mobile, NestJS API with shared UI components",
+      "files": ["apps/web/", "apps/mobile/", "apps/api/", "packages/ui/", "packages/types/"]
+    },
+    {
+      "name": "Design System Monorepo",
+      "description": "Component library, documentation site, and examples",
+      "files": ["packages/components/", "apps/docs/", "apps/playground/"]
+    },
+    {
+      "name": "Multi-tenant SaaS",
+      "description": "Admin dashboard, customer portal, shared configs",
+      "files": ["apps/admin/", "apps/portal/", "packages/config/", "packages/auth/"]
+    }
+  ]
+}

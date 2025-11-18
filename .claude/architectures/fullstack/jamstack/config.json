@@ -1,0 +1,202 @@
+{
+  "name": "JAMstack",
+  "type": "fullstack",
+  "version": "1.0.0",
+  "description": "JavaScript, APIs, and Markup architecture for modern web applications",
+
+  "structure": {
+    "directories": {
+      "src": "Source code and components",
+      "public": "Static assets",
+      "content": "Markdown/CMS content",
+      "api": "Serverless API functions",
+      "styles": "Global styles and themes",
+      "components": "Reusable components",
+      "pages": "Page components"
+    },
+    "namingConventions": {
+      "component": "PascalCase",
+      "page": "kebab-case",
+      "api": "kebab-case",
+      "content": "kebab-case"
+    },
+    "fileExtensions": {
+      "javascript": ["js", "jsx", "ts", "tsx"],
+      "markup": ["md", "mdx", "html"],
+      "style": ["css", "scss", "sass"],
+      "config": ["json", "yaml", "toml"]
+    }
+  },
+
+  "principles": {
+    "prerendering": {
+      "description": "Generate static HTML at build time",
+      "benefits": ["Fast loading", "SEO friendly", "Secure", "Scalable"],
+      "strategies": ["SSG", "ISR", "Hybrid"]
+    },
+    "decoupling": {
+      "description": "Separate frontend from backend",
+      "benefits": ["Independent scaling", "Technology flexibility", "Better DX"],
+      "components": ["Static site", "Headless CMS", "API services"]
+    },
+    "enhancement": {
+      "description": "Progressive enhancement with JavaScript",
+      "benefits": ["Works without JS", "Better performance", "Resilient"],
+      "techniques": ["Hydration", "Lazy loading", "Code splitting"]
+    }
+  },
+
+  "stack": {
+    "j_javascript": {
+      "description": "Modern JavaScript frameworks",
+      "options": ["React", "Vue", "Svelte", "Solid"],
+      "features": ["Component-based", "Reactive", "Performant"]
+    },
+    "a_apis": {
+      "description": "Reusable APIs and microservices",
+      "types": [
+        "Headless CMS (Contentful, Sanity, Strapi)",
+        "Authentication (Auth0, Clerk, Supabase)",
+        "Commerce (Shopify, Stripe)",
+        "Search (Algolia, Typesense)",
+        "Forms (Formspree, Netlify Forms)",
+        "Serverless Functions (Vercel, Netlify, AWS Lambda)"
+      ]
+    },
+    "m_markup": {
+      "description": "Templated markup rendered at build time",
+      "formats": ["Markdown", "MDX", "HTML", "JSON"],
+      "sources": ["Git-based CMS", "Headless CMS", "File system"]
+    }
+  },
+
+  "architecture": {
+    "staticGeneration": {
+      "description": "Build-time page generation",
+      "frameworks": ["Next.js (SSG)", "Gatsby", "Astro", "11ty", "Hugo"],
+      "whenToUse": "Content doesn't change frequently"
+    },
+    "incrementalStaticRegeneration": {
+      "description": "Update static pages after build",
+      "frameworks": ["Next.js (ISR)"],
+      "whenToUse": "Balance between static and dynamic content"
+    },
+    "clientSideRendering": {
+      "description": "Dynamic rendering in browser",
+      "frameworks": ["SPA with React/Vue", "Astro (islands)"],
+      "whenToUse": "Highly interactive, personalized content"
+    }
+  },
+
+  "deployment": {
+    "platforms": {
+      "vercel": "Next.js optimized, edge functions",
+      "netlify": "Build plugins, split testing",
+      "cloudflare": "Global edge network, KV storage",
+      "aws": "S3 + CloudFront + Lambda@Edge",
+      "github": "GitHub Pages for simple sites"
+    },
+    "workflow": [
+      "1. Write content (Markdown/CMS)",
+      "2. Push to Git repository",
+      "3. Automatic build triggered",
+      "4. Static files generated",
+      "5. Deploy to CDN",
+      "6. Instant global distribution"
+    ]
+  },
+
+  "dependencies": {
+    "allowed": {
+      "components": ["api", "content"],
+      "pages": ["components", "api", "content"],
+      "api": [],
+      "content": []
+    },
+    "forbidden": {
+      "api": ["components", "pages"],
+      "content": ["components", "pages", "api"]
+    },
+    "circular": false
+  },
+
+  "qualityRules": {
+    "performance": {
+      "description": "Optimize for Core Web Vitals",
+      "severity": "error",
+      "metrics": {
+        "LCP": "< 2.5s",
+        "FID": "< 100ms",
+        "CLS": "< 0.1"
+      }
+    },
+    "seo": {
+      "description": "SEO-friendly markup and metadata",
+      "severity": "warning",
+      "checks": ["Meta tags", "Semantic HTML", "Sitemap", "robots.txt"]
+    },
+    "accessibility": {
+      "description": "WCAG 2.1 Level AA compliance",
+      "severity": "error"
+    },
+    "security": {
+      "description": "Secure by default",
+      "severity": "error",
+      "principles": ["No server to hack", "HTTPS only", "CSP headers"]
+    }
+  },
+
+  "bestPractices": [
+    "Pre-render everything possible",
+    "Use headless CMS for dynamic content",
+    "Implement atomic deploys",
+    "Leverage CDN and edge functions",
+    "Optimize images and assets",
+    "Implement proper caching strategies",
+    "Use build-time data fetching",
+    "Progressive enhancement over client-side rendering"
+  ],
+
+  "templates": {
+    "page": ".claude/architectures/fullstack/jamstack/templates/page.template",
+    "component": ".claude/architectures/fullstack/jamstack/templates/component.template",
+    "api": ".claude/architectures/fullstack/jamstack/templates/api.template"
+  },
+
+  "references": [
+    {
+      "title": "JAMstack Official Site",
+      "url": "https://jamstack.org/"
+    },
+    {
+      "title": "Static Site Generators",
+      "url": "https://jamstack.org/generators/"
+    },
+    {
+      "title": "Headless CMS Directory",
+      "url": "https://jamstack.org/headless-cms/"
+    },
+    {
+      "title": "Next.js Documentation",
+      "url": "https://nextjs.org/docs"
+    }
+  ],
+
+  "examples": [
+    {
+      "name": "Blog with CMS",
+      "description": "Next.js blog with Contentful CMS and Vercel deployment",
+      "files": ["pages/blog/", "components/", "lib/contentful.ts", "next.config.js"]
+    },
+    {
+      "name": "E-commerce Site",
+      "description": "Astro + Shopify headless commerce integration",
+      "files": ["src/pages/products/", "src/components/", "src/lib/shopify.ts"]
+    },
+    {
+      "name": "Documentation Site",
+      "description": "11ty static site with Markdown content and search",
+      "files": ["content/docs/", "src/layouts/", ".eleventy.js"]
+    }
+  ]
+}

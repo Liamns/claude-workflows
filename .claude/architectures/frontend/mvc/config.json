@@ -1,0 +1,179 @@
+{
+  "name": "MVC/MVVM",
+  "type": "frontend",
+  "version": "1.0.0",
+  "description": "Model-View-Controller and Model-View-ViewModel patterns for frontend",
+
+  "structure": {
+    "directories": {
+      "models": "Data models and business logic",
+      "views": "UI components and templates",
+      "controllers": "Application logic and event handlers",
+      "viewmodels": "View state and presentation logic (MVVM)",
+      "services": "External API and data services",
+      "utils": "Shared utilities"
+    },
+    "namingConventions": {
+      "model": "PascalCase",
+      "view": "PascalCase",
+      "controller": "PascalCase",
+      "viewModel": "PascalCase",
+      "service": "PascalCase"
+    },
+    "fileExtensions": {
+      "component": ["tsx", "jsx", "vue"],
+      "style": ["css", "scss", "sass", "less"],
+      "test": ["test.ts", "test.tsx", "spec.ts", "spec.tsx"]
+    }
+  },
+
+  "layers": {
+    "model": {
+      "description": "Data models and domain logic",
+      "dependencies": [],
+      "rules": {
+        "pureData": true,
+        "noUILogic": true,
+        "validationAllowed": true
+      }
+    },
+    "view": {
+      "description": "UI components and presentation",
+      "dependencies": ["viewmodels", "models"],
+      "rules": {
+        "noBusinessLogic": true,
+        "bindToViewModel": true,
+        "presentationOnly": true
+      }
+    },
+    "controller": {
+      "description": "Application logic and coordination (MVC)",
+      "dependencies": ["models", "services"],
+      "rules": {
+        "orchestrateOnly": true,
+        "handleEvents": true
+      }
+    },
+    "viewmodel": {
+      "description": "View state and presentation logic (MVVM)",
+      "dependencies": ["models", "services"],
+      "rules": {
+        "noUIComponents": true,
+        "observableState": true,
+        "commandPattern": true
+      }
+    },
+    "services": {
+      "description": "External integrations and data access",
+      "dependencies": ["models"],
+      "rules": {
+        "interfaceFirst": true,
+        "asyncOperations": true
+      }
+    }
+  },
+
+  "dependencies": {
+    "allowed": {
+      "views": ["viewmodels", "controllers", "models"],
+      "viewmodels": ["models", "services"],
+      "controllers": ["models", "services", "views"],
+      "services": ["models"],
+      "models": []
+    },
+    "forbidden": {
+      "models": ["views", "viewmodels", "controllers", "services"],
+      "services": ["views", "viewmodels", "controllers"],
+      "viewmodels": ["controllers", "views"],
+      "controllers": ["viewmodels"]
+    },
+    "circular": false
+  },
+
+  "qualityRules": {
+    "modelPurity": {
+      "description": "Models should contain only data and business logic",
+      "severity": "error"
+    },
+    "viewSeparation": {
+      "description": "Views should not contain business logic",
+      "severity": "error"
+    },
+    "dataBinding": {
+      "description": "Use data binding between view and viewmodel/controller",
+      "severity": "warning"
+    },
+    "testability": {
+      "description": "Controllers and ViewModels must be testable independently",
+      "severity": "error"
+    }
+  },
+
+  "patterns": {
+    "mvc": {
+      "description": "User interacts with View → Controller handles logic → Updates Model → View reflects changes",
+      "whenToUse": "Traditional web applications, server-side rendering"
+    },
+    "mvvm": {
+      "description": "View binds to ViewModel → ViewModel exposes observable state → Model updates trigger view refresh",
+      "whenToUse": "Rich client applications, reactive frameworks (React, Vue, Angular)"
+    }
+  },
+
+  "templates": {
+    "model": ".claude/architectures/frontend/mvc/templates/model.template",
+    "view": ".claude/architectures/frontend/mvc/templates/view.template",
+    "controller": ".claude/architectures/frontend/mvc/templates/controller.template",
+    "viewmodel": ".claude/architectures/frontend/mvc/templates/viewmodel.template"
+  },
+
+  "bestPractices": [
+    "Keep models pure - no UI or framework dependencies",
+    "Controllers/ViewModels should orchestrate, not implement business logic",
+    "Use dependency injection for services and repositories",
+    "Implement two-way data binding for MVVM pattern",
+    "Keep views dumb - delegate all logic to controller/viewmodel",
+    "Use observable patterns (RxJS, MobX, Signals) for reactive updates",
+    "Separate presentation logic from domain logic",
+    "Write unit tests for controllers and viewmodels independently",
+    "Use interfaces/protocols for service abstractions",
+    "Avoid circular dependencies between layers"
+  ],
+
+  "references": [
+    {
+      "title": "MVC Pattern - Martin Fowler",
+      "url": "https://martinfowler.com/eaaDev/uiArchs.html"
+    },
+    {
+      "title": "MVVM Pattern - Microsoft",
+      "url": "https://learn.microsoft.com/en-us/dotnet/architecture/maui/mvvm"
+    },
+    {
+      "title": "React MVVM with MobX",
+      "url": "https://mobx.js.org/react-integration.html"
+    },
+    {
+      "title": "Vue.js Official Guide (MVVM-based)",
+      "url": "https://vuejs.org/guide/introduction.html"
+    }
+  ],
+
+  "examples": [
+    {
+      "name": "User Authentication (MVC)",
+      "description": "Model stores user data, Controller handles login logic, View displays form",
+      "files": ["models/User.ts", "controllers/AuthController.ts", "views/LoginView.tsx"]
+    },
+    {
+      "name": "Todo List (MVVM)",
+      "description": "Observable ViewModel with todo state, View binds to ViewModel commands",
+      "files": ["models/Todo.ts", "viewmodels/TodoViewModel.ts", "views/TodoListView.tsx"]
+    },
+    {
+      "name": "Form Validation",
+      "description": "Model defines validation rules, ViewModel exposes validation state",
+      "files": ["models/FormModel.ts", "viewmodels/FormViewModel.ts", "views/FormView.tsx"]
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+/**
+ * {{ServiceName}} Service
+ *
+ * Layered Architecture - Business Logic Layer
+ * Contains business rules and orchestration
+ *
+ * @package business/services
+ */
+
+import { {{RepositoryName}}Repository } from '../data/{{RepositoryName}}Repository';
+
+export class {{ServiceName}}Service {
+  constructor(
+    private readonly repository: {{RepositoryName}}Repository
+  ) {}
+
+  async getData(id: string): Promise<any> {
+    // Business logic
+    const data = await this.repository.findById(id);
+    return this.transform(data);
+  }
+
+  async createData(input: any): Promise<any> {
+    // Validate business rules
+    this.validateBusinessRules(input);
+
+    // Save to data layer
+    return await this.repository.save(input);
+  }
+
+  private validateBusinessRules(input: any): void {
+    // Business validation logic
+  }
+
+  private transform(data: any): any {
+    // Transform data for presentation
+    return data;
+  }
+}

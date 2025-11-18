@@ -1,0 +1,196 @@
+{
+  "name": "Micro Frontend",
+  "type": "frontend",
+  "version": "1.0.0",
+  "description": "Independently deployable frontend modules with module federation",
+
+  "structure": {
+    "directories": {
+      "shell": "Host application and orchestration",
+      "modules": "Independent micro frontend modules",
+      "shared": "Shared libraries and utilities",
+      "infrastructure": "Build and deployment configs"
+    },
+    "namingConventions": {
+      "module": "kebab-case",
+      "component": "PascalCase",
+      "route": "kebab-case"
+    },
+    "fileExtensions": {
+      "component": ["tsx", "jsx", "vue"],
+      "config": ["ts", "js", "json"],
+      "style": ["css", "scss", "sass", "less"]
+    }
+  },
+
+  "architecture": {
+    "shell": {
+      "description": "Host application that loads and orchestrates micro frontends",
+      "responsibilities": [
+        "Application routing",
+        "Authentication and authorization",
+        "Shared state management",
+        "Module loading and lifecycle"
+      ],
+      "canImport": ["shared"],
+      "rules": {
+        "noBusinessLogic": true,
+        "orchestrationOnly": true,
+        "defineRoutes": true
+      }
+    },
+    "modules": {
+      "description": "Independent micro frontend applications",
+      "structure": {
+        "src": "Module source code",
+        "public": "Static assets",
+        "tests": "Module tests",
+        "webpack.config.js": "Module federation config"
+      },
+      "canImport": ["shared"],
+      "rules": {
+        "independentDeployment": true,
+        "versionedExports": true,
+        "noDirectModuleDeps": true
+      }
+    },
+    "shared": {
+      "description": "Shared libraries, components, and utilities",
+      "canImport": [],
+      "rules": {
+        "versionControl": true,
+        "backwardCompatibility": true,
+        "genericOnly": true
+      }
+    }
+  },
+
+  "communication": {
+    "strategies": [
+      {
+        "type": "custom-events",
+        "description": "Browser custom events for loose coupling",
+        "whenToUse": "Simple notifications and data passing"
+      },
+      {
+        "type": "shared-state",
+        "description": "Redux, MobX, or other state management",
+        "whenToUse": "Complex state sharing between modules"
+      },
+      {
+        "type": "url-routing",
+        "description": "URL-based navigation and state",
+        "whenToUse": "Module navigation and deep linking"
+      },
+      {
+        "type": "web-components",
+        "description": "Standard web components API",
+        "whenToUse": "Framework-agnostic integration"
+      }
+    ]
+  },
+
+  "dependencies": {
+    "allowed": {
+      "shell": ["shared"],
+      "modules": ["shared"],
+      "shared": []
+    },
+    "forbidden": {
+      "modules": ["shell", "modules"],
+      "shared": ["shell", "modules"],
+      "shell": ["modules"]
+    },
+    "circular": false
+  },
+
+  "qualityRules": {
+    "moduleIsolation": {
+      "description": "Modules must be independently deployable and testable",
+      "severity": "error"
+    },
+    "looseCoupling": {
+      "description": "Use event-driven communication, avoid direct dependencies",
+      "severity": "error"
+    },
+    "versionCompatibility": {
+      "description": "Shared dependencies must maintain backward compatibility",
+      "severity": "error"
+    },
+    "performanceMonitoring": {
+      "description": "Monitor bundle size and loading performance",
+      "severity": "warning"
+    }
+  },
+
+  "integrationPatterns": {
+    "buildTime": {
+      "description": "Modules compiled together at build time",
+      "tools": ["Nx", "Lerna", "Turborepo"]
+    },
+    "runtime": {
+      "description": "Modules loaded dynamically at runtime",
+      "tools": ["Module Federation", "Single-SPA", "Qiankun"]
+    },
+    "iframe": {
+      "description": "Complete isolation using iframes",
+      "tools": ["Luigi", "OpenComponents"]
+    }
+  },
+
+  "templates": {
+    "module": ".claude/architectures/frontend/micro-frontend/templates/module.template",
+    "shell": ".claude/architectures/frontend/micro-frontend/templates/shell.template",
+    "remote": ".claude/architectures/frontend/micro-frontend/templates/remote.template"
+  },
+
+  "bestPractices": [
+    "Keep modules completely independent - own repo, build, and deployment",
+    "Use module federation for runtime composition and code sharing",
+    "Version all shared dependencies carefully to avoid conflicts",
+    "Implement proper error boundaries to prevent cascade failures",
+    "Monitor bundle sizes - each module should be lean and focused",
+    "Use event-driven communication for loose coupling",
+    "Maintain consistent UX across modules (design system)",
+    "Implement feature flags for gradual rollouts",
+    "Use shared authentication/authorization from shell",
+    "Test modules in isolation and integration scenarios"
+  ],
+
+  "references": [
+    {
+      "title": "Micro Frontends Official Guide",
+      "url": "https://micro-frontends.org/"
+    },
+    {
+      "title": "Webpack Module Federation",
+      "url": "https://webpack.js.org/concepts/module-federation/"
+    },
+    {
+      "title": "Single-SPA Framework",
+      "url": "https://single-spa.js.org/"
+    },
+    {
+      "title": "Martin Fowler - Micro Frontends",
+      "url": "https://martinfowler.com/articles/micro-frontends.html"
+    }
+  ],
+
+  "examples": [
+    {
+      "name": "E-commerce Platform",
+      "description": "Shell app with product catalog, cart, and checkout as separate modules",
+      "files": ["shell/App.tsx", "modules/catalog/", "modules/cart/", "modules/checkout/"]
+    },
+    {
+      "name": "Dashboard with Widgets",
+      "description": "Main dashboard shell loading analytics, reports, and settings modules",
+      "files": ["shell/Dashboard.tsx", "modules/analytics/", "modules/reports/"]
+    },
+    {
+      "name": "Multi-tenant SaaS",
+      "description": "Shared shell with tenant-specific modules loaded dynamically",
+      "files": ["shell/", "tenants/tenant-a/", "tenants/tenant-b/"]
+    }
+  ]
+}

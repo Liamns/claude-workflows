@@ -1,0 +1,34 @@
+/**
+ * {{PackageName}} Package
+ *
+ * Monorepo Architecture - Individual package
+ * Can be app or library within the monorepo
+ *
+ * @package packages/{{package-name}}
+ */
+
+{
+  "name": "@{{org}}/{{package-name}}",
+  "version": "1.0.0",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "test": "jest",
+    "lint": "eslint src/**/*.ts"
+  },
+  "devDependencies": {
+    "@{{org}}/tsconfig": "workspace:*",
+    "tsup": "latest",
+    "typescript": "^5.0.0"
+  }
+}

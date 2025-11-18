@@ -1,0 +1,42 @@
+/**
+ * {{RemoteName}} Remote Configuration
+ *
+ * Micro Frontend Architecture - Module Federation Config
+ * Webpack 5 Module Federation setup
+ *
+ * @package config
+ */
+
+const { ModuleFederationPlugin } = require('webpack').container;
+const dependencies = require('./package.json').dependencies;
+
+module.exports = {
+  plugins: [
+    new ModuleFederationPlugin({
+      name: '{{remoteName}}',
+      filename: 'remoteEntry.js',
+
+      // Exposed modules
+      exposes: {
+        './{{ModuleName}}': './src/{{ModuleName}}',
+        './routes': './src/routes',
+      },
+
+      // Shared dependencies
+      shared: {
+        react: {
+          singleton: true,
+          requiredVersion: dependencies.react,
+        },
+        'react-dom': {
+          singleton: true,
+          requiredVersion: dependencies['react-dom'],
+        },
+        'react-router-dom': {
+          singleton: true,
+          requiredVersion: dependencies['react-router-dom'],
+        },
+      },
+    }),
+  ],
+};

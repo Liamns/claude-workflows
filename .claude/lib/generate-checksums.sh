@@ -31,8 +31,12 @@ source "$SCRIPT_DIR/common.sh"
 # ════════════════════════════════════════════════════════════════════════════
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.."; pwd)"
 
-# 버전 정보 (install.sh와 동기화)
-VERSION="3.2.0"
+# 버전 정보 (.claude/.version 파일에서 읽기)
+if [ -f "$PROJECT_ROOT/.claude/.version" ]; then
+    VERSION=$(cat "$PROJECT_ROOT/.claude/.version" | tr -d '[:space:]')
+else
+    VERSION="3.3.1"  # fallback
+fi
 
 # 기본 출력 파일 (설정하지 않으면 stdout)
 OUTPUT_FILE=""

@@ -1,0 +1,122 @@
+# PR Command Configuration
+# Pull Request 자동 생성
+
+extends: "_base.yaml"
+
+# ============================================================================
+# COMMAND INFO
+# ============================================================================
+
+command: "pr"
+type: "utility"
+description: "Pull Request 자동 생성 with 템플릿 자동 채우기"
+
+# ============================================================================
+# PREREQUISITES
+# ============================================================================
+
+prerequisites:
+  - gh  # GitHub CLI
+  - git
+
+# ============================================================================
+# TEMPLATES
+# ============================================================================
+
+templates:
+  - path: ".claude/templates/git/pr-auto-fill.yaml"
+    purpose: "PR 템플릿 자동 채우기 규칙"
+  - path: ".claude/templates/git/pr-template.md"
+    purpose: "PR 본문 템플릿"
+  - path: ".claude/templates/git/pr-sections-map.json"
+    purpose: "섹션 매핑"
+
+# ============================================================================
+# BASE BRANCH SELECTION
+# ============================================================================
+
+prompts:
+  base_branch:
+    mode: "interactive"
+    header: "🎯 Select base branch for PR"
+    default: "main"
+
+    options:
+      - value: "main"
+        label: "main (Production)"
+        description: "프로덕션 배포용 브랜치"
+
+      - value: "develop"
+        label: "develop (Development)"
+        description: "개발 통합 브랜치"
+
+    # 자동 감지 규칙
+    auto_detect_rules:
+      - branch_pattern: "^feature/.*"
+        base_branch: "develop"
+        confidence: "high"
+
+      - branch_pattern: "^hotfix/.*"
+        base_branch: "main"
+        confidence: "high"
+
+      - branch_pattern: "^fix/.*"
+        base_branch: "develop"
+        confidence: "medium"
+
+# ============================================================================
+# PR AUTO-FILL SETTINGS
+# ============================================================================
+
+auto_fill:
+  enabled: true
+
+  # 데이터 소스
+  sources:
+    - type: "spec_file"
+      path: ".specify/spec.md"
+      priority: 1
+
+    - type: "git_commits"
+      format: "grouped_by_type"
+      priority: 2
+
+    - type: "tasks_verification"
+      path: ".specify/tasks.md"
+      priority: 3
+
+  # 섹션별 자동 채우기
+  sections:
+    changes_detection: true
+    description_generation: true
+    test_generation: true
+    screenshots: "auto_detect_ui_changes"
+    references_generation: true
+    checklist_validation: true
+
+# ============================================================================
+# HOOKS
+# ============================================================================
+
+hooks:
+  pre_execution:
+    - script: ".claude/hooks/pre-command/pr.sh"
+      description: "브랜치 상태 확인"
+      optional: true
+
+# ============================================================================
+# FLAGS
+# ============================================================================
+
+flags:
+  - name: "--base"
+    description: "Base branch 직접 지정"
+    example: "/pr --base main"
+
+  - name: "--draft"
+    description: "Draft PR 생성"
+    example: "/pr --draft"
+
+  - name: "--auto-assign"
+    description: "리뷰어 자동 할당"
+    example: "/pr --auto-assign"

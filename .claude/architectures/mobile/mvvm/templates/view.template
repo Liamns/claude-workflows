@@ -1,0 +1,164 @@
+/**
+ * {{ViewName}} View
+ *
+ * MVVM Architecture - View layer
+ * UI components that observe ViewModel
+ *
+ * @package views
+ */
+
+import React, { useEffect } from 'react';
+import { View, Text, FlatList, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
+import { observer } from 'mobx-react-lite';
+import { {{ViewModelName}}ViewModel } from '../viewmodels/{{ViewModelName}}ViewModel';
+
+interface {{ViewName}}Props {
+  viewModel: {{ViewModelName}}ViewModel;
+}
+
+// Observer pattern - automatically re-renders when ViewModel state changes
+export const {{ViewName}} = observer(({ viewModel }: {{ViewName}}Props) => {
+  // Load data on mount
+  useEffect(() => {
+    viewModel.loadData();
+
+    return () => {
+      viewModel.dispose(); // Cleanup
+    };
+  }, [viewModel]);
+
+  // Render loading state
+  if (viewModel.isLoading && !viewModel.hasData) {
+    return (
+      <View style={styles.centerContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text style={styles.loadingText}>Loading...</Text>
+      </View>
+    );
+  }
+
+  // Render error state
+  if (viewModel.error) {
+    return (
+      <View style={styles.centerContainer}>
+        <Text style={styles.errorText}>Error: {viewModel.error}</Text>
+        <TouchableOpacity
+          style={styles.retryButton}
+          onPress={() => viewModel.loadData()}
+        >
+          <Text style={styles.retryButtonText}>Retry</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  // Render empty state
+  if (viewModel.isEmpty) {
+    return (
+      <View style={styles.centerContainer}>
+        <Text style={styles.emptyText}>No data available</Text>
+      </View>
+    );
+  }
+
+  // Render data list
+  return (
+    <View style={styles.container}>
+      <FlatList
+        data={viewModel.data}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            style={styles.itemContainer}
+            onPress={() => viewModel.selectItem(item.id)}
+          >
+            <Text style={styles.itemTitle}>{item.id}</Text>
+            {/* Add more item details */}
+          </TouchableOpacity>
+        )}
+        refreshing={viewModel.isLoading}
+        onRefresh={() => viewModel.loadData()}
+      />
+
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={() => {
+          // Navigate to create screen
+          viewModel.createItem({});
+        }}
+      >
+        <Text style={styles.fabText}>+</Text>
+      </TouchableOpacity>
+    </View>
+  );
+});
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#666',
+  },
+  errorText: {
+    fontSize: 16,
+    color: '#d32f2f',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+  },
+  retryButton: {
+    backgroundColor: '#2196f3',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 5,
+  },
+  retryButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  itemContainer: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+  },
+  itemTitle: {
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  fab: {
+    position: 'absolute',
+    right: 20,
+    bottom: 20,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#2196f3',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  fabText: {
+    color: '#fff',
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+});

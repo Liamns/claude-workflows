@@ -1,0 +1,152 @@
+/**
+ * {{ViewModelName}} ViewModel
+ *
+ * MVVM Architecture - ViewModel layer
+ * Handles presentation logic and state management
+ *
+ * @package viewmodels
+ */
+
+import { makeAutoObservable, runInAction } from 'mobx';
+// Or use React Context/Zustand depending on stack
+
+export class {{ViewModelName}}ViewModel {
+  // Observable state
+  data: {{ViewModelName}}Data[] = [];
+  isLoading: boolean = false;
+  error: string | null = null;
+  selectedItem: {{ViewModelName}}Data | null = null;
+
+  // Dependencies (injected)
+  constructor(
+    private repository: I{{ViewModelName}}Repository,
+    private navigation: NavigationService
+  ) {
+    makeAutoObservable(this);
+  }
+
+  // Actions
+  async loadData(): Promise<void> {
+    this.isLoading = true;
+    this.error = null;
+
+    try {
+      const result = await this.repository.fetchAll();
+
+      runInAction(() => {
+        this.data = result;
+        this.isLoading = false;
+      });
+    } catch (error) {
+      runInAction(() => {
+        this.error = error.message;
+        this.isLoading = false;
+      });
+    }
+  }
+
+  async selectItem(id: string): Promise<void> {
+    try {
+      const item = await this.repository.fetchById(id);
+
+      runInAction(() => {
+        this.selectedItem = item;
+      });
+
+      this.navigation.navigate('Detail', { id });
+    } catch (error) {
+      runInAction(() => {
+        this.error = error.message;
+      });
+    }
+  }
+
+  async createItem(data: Partial<{{ViewModelName}}Data>): Promise<void> {
+    this.isLoading = true;
+
+    try {
+      await this.repository.create(data);
+      await this.loadData(); // Refresh list
+
+      runInAction(() => {
+        this.isLoading = false;
+      });
+    } catch (error) {
+      runInAction(() => {
+        this.error = error.message;
+        this.isLoading = false;
+      });
+    }
+  }
+
+  async updateItem(id: string, data: Partial<{{ViewModelName}}Data>): Promise<void> {
+    this.isLoading = true;
+
+    try {
+      await this.repository.update(id, data);
+      await this.loadData(); // Refresh list
+
+      runInAction(() => {
+        this.isLoading = false;
+      });
+    } catch (error) {
+      runInAction(() => {
+        this.error = error.message;
+        this.isLoading = false;
+      });
+    }
+  }
+
+  async deleteItem(id: string): Promise<void> {
+    this.isLoading = true;
+
+    try {
+      await this.repository.delete(id);
+      await this.loadData(); // Refresh list
+
+      runInAction(() => {
+        this.isLoading = false;
+      });
+    } catch (error) {
+      runInAction(() => {
+        this.error = error.message;
+        this.isLoading = false;
+      });
+    }
+  }
+
+  // Computed properties
+  get hasData(): boolean {
+    return this.data.length > 0;
+  }
+
+  get isEmpty(): boolean {
+    return !this.isLoading && this.data.length === 0;
+  }
+
+  // Cleanup
+  dispose(): void {
+    // Clean up subscriptions, timers, etc.
+  }
+}
+
+// Model interface
+export interface {{ViewModelName}}Data {
+  id: string;
+  // Add model properties
+}
+
+// Repository interface (implemented by data layer)
+export interface I{{ViewModelName}}Repository {
+  fetchAll(): Promise<{{ViewModelName}}Data[]>;
+  fetchById(id: string): Promise<{{ViewModelName}}Data>;
+  create(data: Partial<{{ViewModelName}}Data>): Promise<{{ViewModelName}}Data>;
+  update(id: string, data: Partial<{{ViewModelName}}Data>): Promise<{{ViewModelName}}Data>;
+  delete(id: string): Promise<void>;
+}
+
+// Navigation service interface
+export interface NavigationService {
+  navigate(screen: string, params?: any): void;
+  goBack(): void;
+}

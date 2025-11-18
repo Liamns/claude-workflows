@@ -7,6 +7,107 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.3.1] - 2025-01-18
+
+### Added
+- **Architecture Templates System** - Complete template library for all 14 architectures
+  - **Backend Templates** (15 templates):
+    - Clean Architecture: entity, useCase, repository templates
+    - Hexagonal: port, adapter templates
+    - DDD: aggregate, valueObject templates
+    - Layered: controller, service templates
+    - Serverless: httpFunction template
+  - **Frontend Templates** (6 templates):
+    - FSD: entity, feature templates
+    - Atomic Design: atom template
+    - MVC: model template
+    - Micro Frontend: module, shell, remote templates
+  - **Fullstack Templates** (9 templates):
+    - Monorepo: workspace, package, shared-lib templates
+    - JAMstack: page, api-route, static-generator templates
+    - Microservices: service, gateway, event templates
+  - **Mobile Templates** (6 templates):
+    - MVVM: viewmodel, view, model templates
+    - Clean Architecture Mobile: useCase, repository, screen templates
+- **Architecture Registry Sync Tool** (`.claude/lib/sync-architecture-registry.sh`)
+  - Automatic registry.json verification and consistency checking
+  - Scans all architecture config files and validates against registry
+  - Detects missing architectures, path mismatches, and orphaned entries
+  - Usage: `bash .claude/lib/sync-architecture-registry.sh --verify-only`
+- **Extended Test Coverage** - Added 5 new test suites (30 total tests)
+  - `test-sync-architecture-registry.sh` - Registry sync validation (7 tests)
+  - `test-config-loader.sh` - Configuration loading and merging (7 tests)
+  - `test-cache-helper.sh` - Cache management operations (7 tests)
+  - `test-branch-state-handler.sh` - Git branch state management (8 tests)
+  - `test-git-operations.sh` - Git operations and workflows (10 tests)
+  - Coverage increased from 14 to 19 core library scripts
+
+### Changed
+- **Architecture System Reorganization**
+  - Consolidated architecture configs to `.claude/architectures/` directory
+  - Added 8 new architecture configurations:
+    - Frontend: MVC/MVVM, Micro Frontend
+    - Backend: Serverless
+    - Fullstack: Monorepo, JAMstack, Microservices
+    - Mobile: MVVM, Clean Architecture Mobile
+  - Updated all architecture references from `architectures/` to `.claude/architectures/`
+  - Fixed FSD layer dependencies (removed widgets layer references)
+  - Fixed Clean Architecture dependencies (presentation layer)
+  - Updated `_base.yaml` documentation paths for all 14 architectures
+  - All 13 commands now properly inherit architecture settings from `_base.yaml`
+- Updated README.md version from v2.5.0 to v3.3.0
+- Regenerated `.claude/.checksums.json` with all new template files
+
+### Fixed
+- Architecture path references in CHANGELOG.md, README.md, install.sh
+- Registry.json synchronization with actual config files
+- Added missing Atomic Design architecture to `_base.yaml` documentation
+
+## [3.3.0] - 2025-01-18
+
+### Added
+- **Database Synchronization Tool** (`/db-sync`) - Production to Development DB sync automation
+  - 6-step automated process: connection check, dump, backup, initialize, restore, verify, cleanup
+  - Dual DB connection verification (pg_isready + psql fallback)
+  - Automatic timestamped backups (keeps last 5)
+  - Automatic rollback on failure
+  - Lock file mechanism to prevent concurrent runs
+  - Comprehensive logging (`.claude/cache/db-sync.log`)
+  - Retry logic for dump creation (max 3 attempts)
+  - Data verification post-restore (table and record counts)
+
+- **Prisma Migration Automation** (`/prisma-migrate`) - Intelligent schema migration
+  - Auto-detection of migrations directory under `prisma/`
+  - Git diff analysis for intelligent migration naming
+  - Interactive environment selection (Development/Production)
+  - Development mode: creates and applies new migration files
+  - Production mode: applies existing migrations only
+  - Smart naming patterns:
+    - `add_{model}_table` - new model detection
+    - `remove_{model}_table` - model deletion detection
+    - `add_index` - index change detection
+    - `schema_update_{timestamp}` - fallback pattern
+  - Schema change detection via git diff and prisma status
+  - Migration file verification post-execution
+
+- **Database Utilities Library** (`.claude/lib/db-utils.sh`)
+  - Logging functions with color coding (info, success, error, warning)
+  - DATABASE_URL parser with regex extraction
+  - PostgreSQL@16 tools availability check
+  - Docker and Prisma CLI verification
+  - Comprehensive unit tests (15 tests)
+
+### Changed
+- Updated README.md with Database Tools section (v3.3.0)
+- Updated workflow-gates.json to v3.2.0 with unified agent names
+- Version bump to 3.3.0
+
+### Documentation
+- Created `/db-sync` command documentation with prerequisites and usage examples
+- Created `/prisma-migrate` command documentation with intelligent naming explanation
+- Updated spec.md status to "Completed" with all test verifications marked
+- All Test Verification checklists completed (US1, US2, US3)
+
 ## [3.2.0] - 2025-11-17
 
 ### Added
@@ -318,7 +419,7 @@ import type { OrderType } from '@/features/order';
 import { OrderList } from '@/features/order';
 ```
 
-자세한 내용: `architectures/frontend/fsd/fsd-architecture.mdc`
+자세한 내용: `.claude/architectures/frontend/fsd/fsd-architecture.mdc`
 
 ### Compatibility
 - Supports upgrade from 2.5.x, 2.6.x → 2.7.0

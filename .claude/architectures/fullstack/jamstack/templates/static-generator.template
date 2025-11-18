@@ -1,0 +1,128 @@
+/**
+ * {{GeneratorName}} Static Site Generator
+ *
+ * JAMstack Architecture - Build-time static generation
+ * Generates HTML files from data sources at build time
+ *
+ * @package scripts
+ */
+
+import fs from 'fs/promises';
+import path from 'path';
+import matter from 'gray-matter';
+import { marked } from 'marked';
+
+interface PageData {
+  slug: string;
+  frontmatter: Record<string, any>;
+  content: string;
+  html: string;
+}
+
+export class {{GeneratorName}} {
+  private sourceDir: string;
+  private outputDir: string;
+
+  constructor(sourceDir: string, outputDir: string) {
+    this.sourceDir = sourceDir;
+    this.outputDir = outputDir;
+  }
+
+  async generate() {
+    console.log('Starting static site generation...');
+
+    // 1. Read all source files
+    const files = await this.readSourceFiles();
+
+    // 2. Parse and transform content
+    const pages = await this.parseFiles(files);
+
+    // 3. Generate HTML pages
+    await this.generatePages(pages);
+
+    // 4. Generate index/sitemap
+    await this.generateIndex(pages);
+
+    console.log(`Generated ${pages.length} pages successfully!`);
+  }
+
+  private async readSourceFiles(): Promise<string[]> {
+    const files = await fs.readdir(this.sourceDir);
+    return files.filter(file => file.endsWith('.md') || file.endsWith('.mdx'));
+  }
+
+  private async parseFiles(files: string[]): Promise<PageData[]> {
+    const pages: PageData[] = [];
+
+    for (const file of files) {
+      const content = await fs.readFile(
+        path.join(this.sourceDir, file),
+        'utf-8'
+      );
+
+      const { data: frontmatter, content: markdown } = matter(content);
+      const html = marked(markdown);
+      const slug = file.replace(/\.(md|mdx)$/, '');
+
+      pages.push({
+        slug,
+        frontmatter,
+        content: markdown,
+        html
+      });
+    }
+
+    return pages;
+  }
+
+  private async generatePages(pages: PageData[]) {
+    await fs.mkdir(this.outputDir, { recursive: true });
+
+    for (const page of pages) {
+      const html = this.renderTemplate(page);
+      const outputPath = path.join(this.outputDir, `${page.slug}.html`);
+      await fs.writeFile(outputPath, html, 'utf-8');
+    }
+  }
+
+  private renderTemplate(page: PageData): string {
+    return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${page.frontmatter.title || page.slug}</title>
+  <meta name="description" content="${page.frontmatter.description || ''}">
+</head>
+<body>
+  <main>
+    ${page.html}
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>
+    `.trim();
+  }
+
+  private async generateIndex(pages: PageData[]) {
+    const index = {
+      pages: pages.map(p => ({
+        slug: p.slug,
+        title: p.frontmatter.title,
+        description: p.frontmatter.description,
+      })),
+      generatedAt: new Date().toISOString(),
+    };
+
+    await fs.writeFile(
+      path.join(this.outputDir, 'index.json'),
+      JSON.stringify(index, null, 2),
+      'utf-8'
+    );
+  }
+}
+
+// Usage
+const generator = new {{GeneratorName}}('./content', './public');
+generator.generate();

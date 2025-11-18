@@ -1,0 +1,48 @@
+/**
+ * {{AdapterName}} Adapter
+ *
+ * Hexagonal Architecture - Implements port interface
+ * Connects core application to external systems
+ *
+ * @package adapters
+ */
+
+import { {{PortName}}OutputPort } from '../ports/{{PortName}}OutputPort';
+
+// Inbound Adapter (Primary) - e.g., REST Controller
+export class {{AdapterName}}Controller {
+  constructor(
+    private readonly inputPort: {{PortName}}InputPort
+  ) {}
+
+  async handleRequest(req: Request): Promise<Response> {
+    const input = this.mapRequestToInput(req);
+    const output = await this.inputPort.execute(input);
+    return this.mapOutputToResponse(output);
+  }
+
+  private mapRequestToInput(req: Request): {{PortName}}Input {
+    return {
+      // Map HTTP request to port input
+    };
+  }
+
+  private mapOutputToResponse(output: {{PortName}}Output): Response {
+    return {
+      // Map port output to HTTP response
+    };
+  }
+}
+
+// Outbound Adapter (Secondary) - e.g., Database Repository
+export class {{AdapterName}}Adapter implements {{PortName}}OutputPort {
+  constructor(
+    private readonly externalService: ExternalService
+  ) {}
+
+  async method(data: any): Promise<any> {
+    // Implement the port interface
+    // Interact with external system (DB, API, etc.)
+    return await this.externalService.call(data);
+  }
+}

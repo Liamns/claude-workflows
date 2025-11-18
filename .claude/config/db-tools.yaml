@@ -1,0 +1,82 @@
+# Database Tools Configuration
+# ============================================
+# Configuration for database synchronization and Prisma migration tools
+# ============================================
+
+version: "1.0"
+
+# PostgreSQL Configuration
+postgresql:
+  # Path to PostgreSQL binaries (optional, auto-detected if not set)
+  # Leave empty to use auto-detection
+  bin_dir: ""
+
+  # Required PostgreSQL version (default: 16)
+  version: 16
+
+  # Require exact version match (default: false)
+  # If false, any version >= required version is acceptable
+  require_exact_version: false
+
+  # Common paths to search (in priority order)
+  # Auto-detection will try these paths if bin_dir is not set
+  search_paths:
+    - "/opt/homebrew/opt/postgresql@16/bin"  # Apple Silicon Mac (Homebrew)
+    - "/usr/local/opt/postgresql@16/bin"     # Intel Mac (Homebrew)
+    - "/opt/homebrew/opt/postgresql/bin"     # Generic Homebrew
+    - "/usr/local/pgsql/bin"                 # Generic Linux
+    - "/usr/lib/postgresql/16/bin"           # Debian/Ubuntu
+    - "/usr/pgsql-16/bin"                    # RedHat/CentOS
+
+# Docker Configuration
+docker:
+  # Docker command (default: docker)
+  command: "docker"
+
+  # Compose command (default: docker-compose)
+  # Use "docker compose" for Docker Compose V2 plugin
+  compose_command: "docker-compose"
+
+  # Require Docker for db-sync (default: true)
+  # Set to false if using alternative container runtime
+  required: true
+
+# Prisma Configuration
+prisma:
+  # Prisma command (default: npx prisma)
+  # Alternatives: "yarn prisma", "pnpm prisma", "./node_modules/.bin/prisma"
+  command: "npx prisma"
+
+  # Require Prisma (default: true)
+  # Set to false if Prisma is not used in this project
+  required: true
+
+# Database Synchronization Configuration
+db_sync:
+  # Lock file location (default: .claude/cache/db-sync.lock)
+  # Use absolute path or relative to project root
+  lock_file: ""
+
+  # Dump file location (default: /tmp/baechaking_backup.dump)
+  dump_file: ""
+
+  # Log file location (default: .claude/cache/db-sync.log)
+  log_file: ""
+
+  # Backup retention count (default: 5)
+  # Number of backups to keep before cleaning up old ones
+  backup_retention: 5
+
+  # Enable .pgpass usage (default: true)
+  # Set to false to disable .pgpass file creation
+  use_pgpass: true
+
+  # PostgreSQL dump format (default: c)
+  # Options: c (custom), t (tar), p (plain text), d (directory)
+  dump_format: "c"
+
+# Notes:
+# - Empty values ("") will use default settings
+# - Environment variables take precedence over config file
+#   Example: PG_BIN_DIR environment variable overrides postgresql.bin_dir
+# - This config file is optional - all tools work without it using defaults

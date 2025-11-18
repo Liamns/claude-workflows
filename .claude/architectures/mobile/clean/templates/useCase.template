@@ -1,0 +1,109 @@
+/**
+ * {{UseCaseName}} Use Case
+ *
+ * Clean Architecture Mobile - Use Case (Application Layer)
+ * Contains application business rules and orchestrates data flow
+ *
+ * @package domain/usecases
+ */
+
+// Use Case interface
+export interface {{UseCaseName}}UseCase {
+  execute(request: {{UseCaseName}}Request): Promise<{{UseCaseName}}Response>;
+}
+
+// Implementation
+export class {{UseCaseName}}UseCaseImpl implements {{UseCaseName}}UseCase {
+  constructor(
+    private readonly repository: I{{EntityName}}Repository,
+    private readonly validator: I{{EntityName}}Validator
+  ) {}
+
+  async execute(request: {{UseCaseName}}Request): Promise<{{UseCaseName}}Response> {
+    try {
+      // 1. Validate input
+      const validationResult = await this.validator.validate(request);
+      if (!validationResult.isValid) {
+        return {
+          success: false,
+          error: validationResult.errors.join(', '),
+        };
+      }
+
+      // 2. Execute business logic
+      const entity = await this.repository.findById(request.id);
+      if (!entity) {
+        return {
+          success: false,
+          error: 'Entity not found',
+        };
+      }
+
+      // 3. Apply domain rules
+      entity.applyBusinessRule(request.data);
+
+      // 4. Persist changes
+      await this.repository.save(entity);
+
+      // 5. Return response
+      return {
+        success: true,
+        data: this.mapToResponse(entity),
+      };
+    } catch (error) {
+      console.error('Use case error:', error);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  }
+
+  private mapToResponse(entity: {{EntityName}}): {{UseCaseName}}Data {
+    return {
+      id: entity.id,
+      // Map entity properties to response
+    };
+  }
+}
+
+// Request DTO
+export interface {{UseCaseName}}Request {
+  id: string;
+  data: any;
+}
+
+// Response DTO
+export interface {{UseCaseName}}Response {
+  success: boolean;
+  data?: {{UseCaseName}}Data;
+  error?: string;
+}
+
+export interface {{UseCaseName}}Data {
+  id: string;
+  // Response data structure
+}
+
+// Repository interface (Domain layer)
+export interface I{{EntityName}}Repository {
+  findById(id: string): Promise<{{EntityName}} | null>;
+  save(entity: {{EntityName}}): Promise<void>;
+  delete(id: string): Promise<void>;
+}
+
+// Validator interface
+export interface I{{EntityName}}Validator {
+  validate(request: any): Promise<ValidationResult>;
+}
+
+export interface ValidationResult {
+  isValid: boolean;
+  errors: string[];
+}
+
+// Entity interface (placeholder)
+export interface {{EntityName}} {
+  id: string;
+  applyBusinessRule(data: any): void;
+}

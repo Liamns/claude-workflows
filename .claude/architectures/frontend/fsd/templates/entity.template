@@ -1,0 +1,48 @@
+/**
+ * {{EntityName}} Entity
+ *
+ * FSD - Entity layer
+ * Business entities and their logic
+ *
+ * @package entities/{{entity-name}}
+ */
+
+import React from 'react';
+import { create } from 'zustand';
+
+// Entity Store
+interface {{EntityName}}Store {
+  items: {{EntityName}}[];
+  isLoading: boolean;
+  fetchItems: () => Promise<void>;
+  updateItem: (id: string, data: Partial<{{EntityName}}>) => Promise<void>;
+}
+
+export const use{{EntityName}}Store = create<{{EntityName}}Store>((set) => ({
+  items: [],
+  isLoading: false,
+  fetchItems: async () => {
+    set({ isLoading: true });
+    const items = await api.get{{EntityName}}s();
+    set({ items, isLoading: false });
+  },
+  updateItem: async (id, data) => {
+    await api.update{{EntityName}}(id, data);
+    // Update store
+  }
+}));
+
+// Entity Model
+export interface {{EntityName}} {
+  id: string;
+  // Entity properties
+}
+
+// Entity UI Component
+export const {{EntityName}}Card: React.FC<{ data: {{EntityName}} }> = ({ data }) => {
+  return (
+    <div className="{{entity-name}}-card">
+      {/* Entity presentation */}
+    </div>
+  );
+};

@@ -3,9 +3,9 @@
   "version": "1.1.0",
   "description": "Architecture patterns registry for multi-architecture support",
   "implementationStatus": {
-    "implemented": ["fsd", "atomic", "clean", "hexagonal", "ddd", "layered"],
-    "planned": ["mvc", "micro-frontend", "serverless", "monorepo", "jamstack", "microservices", "mvvm", "clean-mobile"],
-    "comingSoon": "2024 Q1"
+    "implemented": ["fsd", "atomic", "clean", "hexagonal", "ddd", "layered", "mvc", "micro-frontend", "serverless", "monorepo", "jamstack", "microservices", "mvvm", "clean-mobile"],
+    "planned": [],
+    "comingSoon": "All core architectures implemented"
   },
   "architectures": {
     "frontend": {
@@ -14,7 +14,7 @@
         "description": "Layered architecture for frontend projects with strict isolation",
         "aliases": ["feature-sliced", "FSD"],
         "compatibility": ["react", "vue", "angular", "next", "nuxt"],
-        "configPath": "architectures/frontend/fsd/config.json",
+        "configPath": ".claude/architectures/frontend/fsd/config.json",
         "enabled": true
       },
       "atomic": {
@@ -22,7 +22,7 @@
         "description": "Component hierarchy from atoms to pages",
         "aliases": ["atomic-design"],
         "compatibility": ["react", "vue", "angular"],
-        "configPath": "architectures/frontend/atomic/config.json",
+        "configPath": ".claude/architectures/frontend/atomic/config.json",
         "enabled": true
       },
       "mvc": {
@@ -30,18 +30,16 @@
         "description": "Model-View-Controller and variants",
         "aliases": ["model-view-controller", "mvp", "mvvm"],
         "compatibility": ["angular", "vue", "react"],
-        "configPath": "architectures/frontend/mvc/config.json",
-        "enabled": false,
-        "status": "planned"
+        "configPath": ".claude/architectures/frontend/mvc/config.json",
+        "enabled": true
       },
       "micro-frontend": {
         "name": "Micro Frontend",
         "description": "Independently deployable frontend modules",
         "aliases": ["micro-frontends", "module-federation"],
         "compatibility": ["react", "vue", "angular"],
-        "configPath": "architectures/frontend/micro-frontend/config.json",
-        "enabled": false,
-        "status": "planned"
+        "configPath": ".claude/architectures/frontend/micro-frontend/config.json",
+        "enabled": true
       }
     },
     "backend": {
@@ -50,7 +48,7 @@
         "description": "Domain-centric architecture with clear boundaries",
         "aliases": ["clean-arch", "onion"],
         "compatibility": ["node", "python", "java", "go", "dotnet"],
-        "configPath": "architectures/backend/clean/config.json",
+        "configPath": ".claude/architectures/backend/clean/config.json",
         "enabled": true
       },
       "hexagonal": {
@@ -58,7 +56,7 @@
         "description": "Ports and Adapters pattern for testability",
         "aliases": ["ports-and-adapters", "hexagon"],
         "compatibility": ["node", "python", "java", "go", "dotnet"],
-        "configPath": "architectures/backend/hexagonal/config.json",
+        "configPath": ".claude/architectures/backend/hexagonal/config.json",
         "enabled": true
       },
       "ddd": {
@@ -66,7 +64,7 @@
         "description": "Complex domain modeling with bounded contexts",
         "aliases": ["domain-driven"],
         "compatibility": ["node", "python", "java", "go", "dotnet"],
-        "configPath": "architectures/backend/ddd/config.json",
+        "configPath": ".claude/architectures/backend/ddd/config.json",
         "enabled": true
       },
       "layered": {
@@ -74,7 +72,7 @@
         "description": "Traditional n-tier architecture",
         "aliases": ["n-tier", "3-tier"],
         "compatibility": ["node", "python", "java", "go", "dotnet"],
-        "configPath": "architectures/backend/layered/config.json",
+        "configPath": ".claude/architectures/backend/layered/config.json",
         "enabled": true
       },
       "serverless": {
@@ -82,9 +80,8 @@
         "description": "Function-as-a-Service and event-driven patterns",
         "aliases": ["faas", "lambda"],
         "compatibility": ["node", "python", "go", "java"],
-        "configPath": "architectures/backend/serverless/config.json",
-        "enabled": false,
-        "status": "planned"
+        "configPath": ".claude/architectures/backend/serverless/config.json",
+        "enabled": true
       }
     },
     "fullstack": {
@@ -93,27 +90,24 @@
         "description": "Unified repository for multiple projects",
         "aliases": ["mono-repo", "nx", "turborepo"],
         "compatibility": ["nx", "turborepo", "lerna", "rush"],
-        "configPath": "architectures/fullstack/monorepo/config.json",
-        "enabled": false,
-        "status": "planned"
+        "configPath": ".claude/architectures/fullstack/monorepo/config.json",
+        "enabled": true
       },
       "jamstack": {
         "name": "JAMstack",
         "description": "JavaScript, APIs, and Markup architecture",
         "aliases": ["jam"],
         "compatibility": ["gatsby", "next", "nuxt", "11ty"],
-        "configPath": "architectures/fullstack/jamstack/config.json",
-        "enabled": false,
-        "status": "planned"
+        "configPath": ".claude/architectures/fullstack/jamstack/config.json",
+        "enabled": true
       },
       "microservices": {
         "name": "Microservices",
         "description": "Distributed services architecture",
         "aliases": ["micro-services"],
         "compatibility": ["docker", "kubernetes", "all"],
-        "configPath": "architectures/fullstack/microservices/config.json",
-        "enabled": false,
-        "status": "planned"
+        "configPath": ".claude/architectures/fullstack/microservices/config.json",
+        "enabled": true
       }
     },
     "mobile": {
@@ -122,18 +116,16 @@
         "description": "Model-View-ViewModel for mobile apps",
         "aliases": ["mobile-mvvm"],
         "compatibility": ["react-native", "flutter", "ionic"],
-        "configPath": "architectures/mobile/mvvm/config.json",
-        "enabled": false,
-        "status": "planned"
+        "configPath": ".claude/architectures/mobile/mvvm/config.json",
+        "enabled": true
       },
       "clean-mobile": {
         "name": "Clean Architecture Mobile",
         "description": "Clean architecture adapted for mobile",
         "aliases": ["mobile-clean"],
         "compatibility": ["react-native", "flutter", "ionic"],
-        "configPath": "architectures/mobile/clean/config.json",
-        "enabled": false,
-        "status": "planned"
+        "configPath": ".claude/architectures/mobile/clean/config.json",
+        "enabled": true
       }
     }
   },

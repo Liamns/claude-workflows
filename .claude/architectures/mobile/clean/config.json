@@ -1,0 +1,275 @@
+{
+  "name": "Clean Architecture Mobile",
+  "type": "mobile",
+  "version": "1.0.0",
+  "description": "Clean Architecture principles adapted for mobile applications",
+
+  "structure": {
+    "directories": {
+      "domain": "Core business logic and use cases",
+      "data": "Data layer with repositories and data sources",
+      "presentation": "UI layer with screens and state management",
+      "core": "Shared utilities and base classes",
+      "di": "Dependency injection configuration"
+    },
+    "namingConventions": {
+      "entity": "PascalCase",
+      "useCase": "PascalCase + UseCase suffix",
+      "repository": "I + PascalCase + Repository (interface)",
+      "screen": "PascalCase + Screen suffix",
+      "viewModel": "PascalCase + ViewModel suffix"
+    },
+    "fileExtensions": {
+      "reactNative": ["tsx", "ts"],
+      "flutter": ["dart"],
+      "kotlin": ["kt"],
+      "swift": ["swift"]
+    }
+  },
+
+  "layers": {
+    "domain": {
+      "description": "Enterprise business rules",
+      "components": {
+        "entities": "Core business objects",
+        "useCases": "Application business rules",
+        "repositories": "Repository interfaces (contracts)"
+      },
+      "dependencies": [],
+      "rules": {
+        "noDependencies": true,
+        "pureBusinessLogic": true,
+        "noFrameworkDependencies": true,
+        "platformIndependent": true
+      }
+    },
+    "data": {
+      "description": "Data management and persistence",
+      "components": {
+        "repositories": "Repository implementations",
+        "dataSources": "Remote and local data sources",
+        "models": "Data transfer objects",
+        "mappers": "Entity <-> Model converters"
+      },
+      "dependencies": ["domain"],
+      "rules": {
+        "implementDomainContracts": true,
+        "mapToEntities": true,
+        "handleDataSources": true
+      }
+    },
+    "presentation": {
+      "description": "UI and user interaction",
+      "components": {
+        "screens": "UI screens/pages",
+        "widgets": "Reusable UI components",
+        "viewModels": "Presentation logic and state",
+        "navigation": "Navigation configuration"
+      },
+      "dependencies": ["domain"],
+      "rules": {
+        "callUseCases": true,
+        "noDataLayer": true,
+        "stateManagement": true
+      }
+    },
+    "core": {
+      "description": "Shared utilities and infrastructure",
+      "components": {
+        "network": "HTTP client configuration",
+        "storage": "Local storage utilities",
+        "errors": "Error handling",
+        "extensions": "Helper extensions",
+        "constants": "App constants"
+      },
+      "dependencies": [],
+      "rules": {
+        "generic": true,
+        "reusable": true
+      }
+    }
+  },
+
+  "dependencyFlow": {
+    "principle": "Dependency Inversion - inner layers don't depend on outer",
+    "flow": "Presentation → Domain ← Data",
+    "contracts": "Domain defines interfaces, outer layers implement"
+  },
+
+  "dependencies": {
+    "allowed": {
+      "presentation": ["domain"],
+      "data": ["domain"],
+      "domain": [],
+      "core": []
+    },
+    "forbidden": {
+      "domain": ["presentation", "data", "core"],
+      "data": ["presentation"],
+      "presentation": ["data"]
+    },
+    "circular": false
+  },
+
+  "patterns": {
+    "useCase": {
+      "description": "Single responsibility business logic units",
+      "structure": "execute() method with input/output",
+      "examples": ["LoginUseCase", "GetUserProfileUseCase", "UpdateSettingsUseCase"]
+    },
+    "repository": {
+      "description": "Abstract data access",
+      "pattern": "Interface in domain, implementation in data",
+      "benefits": ["Testability", "Data source flexibility", "Caching abstraction"]
+    },
+    "mapper": {
+      "description": "Convert between layers",
+      "types": [
+        "Entity ← → Model (data layer)",
+        "Entity ← → ViewModel (presentation layer)"
+      ]
+    },
+    "dependencyInjection": {
+      "description": "Inject dependencies via constructor",
+      "tools": {
+        "flutter": "get_it, provider",
+        "reactNative": "tsyringe, inversify",
+        "kotlin": "Hilt, Koin",
+        "swift": "Swinject"
+      }
+    }
+  },
+
+  "qualityRules": {
+    "domainPurity": {
+      "description": "Domain layer has zero external dependencies",
+      "severity": "error"
+    },
+    "dependencyInversion": {
+      "description": "Depend on abstractions, not concretions",
+      "severity": "error"
+    },
+    "singleResponsibility": {
+      "description": "Each use case has one responsibility",
+      "severity": "error"
+    },
+    "testability": {
+      "description": "All business logic is testable without UI/database",
+      "severity": "error",
+      "coverage": "> 80% for domain layer"
+    },
+    "offlineFirst": {
+      "description": "Support offline operation with local data source",
+      "severity": "warning"
+    }
+  },
+
+  "mobileAdaptations": {
+    "dataSync": {
+      "pattern": "Repository pattern with dual data sources",
+      "strategy": [
+        "Check local cache first",
+        "Fetch from remote if needed",
+        "Update local cache",
+        "Return to UI"
+      ]
+    },
+    "stateManagement": {
+      "options": {
+        "flutter": ["BLoC", "Provider", "Riverpod"],
+        "reactNative": ["MobX", "Redux", "Zustand"],
+        "kotlin": ["ViewModel + LiveData/Flow"],
+        "swift": ["Combine + ViewModel"]
+      }
+    },
+    "navigation": {
+      "approach": "Navigator in presentation layer",
+      "principles": ["Type-safe routes", "Deep linking support", "State preservation"]
+    },
+    "platformSpecific": {
+      "approach": "Platform adapters in core/infrastructure",
+      "examples": ["Camera", "Location", "Biometrics", "Push notifications"]
+    }
+  },
+
+  "testing": {
+    "unit": {
+      "scope": "Domain layer (entities, use cases)",
+      "dependencies": "Mock repositories",
+      "coverage": "> 80%"
+    },
+    "integration": {
+      "scope": "Data layer (repositories, data sources)",
+      "dependencies": "Test doubles or test database"
+    },
+    "widget": {
+      "scope": "Presentation layer (screens, widgets)",
+      "dependencies": "Mock use cases"
+    },
+    "e2e": {
+      "scope": "Full application flow",
+      "tools": {
+        "flutter": "integration_test",
+        "reactNative": "Detox",
+        "native": "XCUITest, Espresso"
+      }
+    }
+  },
+
+  "bestPractices": [
+    "Define use cases for all business operations",
+    "Use dependency injection throughout",
+    "Keep domain layer framework-agnostic",
+    "Implement repository pattern for data access",
+    "Use mappers to convert between layers",
+    "Test business logic without UI",
+    "Implement offline-first with repository caching",
+    "Use reactive streams for data flow",
+    "Handle errors in domain layer",
+    "Separate platform-specific code into adapters"
+  ],
+
+  "templates": {
+    "entity": ".claude/architectures/mobile/clean/templates/entity.template",
+    "useCase": ".claude/architectures/mobile/clean/templates/useCase.template",
+    "repository": ".claude/architectures/mobile/clean/templates/repository.template",
+    "screen": ".claude/architectures/mobile/clean/templates/screen.template"
+  },
+
+  "references": [
+    {
+      "title": "Clean Architecture by Uncle Bob",
+      "url": "https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html"
+    },
+    {
+      "title": "Flutter Clean Architecture + TDD",
+      "url": "https://resocoder.com/flutter-clean-architecture-tdd/"
+    },
+    {
+      "title": "Android App Architecture Guide",
+      "url": "https://developer.android.com/topic/architecture"
+    },
+    {
+      "title": "Clean Architecture in React Native",
+      "url": "https://www.freecodecamp.org/news/clean-architecture-with-react/"
+    }
+  ],
+
+  "examples": [
+    {
+      "name": "News Reader App",
+      "description": "GetArticlesUseCase → ArticleRepository (remote + local) → UI",
+      "files": ["domain/useCases/GetArticlesUseCase.ts", "data/repositories/ArticleRepositoryImpl.ts", "presentation/screens/ArticleListScreen.tsx"]
+    },
+    {
+      "name": "Weather App",
+      "description": "Location-based weather with caching, offline support",
+      "files": ["domain/useCases/GetWeatherUseCase.ts", "data/dataSources/WeatherRemoteDataSource.ts", "data/dataSources/WeatherLocalDataSource.ts"]
+    },
+    {
+      "name": "E-commerce Checkout",
+      "description": "Multi-step checkout flow with order processing use case",
+      "files": ["domain/useCases/ProcessOrderUseCase.ts", "domain/entities/Order.ts", "presentation/screens/CheckoutScreen.tsx"]
+    }
+  ]
+}

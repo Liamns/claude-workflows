@@ -1,0 +1,44 @@
+/**
+ * {{UseCaseName}} Use Case
+ *
+ * Application business rule
+ * Part of: Application Layer (Clean Architecture)
+ *
+ * @package application/use-cases
+ */
+
+export interface {{UseCaseName}}Input {
+  // Add input parameters
+}
+
+export interface {{UseCaseName}}Output {
+  // Add output data
+}
+
+export class {{UseCaseName}}UseCase {
+  constructor(
+    // Inject repository interfaces from domain layer
+    private readonly repository: I{{EntityName}}Repository
+  ) {}
+
+  async execute(input: {{UseCaseName}}Input): Promise<{{UseCaseName}}Output> {
+    // 1. Validate input
+    this.validateInput(input);
+
+    // 2. Execute business logic
+    // Use domain entities and repository
+    const result = await this.repository.method(input);
+
+    // 3. Return output
+    return {
+      // Map to output format
+    };
+  }
+
+  private validateInput(input: {{UseCaseName}}Input): void {
+    // Add validation logic
+    if (!input) {
+      throw new Error('Invalid input');
+    }
+  }
+}

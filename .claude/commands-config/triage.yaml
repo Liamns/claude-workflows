@@ -1,0 +1,290 @@
+# Triage Command Configuration
+# 작업 분류 및 워크플로우 선택
+
+extends: "_base.yaml"
+
+# ============================================================================
+# COMMAND INFO
+# ============================================================================
+
+command: "triage"
+type: "utility"
+description: "작업을 Epic/Major/Minor/Micro로 자동 분류 (키워드 기반 복잡도 계산)"
+
+# ============================================================================
+# COMPLEXITY CALCULATION
+# ============================================================================
+
+complexity_calculation:
+  enabled: true
+  auto_score: true
+
+  # 키워드 기반 점수 시스템
+  keyword_scores:
+    # 아키텍처 & 시스템 레벨 (높은 복잡도)
+    architecture: 8
+    refactoring: 6
+    migration: 7
+    infrastructure: 7
+    framework: 6
+
+    # API & 인터페이스
+    api: 5
+    endpoint: 4
+    interface: 4
+    contract: 5
+    integration: 5
+
+    # 데이터베이스
+    database: 5
+    schema: 5
+    migration: 6
+    query: 3
+
+    # 기능 개발
+    feature: 4
+    component: 3
+    module: 4
+    service: 4
+
+    # 품질 & 테스트
+    testing: 2
+    coverage: 2
+    security: 5
+    performance: 4
+    optimization: 4
+
+    # 버그 & 수정
+    bugfix: 2
+    hotfix: 3
+    fix: 2
+
+    # 문서 & 설정 (낮은 복잡도)
+    documentation: 1
+    config: 1
+    typo: -1
+    comment: 0
+    formatting: 0
+
+  # 파일 개수 점수
+  file_count_scores:
+    "0": 0
+    "1-2": 1
+    "3-5": 3
+    "6-10": 5
+    "11-20": 8
+    "20+": 12
+
+  # 예상 소요 시간 점수
+  duration_scores:
+    "< 30min": 0
+    "30min-2h": 2
+    "2h-1d": 4
+    "1-2d": 7
+    "2-5d": 10
+    "1w+": 15
+    "1m+": 20
+
+  # 영향 범위 점수
+  impact_scores:
+    single_file: 0
+    single_feature: 2
+    multiple_features: 5
+    cross_domain: 8
+    system_wide: 12
+
+  # 팀 협업 점수
+  team_scores:
+    solo: 0
+    pair: 2
+    team: 5
+    cross_team: 10
+
+  # 가중치 시스템
+  weights:
+    keywords: 0.35        # 35%
+    file_count: 0.20      # 20%
+    duration: 0.25        # 25%
+    impact: 0.15          # 15%
+    team: 0.05            # 5%
+
+# ============================================================================
+# CLASSIFICATION THRESHOLDS
+# ============================================================================
+
+classification:
+  # 복잡도 점수 기반 분류
+  thresholds:
+    epic:
+      min_score: 15
+      max_score: null
+      additional_requirements:
+        - duration: "> 1 month"
+        - teams: "multiple"
+        - scope: "전사적"
+
+    major:
+      min_score: 8
+      max_score: 14
+      additional_requirements:
+        - duration: "> 2 days"
+        - new_files: "> 3"
+
+    minor:
+      min_score: 3
+      max_score: 7
+      additional_requirements:
+        - duration: "< 1 day"
+
+    micro:
+      min_score: 0
+      max_score: 2
+      additional_requirements:
+        - duration: "< 30 minutes"
+
+  # 강제 분류 규칙 (복잡도 점수와 무관)
+  forced_rules:
+    epic:
+      - condition: "duration > 1 month AND teams multiple"
+        override: true
+
+    micro:
+      - condition: "typo_fix OR comment_only"
+        override: true
+
+# ============================================================================
+# AUTO-DETECTION PATTERNS
+# ============================================================================
+
+auto_detection:
+  enabled: true
+
+  # 제목/설명에서 키워드 추출
+  keyword_extraction:
+    enabled: true
+    sources:
+      - "title"
+      - "description"
+      - "spec_file"
+      - "branch_name"
+
+    # 키워드 정규화
+    normalization:
+      case_insensitive: true
+      stem_words: true
+      synonyms:
+        refactor: ["refactoring", "restructure"]
+        api: ["rest", "graphql", "endpoint"]
+        bugfix: ["bug", "fix", "hotfix"]
+
+  # Git 정보에서 추론
+  git_analysis:
+    enabled: true
+    analyze:
+      - "changed_files_count"
+      - "changed_lines_count"
+      - "affected_modules"
+      - "branch_pattern"
+
+  # Spec 파일 분석
+  spec_analysis:
+    enabled: true
+    parse:
+      - ".specify/specs/**/*.md"
+      - "feature-spec.md"
+    extract:
+      - "estimated_time"
+      - "affected_systems"
+      - "dependencies"
+
+# ============================================================================
+# INTERACTIVE PROMPTS
+# ============================================================================
+
+prompts:
+  initial_questions:
+    - question: "작업에 대해 간단히 설명해주세요"
+      type: "text"
+      required: true
+      extract_keywords: true
+
+    - question: "예상 소요 시간은?"
+      type: "select"
+      options:
+        - "< 30분"
+        - "30분 - 2시간"
+        - "2시간 - 1일"
+        - "1-2일"
+        - "2-5일"
+        - "1주 이상"
+        - "1개월 이상"
+
+    - question: "몇 개의 파일을 수정/생성하나요?"
+      type: "select"
+      options:
+        - "1-2개"
+        - "3-5개"
+        - "6-10개"
+        - "11-20개"
+        - "20개 이상"
+
+    - question: "어떤 종류의 작업인가요?"
+      type: "multi_select"
+      options:
+        - label: "새로운 기능 추가"
+          keywords: ["feature", "component"]
+        - label: "API/인터페이스 변경"
+          keywords: ["api", "interface"]
+        - label: "아키텍처 변경"
+          keywords: ["architecture", "refactoring"]
+        - label: "버그 수정"
+          keywords: ["bugfix", "fix"]
+        - label: "성능 최적화"
+          keywords: ["performance", "optimization"]
+        - label: "테스트 추가"
+          keywords: ["testing", "coverage"]
+        - label: "문서/설정 변경"
+          keywords: ["documentation", "config"]
+
+  confirmation:
+    enabled: true
+    show_score_breakdown: true
+    allow_override: true
+
+# ============================================================================
+# OUTPUT CONFIGURATION
+# ============================================================================
+
+output:
+  format: "detailed"
+
+  sections:
+    classification_result:
+      enabled: true
+      show:
+        - "workflow_type"        # epic/major/minor/micro
+        - "complexity_score"     # 숫자 점수
+        - "confidence_level"     # high/medium/low
+
+    score_breakdown:
+      enabled: true
+      show:
+        - "keyword_score"
+        - "file_count_score"
+        - "duration_score"
+        - "impact_score"
+        - "team_score"
+        - "total_weighted_score"
+
+    recommendations:
+      enabled: true
+      include:
+        - "suggested_workflow"   # /epic, /major, /minor, /micro
+        - "estimated_time"
+        - "required_approvals"
+        - "suggested_agents"
+        - "quality_gates"
+
+    next_steps:
+      enabled: true
+      auto_generate_command: true  # 다음 실행할 명령어 자동 생성

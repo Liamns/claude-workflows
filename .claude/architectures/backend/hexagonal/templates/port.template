@@ -1,0 +1,29 @@
+/**
+ * {{PortName}} Port (Interface)
+ *
+ * Hexagonal Architecture - Ports & Adapters
+ * Defines the contract for external interactions
+ *
+ * @package core/ports
+ */
+
+// Inbound Port (Primary/Driving)
+// Called by external actors (controllers, CLI, etc.)
+export interface {{PortName}}InputPort {
+  execute(input: {{PortName}}Input): Promise<{{PortName}}Output>;
+}
+
+// Outbound Port (Secondary/Driven)
+// Called by application core (repositories, services, etc.)
+export interface {{PortName}}OutputPort {
+  // Define methods that adapters must implement
+  method(data: any): Promise<any>;
+}
+
+export interface {{PortName}}Input {
+  // Input data structure
+}
+
+export interface {{PortName}}Output {
+  // Output data structure
+}

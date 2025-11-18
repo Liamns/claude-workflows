@@ -1,0 +1,74 @@
+/**
+ * {{EntityName}} Repository Interface
+ *
+ * Repository contract defined in domain layer
+ * Implementation will be in infrastructure layer
+ * Part of: Domain Layer (Clean Architecture)
+ *
+ * @package domain/repositories
+ */
+
+import { {{EntityName}} } from '../entities/{{EntityName}}';
+
+export interface I{{EntityName}}Repository {
+  findById(id: string): Promise<{{EntityName}} | null>;
+  findAll(): Promise<{{EntityName}}[]>;
+  save(entity: {{EntityName}}): Promise<void>;
+  update(entity: {{EntityName}}): Promise<void>;
+  delete(id: string): Promise<void>;
+}
+
+/**
+ * {{EntityName}} Repository Implementation
+ *
+ * Concrete implementation using database/ORM
+ * Part of: Infrastructure Layer (Clean Architecture)
+ *
+ * @package infrastructure/repositories
+ */
+
+export class {{EntityName}}Repository implements I{{EntityName}}Repository {
+  constructor(
+    // Inject database connection/ORM
+    private readonly db: Database
+  ) {}
+
+  async findById(id: string): Promise<{{EntityName}} | null> {
+    const data = await this.db.query('SELECT * FROM {{table_name}} WHERE id = ?', [id]);
+    return data ? this.toDomain(data) : null;
+  }
+
+  async findAll(): Promise<{{EntityName}}[]> {
+    const data = await this.db.query('SELECT * FROM {{table_name}}');
+    return data.map(this.toDomain);
+  }
+
+  async save(entity: {{EntityName}}): Promise<void> {
+    const data = this.toPersistence(entity);
+    await this.db.insert('{{table_name}}', data);
+  }
+
+  async update(entity: {{EntityName}}): Promise<void> {
+    const data = this.toPersistence(entity);
+    await this.db.update('{{table_name}}', data, { id: entity.id });
+  }
+
+  async delete(id: string): Promise<void> {
+    await this.db.delete('{{table_name}}', { id });
+  }
+
+  // Mapper: Database → Domain
+  private toDomain(raw: any): {{EntityName}} {
+    return {{EntityName}}.create({
+      // Map database fields to domain props
+    });
+  }
+
+  // Mapper: Domain → Database
+  private toPersistence(entity: {{EntityName}}): any {
+    return {
+      id: entity.id,
+      // Map domain props to database fields
+    };
+  }
+}

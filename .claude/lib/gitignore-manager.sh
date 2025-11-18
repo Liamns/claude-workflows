@@ -22,32 +22,17 @@ set -e
 
 # Claude Workflows Installer가 자동으로 추가하는 .gitignore 패턴
 readonly INSTALLER_GITIGNORE_PATTERNS=(
-    # Backup files
-    ".claude/.backup/"
-    ".claude/.backup/*"
+    # Claude Workflows 디렉토리 전체
+    ".claude/"
 
-    # Cache directories
-    ".claude/cache/"
-    ".claude/cache/*"
-    "!.claude/cache/.gitkeep"
-    "!.claude/cache/*/gitkeep"
+    # Specify 디렉토리 전체
+    ".specify/"
 
     # Log files
     "*.log"
-    ".claude/.backup/*.log"
 
     # Temporary files
     "*.tmp"
-    ".specify/temp/"
-
-    # Personal settings (user-specific)
-    ".claude/settings.local.json"
-    ".claude/config/*-local.json"
-    ".claude/config/plan-mode.json"
-
-    # Personal metrics (user-specific)
-    ".claude/metrics/"
-    ".claude/cache/metrics/"
 
     # OS-specific files
     ".DS_Store"

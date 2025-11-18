@@ -163,6 +163,16 @@ parse_env_files() {
     TARGET_DB_PASS="$DB_PASS"
     TARGET_DB_NAME="$DB_NAME"
 
+    # Auto-detect Docker host port mapping
+    # This automatically converts Docker internal hostnames (e.g., postgres_dev:5432)
+    # to host-accessible addresses (e.g., localhost:6022)
+    if map_docker_host "$TARGET_DB_HOST" "$TARGET_DB_PORT"; then
+        log_info "Detected Docker service: $TARGET_DB_HOST:$TARGET_DB_PORT"
+        log_info "Mapping to host: $MAPPED_HOST:$MAPPED_PORT"
+        TARGET_DB_HOST="$MAPPED_HOST"
+        TARGET_DB_PORT="$MAPPED_PORT"
+    fi
+
     log_success "Target DB: $TARGET_DB_HOST:$TARGET_DB_PORT"
 
     return 0

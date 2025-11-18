@@ -237,3 +237,86 @@ check_prisma() {
     log_success "Prisma CLI is available"
     return 0
 }
+
+# ============================================================================
+# Docker Port Mapping Auto-Detection
+# ============================================================================
+
+# Get host port mapping for a Docker service
+# Usage: get_docker_host_port "postgres_dev" "5432"
+# Returns: "6022" (or empty if not found)
+get_docker_host_port() {
+    local service="$1"
+    local container_port="$2"
+
+    # Method 1: Try docker-compose port command (most reliable)
+    local mapping
+    mapping=$(docker-compose port "$service" "$container_port" 2>/dev/null)
+
+    if [ -n "$mapping" ]; then
+        # Extract port from "0.0.0.0:6022" or "127.0.0.1:6022"
+        echo "$mapping" | sed 's/.*://'
+        return 0
+    fi
+
+    # Method 2: Fallback to docker inspect
+    local container_name
+    container_name=$(docker-compose ps -q "$service" 2>/dev/null)
+
+    if [ -n "$container_name" ]; then
+        local host_port
+        host_port=$(docker inspect "$container_name" \
+            --format "{{(index (index .NetworkSettings.Ports \"${container_port}/tcp\") 0).HostPort}}" 2>/dev/null)
+
+        if [ -n "$host_port" ] && [ "$host_port" != "<no value>" ]; then
+            echo "$host_port"
+            return 0
+        fi
+    fi
+
+    return 1
+}
+
+# Map Docker internal hostname to localhost with auto-detected port
+# Usage: map_docker_host "postgres_dev" "5432"
+# Sets: MAPPED_HOST="localhost", MAPPED_PORT="6022"
+# Returns: 0 if mapped successfully, 1 if not a Docker hostname
+map_docker_host() {
+    local docker_host="$1"
+    local container_port="$2"
+
+    # Map known Docker service names
+    local service_name=""
+    case "$docker_host" in
+        postgres_dev)
+            service_name="postgres_dev"
+            ;;
+        postgres_test)
+            service_name="postgres_test"
+            ;;
+        redis_dev)
+            service_name="redis_dev"
+            ;;
+        *)
+            # Not a recognized Docker hostname
+            return 1
+            ;;
+    esac
+
+    # Get host port mapping
+    local host_port
+    host_port=$(get_docker_host_port "$service_name" "$container_port")
+
+    if [ -n "$host_port" ]; then
+        # shellcheck disable=SC2034  # Variables used by caller
+        MAPPED_HOST="localhost"
+        # shellcheck disable=SC2034
+        MAPPED_PORT="$host_port"
+        return 0
+    else
+        log_warning "Could not detect port mapping for $service_name:$container_port"
+        log_info "Please ensure the Docker container is running:"
+        log_info "  docker-compose up -d $service_name"
+        return 1
+    fi
+}

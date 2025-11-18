@@ -1,8 +1,8 @@
 {
   "version": "3.3.1",
-  "generatedAt": "2025-11-18T05:35:27Z",
+  "generatedAt": "2025-11-18T05:45:15Z",
   "files": {
-    ".claude/.checksums.json": "fcbb85e59ea9729538a5d7cd3c5cebbbff099a984bfddfbbd2abfefb64cd348d",
+    ".claude/.checksums.json": "c88adb188e7c9060e9ff195f08e6215a4c5dac738834a4ac36ccb0bacf29d5ef",
     ".claude/.version": "ef2a79c2f7dc37800a73fd9930b307824ce20af920cbc7159323456418e77e6b",
     ".claude/agents/api-designer.md": "8d34ac2f5c3c7d9e25ffe46463b8efa3073a1f023f6226ef2f2d184b1a64c1b5",
     ".claude/agents/architect-unified.md": "509dd35487a5054f559f7ec6536f33a6015f09bfdcc113916718970d2c43f77f",
@@ -132,8 +132,8 @@
     ".claude/lib/config-loader.sh": "47450877e529eff6649313a966aa8cafaf91e9adc833765f508ef38c6e5adc7c",
     ".claude/lib/create-new-command.sh": "41e82003af1aec57194b0b9f98f5270bba0dda151c32c15b30d97b2a565e5dc1",
     ".claude/lib/dashboard-generator.sh": "500e5e602ccdfac0a834d9de43a7fdaf38a2c56ede13a1f89d5bc9edea1aed25",
-    ".claude/lib/db-sync.sh": "bb5b07202d6d34380fea805ea74b05bb984cc92db38545e5dd83f23fb93fd2d5",
-    ".claude/lib/db-utils.sh": "1199279a34acdc54693094b96fbf4cc6fe045365bc49a776792196851b24904c",
+    ".claude/lib/db-sync.sh": "a5ac8d1d9846bb0c99c839c56fd909d3f483a822ce9cf4f6c9d78b57675b8155",
+    ".claude/lib/db-utils.sh": "81cc26be7ffd75d8de4233acd29769de3d43324d847993be7bcaebdeeb3fa5ff",
     ".claude/lib/discover-commands.sh": "c2036d88d1f4d74aa7b54e539d985b55d2731305d005377247ae8cf423c2e0e5",
     ".claude/lib/document-preview/batch-preview.sh": "9c42961368cdfa20607ce2ab9ca647bd00e58f7e5684ac45af5aed827b01738e",
     ".claude/lib/document-preview/consent-manager.sh": "52f64b509437ebe3b2e9c3a2511a4168eada94d0db2c9b22a38fc385e1f43871",

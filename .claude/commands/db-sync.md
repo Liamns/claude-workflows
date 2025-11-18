@@ -10,6 +10,43 @@ usage: "/db-sync"
 
 Synchronizes the database from production (source) to development (target) environment.
 
+## Output Language
+
+**IMPORTANT**: 사용자가 확인하는 모든 출력은 반드시 **한글로 작성**해야 합니다.
+
+**한글 작성 대상:**
+- 진행 단계 메시지
+- 성공/실패 상태
+- 검증 결과
+- 에러 메시지 및 경고
+
+**영어 유지:**
+- 데이터베이스 이름
+- 파일 경로
+- 명령어
+
+**예시 출력:**
+```
+============================================
+  DB 동기화 - 데이터베이스 동기화
+============================================
+
+=== 단계 0: DB 연결 확인 ===
+✓ PostgreSQL 도구 사용 가능
+✓ 소스 DB: localhost:5433
+✓ 타겟 DB: localhost:6022
+✓ 모든 DB 연결 확인 완료
+
+=== 단계 1: 데이터베이스 덤프 생성 ===
+✓ 덤프 생성 완료: /tmp/baechaking_backup.dump (155K)
+
+=== 단계 5: 데이터 검증 ===
+ℹ️  테이블 발견: 27개
+ℹ️  User: 22개 레코드
+ℹ️  Order: 110개 레코드
+✓ 데이터 검증 완료
+```
+
 This command performs a complete database synchronization with the following steps:
 
 1. **Connection Check**: Verifies connectivity to both source and target databases

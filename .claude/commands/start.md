@@ -4,6 +4,41 @@
 
 Initialize Claude Workflows in your project with automatic architecture detection and setup.
 
+## Output Language
+
+**IMPORTANT**: 사용자가 확인하는 모든 초기화 메시지와 설정 정보는 반드시 **한글로 작성**해야 합니다.
+
+**한글 작성 대상:**
+- 초기화 진행 상황 메시지
+- 아키텍처 감지 결과
+- 설정 파일 생성 안내
+- Constitution 생성 내용
+- 검증 결과 및 권장사항
+
+**영어 유지:**
+- 아키텍처 이름 (FSD, Clean Architecture 등)
+- 파일 경로
+- 명령어
+
+**예시 출력:**
+```
+🚀 Claude Workflows - 프로젝트 초기화
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 프로젝트 구조 분석 중...
+
+✓ 발견: package.json
+✓ 발견: src/ 디렉토리
+✓ 감지됨: React 애플리케이션
+
+🎯 아키텍처 감지: Feature-Sliced Design (FSD)
+신뢰도: 95%
+
+📝 설정 파일 생성 중:
+- .specify/memory/constitution.md 생성
+- .specify/config/architecture.json 생성
+```
+
 This command:
 1. **Detects Architecture**: Analyzes existing codebase structure
 2. **Configures Templates**: Sets up architecture-specific templates

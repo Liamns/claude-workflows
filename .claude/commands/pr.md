@@ -4,6 +4,44 @@
 
 Automatically creates pull requests with intelligent descriptions based on commit history and code changes.
 
+## Output Language
+
+**IMPORTANT**: 사용자나 동료가 확인하는 모든 출력은 반드시 **한글로 작성**해야 합니다.
+
+**한글 작성 대상:**
+- PR 제목의 설명 부분 (콜론 `:` 이후)
+- PR 본문 전체 (Summary, Changes, Test Plan 등)
+- 진행 상황 메시지
+- 에러 메시지 및 경고
+
+**영어 유지:**
+- PR 제목의 타입과 스코프 (feat, fix 등)
+- 코드, 파일 경로
+- 명령어
+
+**예시:**
+```markdown
+제목: feat(auth): JWT 인증 시스템 추가
+
+## 요약
+- JWT 기반 인증 시스템 구현
+- 리프레시 토큰 메커니즘 추가
+- 역할 기반 접근 제어 구현
+
+## 변경 사항
+- `src/auth/`: 새로운 인증 모듈
+- `src/middleware/auth.ts`: JWT 검증 미들웨어
+- `tests/auth.test.ts`: 인증 테스트 suite
+
+## 테스트 계획
+- [ ] 수동: 유효한 자격 증명으로 로그인
+- [ ] 수동: 토큰 만료 확인
+- [ ] 자동: `npm test` 실행
+- [ ] 자동: CI/CD 파이프라인 확인
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+```
+
 This command:
 1. **Analyzes Branch**: Reviews all commits since divergence from base
 2. **Generates Summary**: Creates comprehensive PR description

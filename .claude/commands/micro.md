@@ -4,6 +4,34 @@
 
 Ultra-fast workflow for trivial changes with 85% token savings through minimal overhead and direct execution.
 
+## Output Language
+
+**IMPORTANT**: 사용자나 동료가 확인하는 모든 출력은 반드시 **한글로 작성**해야 합니다.
+
+**한글 작성 대상:**
+- 변경 사항 설명 및 요약
+- 진행 상황 메시지
+- 검증 결과
+- 에러 메시지 및 경고
+
+**영어 유지:**
+- 코드, 변수명, 함수명, 파일 경로
+- 명령어
+
+**예시 출력:**
+```
+✅ 변경 완료
+
+📝 수정 내용:
+- README.md: 오타 수정 (teh → the)
+
+🔍 검증:
+- 파일 저장 완료
+- 문법 오류 없음
+
+다음 단계: /commit으로 커밋 생성
+```
+
 This command:
 1. **Identifies Change**: Quick analysis of trivial modification needed
 2. **Validates Scope**: Ensures change is truly micro-level (< 30 min)

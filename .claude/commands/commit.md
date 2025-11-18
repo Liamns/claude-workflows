@@ -4,6 +4,34 @@
 
 Automatically generates semantic commit messages following Conventional Commits format by analyzing staged changes.
 
+## Output Language
+
+**IMPORTANT**: 사용자나 동료가 확인하는 모든 출력은 반드시 **한글로 작성**해야 합니다.
+
+**한글 작성 대상:**
+- 커밋 메시지 제목의 설명 부분 (콜론 `:` 이후)
+- 커밋 메시지 본문 (body) - 변경 사항 상세 설명
+- 진행 상황 메시지 및 안내
+- 에러 메시지 및 경고
+
+**영어 유지:**
+- 커밋 타입 (feat, fix, chore, docs 등)
+- 스코프 (auth, api, ui 등)
+- 코드, 변수명, 함수명, 파일 경로
+
+**예시:**
+```
+feat(auth): JWT 인증 시스템 추가
+
+토큰 생성 및 검증 기능 구현
+- 리프레시 토큰 메커니즘 추가
+- 역할 기반 접근 제어 포함
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+```
+
 This command:
 1. **Analyzes Changes**: Reviews all staged files and their modifications
 2. **Generates Message**: Creates a concise, descriptive commit message

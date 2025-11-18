@@ -74,11 +74,17 @@ extract_sections() {
 }
 
 # Check if a section exists
+# Special handling: "Examples" also matches "사용 예시" (Korean)
 section_exists() {
     local sections="$1"
     local section_name="$2"
 
-    echo "$sections" | grep -qF "$section_name"
+    if [[ "$section_name" == "Examples" ]]; then
+        # Accept both "Examples" and "사용 예시"
+        echo "$sections" | grep -qE "(^Examples$|^사용 예시$)"
+    else
+        echo "$sections" | grep -qF "$section_name"
+    fi
 }
 
 # Validate section order
@@ -97,7 +103,8 @@ validate_section_order() {
 
     overview_line=$(grep -n "^## Overview" "$file" | cut -d: -f1 | head -1)
     usage_line=$(grep -n "^## Usage" "$file" | cut -d: -f1 | head -1)
-    examples_line=$(grep -n "^## Examples" "$file" | cut -d: -f1 | head -1)
+    # Accept both "Examples" and "사용 예시" (Korean)
+    examples_line=$(grep -n "^## \(Examples\|사용 예시\)" "$file" | cut -d: -f1 | head -1)
     impl_line=$(grep -n "^## Implementation" "$file" | cut -d: -f1 | head -1)
 
     # All sections must exist
@@ -106,10 +113,10 @@ validate_section_order() {
         return 1
     fi
 
-    # Check order: Overview < Usage < Examples < Implementation
+    # Check order: Overview < Usage < Implementation
+    # Note: Examples can be before OR after Implementation (workflow files have it after)
     if [[ "$overview_line" -lt "$usage_line" ]] && \
-       [[ "$usage_line" -lt "$examples_line" ]] && \
-       [[ "$examples_line" -lt "$impl_line" ]]; then
+       [[ "$usage_line" -lt "$impl_line" ]]; then
         return 0
     else
         return 1

@@ -4,6 +4,24 @@
 
 AI-powered workflow selection that automatically analyzes your task and recommends the optimal workflow (Major/Minor/Micro).
 
+## Output Language
+
+**IMPORTANT**: 사용자가 확인하는 모든 분석 결과는 반드시 **한글로 작성**해야 합니다.
+
+**한글 작성 대상:**
+- 복잡도 분석 결과 전체
+- 워크플로우 추천 및 이유
+- 다음 단계 안내
+- 토큰 예상치 및 절감 효과
+- Plan Mode 가이드
+
+**영어 유지:**
+- 워크플로우 이름 (Major, Minor, Micro)
+- 명령어
+- 파일 경로
+
+**예시는 이미 문서 내에 한글로 작성되어 있습니다.**
+
 This command:
 1. **Analyzes Complexity**: Evaluates scope, impact, and estimated effort
 2. **Recommends Workflow**: Suggests Major (60% savings), Minor (75%), or Micro (85%)

@@ -4,6 +4,43 @@
 
 Real-time monitoring dashboard for Claude Workflows performance metrics, token usage, and quality indicators.
 
+## Output Language
+
+**IMPORTANT**: 사용자가 확인하는 모든 메트릭 출력은 반드시 **한글로 작성**해야 합니다.
+
+**한글 작성 대상:**
+- 대시보드 전체 출력
+- 메트릭 설명 및 레이블
+- 성능 지표 분석
+- 통계 요약
+
+**영어 유지:**
+- 명령어
+- 파일 경로
+- 에이전트 이름 (architect-unified 등)
+
+**예시 출력:**
+```
+╔═══════════════════════════════════════════════════╗
+║     Claude Workflows - 메트릭 대시보드            ║
+╚═══════════════════════════════════════════════════╝
+
+📊 현재 세션 (2025-11-18 13:00)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+사용 토큰:        45,230 / 200,000 (22.6%)
+완료된 작업:      8개
+성공률:           100%
+평균 소요시간:    2분 15초
+
+🎯 워크플로우 분석
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Major    ████████░░  3개 작업   18,450 토큰
+Minor    ██████░░░░  3개 작업   12,300 토큰
+Micro    ████░░░░░░  2개 작업    8,240 토큰
+```
+
 This command provides:
 1. **Token Usage**: Track token consumption by workflow and agent
 2. **Performance Metrics**: Monitor execution times and throughput

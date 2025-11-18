@@ -4,6 +4,37 @@
 
 Manages complex multi-feature initiatives by breaking them into Features and Tasks with dependency tracking and progress management.
 
+## Output Language
+
+**IMPORTANT**: 사용자나 동료가 확인하는 모든 문서와 출력은 반드시 **한글로 작성**해야 합니다.
+
+**한글 작성 대상:**
+- epic.md - Epic 정의 및 분해 전체
+- progress.md - 진행 상황 추적 문서
+- roadmap.md - 타임라인 및 마일스톤
+- 각 Feature 문서
+- 진행 상황 메시지
+- 에러 메시지 및 경고
+
+**영어 유지:**
+- 코드, 변수명, 함수명, 파일 경로
+- 기술 용어
+- 명령어
+
+**예시 문서 구조:**
+```markdown
+# Epic: 마이크로서비스 마이그레이션
+
+## Vision
+모놀리식 애플리케이션을 확장 가능한 마이크로서비스 아키텍처로 전환
+
+## Complexity Assessment
+- Score: 15/15 (매우 복잡)
+- Duration: 8-12주
+- Team Size: 3-5명의 개발자
+...
+```
+
 This command provides:
 1. **Epic Planning**: High-level initiative breakdown
 2. **Feature Decomposition**: Epic → 3-5 Features → Multiple Tasks

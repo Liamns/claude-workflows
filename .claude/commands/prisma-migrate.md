@@ -10,6 +10,69 @@ usage: "/prisma-migrate"
 
 Automates Prisma schema migrations with intelligent detection and naming.
 
+## Output Language
+
+**IMPORTANT**: 사용자가 확인하는 모든 출력은 반드시 **한글로 작성**해야 합니다.
+
+**한글 작성 대상:**
+- 진행 단계 메시지
+- 스키마 변경 감지 메시지
+- 환경 선택 프롬프트
+- 마이그레이션 실행 상태
+- 성공/실패 메시지 및 경고
+
+**영어 유지:**
+- Prisma 명령어
+- 파일 경로
+- 마이그레이션 파일명 (타임스탬프_이름)
+- 환경 이름 (development, production)
+
+**예시 출력:**
+```
+============================================
+  Prisma 마이그레이션
+============================================
+
+=== 단계 0: 마이그레이션 디렉토리 감지 ===
+✓ 마이그레이션 디렉토리 발견: prisma/schema/migrations
+✓ 스키마 발견: prisma/schema/schema.prisma
+
+기존 마이그레이션:
+  총: 12개 마이그레이션
+  최근 마이그레이션:
+    - 20250115142030_add_user_table
+    - 20250114093015_add_index
+
+=== 단계 1: 스키마 변경 확인 ===
+ℹ️  스키마 파일에 커밋되지 않은 변경사항 있음
+
+=== 단계 2: 환경 선택 ===
+환경을 선택하세요:
+  1) Development (마이그레이션 파일 생성 + 적용)
+  2) Production (기존 마이그레이션만 적용)
+
+선택 (1/2): 1
+✓ 환경: Development
+
+=== 단계 3: 마이그레이션 이름 생성 ===
+ℹ️  스키마 변경사항 분석 중...
+✓ 마이그레이션 이름 생성: add_order_table
+
+=== 단계 4: 마이그레이션 실행 ===
+ℹ️  Development 마이그레이션 실행 중...
+✓ 마이그레이션 생성 및 적용 완료
+ℹ️  마이그레이션 파일: 20250118143052_add_order_table
+
+============================================
+✅ 마이그레이션 완료!
+============================================
+
+ℹ️  환경: development
+ℹ️  스키마: prisma/schema/schema.prisma
+ℹ️  마이그레이션 이름: add_order_table
+ℹ️  총 마이그레이션: 13개
+```
+
 This command performs automated Prisma migrations with the following steps:
 
 1. **Detect Migrations**: Automatically finds your Prisma schema and migrations directory

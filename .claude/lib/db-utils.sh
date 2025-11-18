@@ -37,21 +37,76 @@ log_warning() {
 }
 
 # ============================================================================
+# Config File Loading
+# ============================================================================
+
+# Load configuration from db-tools.yaml
+load_db_config() {
+    local config_file=".claude/config/db-tools.yaml"
+
+    # Check if config file exists
+    if [ ! -f "$config_file" ]; then
+        return 0  # Config file is optional
+    fi
+
+    # Simple YAML parser using grep/sed (no external dependencies)
+    # Extract postgresql.bin_dir
+    if [ -z "$PG_BIN_DIR" ]; then
+        PG_BIN_DIR=$(grep -A 20 "^postgresql:" "$config_file" | \
+                     grep "bin_dir:" | \
+                     sed 's/^[[:space:]]*bin_dir:[[:space:]]*"\([^"]*\)".*/\1/' | \
+                     head -1)
+    fi
+
+    # Extract docker.command
+    if [ -z "$DOCKER_COMMAND" ]; then
+        DOCKER_COMMAND=$(grep -A 10 "^docker:" "$config_file" | \
+                         grep "command:" | \
+                         sed 's/^[[:space:]]*command:[[:space:]]*"\([^"]*\)".*/\1/' | \
+                         head -1)
+        DOCKER_COMMAND=${DOCKER_COMMAND:-docker}
+    fi
+
+    # Extract docker.compose_command
+    if [ -z "$COMPOSE_COMMAND" ]; then
+        COMPOSE_COMMAND=$(grep -A 10 "^docker:" "$config_file" | \
+                          grep "compose_command:" | \
+                          sed 's/^[[:space:]]*compose_command:[[:space:]]*"\([^"]*\)".*/\1/' | \
+                          head -1)
+        COMPOSE_COMMAND=${COMPOSE_COMMAND:-docker-compose}
+    fi
+
+    # Extract prisma.command
+    if [ -z "$PRISMA_COMMAND" ]; then
+        PRISMA_COMMAND=$(grep -A 10 "^prisma:" "$config_file" | \
+                         grep "command:" | \
+                         sed 's/^[[:space:]]*command:[[:space:]]*"\([^"]*\)".*/\1/' | \
+                         head -1)
+        PRISMA_COMMAND=${PRISMA_COMMAND:-npx prisma}
+    fi
+}
+
+# ============================================================================
 # DATABASE_URL Parsing Function
 # ============================================================================
 
 # Parse DATABASE_URL and extract components
 # Usage: parse_database_url "postgresql://user:pass@localhost:5433/dbname"
-# Sets: DB_USER, DB_PASS, DB_HOST, DB_PORT, DB_NAME
+# Sets: DB_USER, DB_PASS, DB_HOST, DB_PORT, DB_NAME (used by caller)
 parse_database_url() {
     local url="$1"
 
     # Regex to parse: postgresql://user:pass@host:port/dbname
     if [[ $url =~ ^postgresql://([^:]+):([^@]+)@([^:]+):([0-9]+)/(.+)$ ]]; then
+        # shellcheck disable=SC2034  # Variables are used by caller script
         DB_USER="${BASH_REMATCH[1]}"
+        # shellcheck disable=SC2034
         DB_PASS="${BASH_REMATCH[2]}"
+        # shellcheck disable=SC2034
         DB_HOST="${BASH_REMATCH[3]}"
+        # shellcheck disable=SC2034
         DB_PORT="${BASH_REMATCH[4]}"
+        # shellcheck disable=SC2034
         DB_NAME="${BASH_REMATCH[5]}"
         return 0
     else
@@ -66,31 +121,58 @@ parse_database_url() {
 # ============================================================================
 
 check_postgresql_tools() {
-    local PG_BIN_DIR="/opt/homebrew/opt/postgresql@16/bin"
+    # Load config if not already loaded
+    load_db_config
 
-    # Check if PostgreSQL bin directory exists
-    if [ ! -d "$PG_BIN_DIR" ]; then
-        log_error "PostgreSQL@16 bin directory not found: $PG_BIN_DIR"
-        log_info "Please install PostgreSQL@16:"
-        log_info "  brew install postgresql@16"
-        return 1
+    # Priority 1: Environment variable
+    if [ -n "$PG_BIN_DIR" ] && [ -d "$PG_BIN_DIR" ]; then
+        export PATH="$PG_BIN_DIR:$PATH"
+        log_success "Using PostgreSQL from: $PG_BIN_DIR"
+        return 0
     fi
 
-    # Check for required tools
-    local required_tools=("pg_dump" "pg_restore" "pg_isready" "psql")
+    # Priority 2: Check if tools are already in PATH
+    if command -v pg_dump &> /dev/null && \
+       command -v pg_restore &> /dev/null && \
+       command -v pg_isready &> /dev/null && \
+       command -v psql &> /dev/null; then
+        log_success "PostgreSQL tools found in PATH"
+        return 0
+    fi
 
-    for tool in "${required_tools[@]}"; do
-        if [ ! -x "$PG_BIN_DIR/$tool" ]; then
-            log_error "Required tool not found: $tool"
-            log_info "Please reinstall PostgreSQL@16"
-            return 1
+    # Priority 3: Try common installation paths
+    local common_paths=(
+        "/opt/homebrew/opt/postgresql@16/bin"  # Apple Silicon Mac
+        "/usr/local/opt/postgresql@16/bin"     # Intel Mac
+        "/opt/homebrew/opt/postgresql/bin"     # Generic Homebrew
+        "/usr/local/pgsql/bin"                 # Generic Linux
+        "/usr/lib/postgresql/16/bin"           # Debian/Ubuntu
+        "/usr/pgsql-16/bin"                    # RedHat/CentOS
+    )
+
+    for path in "${common_paths[@]}"; do
+        if [ -d "$path" ]; then
+            # Verify required tools exist
+            if [ -x "$path/pg_dump" ] && \
+               [ -x "$path/pg_restore" ] && \
+               [ -x "$path/pg_isready" ] && \
+               [ -x "$path/psql" ]; then
+                export PATH="$path:$PATH"
+                log_success "Found PostgreSQL tools at: $path"
+                return 0
+            fi
         fi
     done
 
-    # Export PATH
-    export PATH="$PG_BIN_DIR:$PATH"
-    log_success "PostgreSQL tools available"
-    return 0
+    # No PostgreSQL tools found
+    log_error "PostgreSQL tools not found"
+    log_info "Please install PostgreSQL:"
+    log_info "  macOS: brew install postgresql@16"
+    log_info "  Ubuntu/Debian: sudo apt-get install postgresql-client-16"
+    log_info "  RedHat/CentOS: sudo yum install postgresql16"
+    log_info ""
+    log_info "Or set PG_BIN_DIR environment variable to PostgreSQL bin directory"
+    return 1
 }
 
 # ============================================================================
@@ -98,22 +180,31 @@ check_postgresql_tools() {
 # ============================================================================
 
 check_docker() {
+    # Load config if not already loaded
+    load_db_config
+
+    # Use configured docker command (defaults to "docker")
+    local docker_cmd="${DOCKER_COMMAND:-docker}"
+    local compose_cmd="${COMPOSE_COMMAND:-docker-compose}"
+
     # Check if docker command exists
-    if ! command -v docker &> /dev/null; then
-        log_error "Docker not found"
-        log_info "Please install Docker Desktop"
+    if ! command -v "$docker_cmd" &> /dev/null; then
+        log_error "Docker not found (command: $docker_cmd)"
+        log_info "Please install Docker Desktop or set DOCKER_COMMAND in config"
         return 1
     fi
 
-    # Check if docker-compose command exists
-    if ! command -v docker-compose &> /dev/null; then
-        log_error "docker-compose not found"
-        log_info "Please install docker-compose"
+    # Check if compose command exists
+    # Try both docker-compose and docker compose
+    if ! command -v "$compose_cmd" &> /dev/null && \
+       ! $docker_cmd compose version &> /dev/null; then
+        log_error "Docker Compose not found (tried: $compose_cmd, docker compose)"
+        log_info "Please install Docker Compose or set COMPOSE_COMMAND in config"
         return 1
     fi
 
     # Check if Docker daemon is running
-    if ! docker info &> /dev/null; then
+    if ! $docker_cmd info &> /dev/null; then
         log_error "Docker daemon is not running"
         log_info "Please start Docker Desktop"
         return 1
@@ -128,18 +219,18 @@ check_docker() {
 # ============================================================================
 
 check_prisma() {
-    # Check if npx command exists
-    if ! command -v npx &> /dev/null; then
-        log_error "npx not found"
-        log_info "Please install Node.js and npm"
-        return 1
-    fi
+    # Load config if not already loaded
+    load_db_config
 
-    # Check if prisma is executable via npx
-    if ! npx prisma --version &> /dev/null; then
-        log_error "Prisma CLI not accessible via npx"
+    # Use configured prisma command (defaults to "npx prisma")
+    local prisma_cmd="${PRISMA_COMMAND:-npx prisma}"
+
+    # Check if prisma command is accessible
+    if ! $prisma_cmd --version &> /dev/null; then
+        log_error "Prisma CLI not accessible (command: $prisma_cmd)"
         log_info "Please install Prisma:"
         log_info "  npm install -D prisma"
+        log_info "Or set PRISMA_COMMAND in config/environment"
         return 1
     fi
 

@@ -18,7 +18,7 @@ source "$SCRIPT_DIR/db-utils.sh"
 # ============================================================================
 
 LOG_FILE=".claude/cache/db-sync.log"
-LOCK_FILE="/tmp/db-sync.lock"
+LOCK_FILE=".claude/cache/db-sync.lock"
 DUMP_FILE="/tmp/baechaking_backup.dump"
 
 # ============================================================================
@@ -26,8 +26,28 @@ DUMP_FILE="/tmp/baechaking_backup.dump"
 # ============================================================================
 
 check_lock_file() {
+    # Create cache directory if it doesn't exist
+    mkdir -p "$(dirname "$LOCK_FILE")"
+
+    # Try to create lock file atomically using noclobber
+    # This prevents race conditions between check and create
+    if (set -o noclobber; echo $$ > "$LOCK_FILE") 2>/dev/null; then
+        # Lock acquired successfully
+        log_info "Lock file created: $LOCK_FILE"
+        return 0
+    fi
+
+    # Lock file exists - check if process is still running
     if [ -f "$LOCK_FILE" ]; then
-        local pid=$(cat "$LOCK_FILE" 2>/dev/null)
+        local pid
+        pid=$(cat "$LOCK_FILE" 2>/dev/null)
+
+        if [ -z "$pid" ]; then
+            log_warning "Invalid lock file (no PID), removing..."
+            rm -f "$LOCK_FILE"
+            # Retry lock acquisition
+            return 1
+        fi
 
         # Check if process is still running
         if ps -p "$pid" > /dev/null 2>&1; then
@@ -38,13 +58,14 @@ check_lock_file() {
         else
             log_warning "Removing stale lock file (PID $pid not running)"
             rm -f "$LOCK_FILE"
+            # Retry lock acquisition
+            return 1
         fi
     fi
 
-    # Create lock file with current PID
-    echo $$ > "$LOCK_FILE"
-    log_info "Lock file created"
-    return 0
+    # Unknown error
+    log_error "Failed to acquire lock file"
+    return 1
 }
 
 # ============================================================================
@@ -69,7 +90,8 @@ check_db_connection() {
     # Secondary check using psql if pg_isready fails
     log_warning "pg_isready check failed, trying psql..."
 
-    if PGPASSWORD="$DB_PASS" psql -h "$host" -p "$port" -U "$user" -d "$db" -c "SELECT 1" &> /dev/null; then
+    # Note: Uses PGPASSFILE environment variable set by setup_pgpass()
+    if psql -h "$host" -p "$port" -U "$user" -d "$db" -c "SELECT 1" &> /dev/null; then
         log_success "DB connection successful (via psql): $label ($host:$port)"
         return 0
     fi
@@ -220,7 +242,8 @@ create_dump() {
     local retry_count=0
 
     while [ $retry_count -lt $max_retries ]; do
-        if PGPASSWORD="$SOURCE_DB_PASS" pg_dump \
+        # Note: Uses PGPASSFILE environment variable set by setup_pgpass()
+        if pg_dump \
             -h "$SOURCE_DB_HOST" \
             -p "$SOURCE_DB_PORT" \
             -U "$SOURCE_DB_USER" \
@@ -230,7 +253,8 @@ create_dump() {
 
             # Check if dump file was created
             if [ -f "$DUMP_FILE" ]; then
-                local file_size=$(du -h "$DUMP_FILE" | cut -f1)
+                local file_size
+                file_size=$(du -h "$DUMP_FILE" | cut -f1)
                 log_success "Dump created successfully: $DUMP_FILE ($file_size)"
                 return 0
             else
@@ -264,7 +288,8 @@ create_backup() {
     log_info "=== Step 2: Create Backup ==="
     echo ""
 
-    local timestamp=$(date +%Y%m%d_%H%M%S)
+    local timestamp
+    timestamp=$(date +%Y%m%d_%H%M%S)
     local backup_dir="postgres/user_backup_$timestamp"
 
     log_info "Creating backup of current data..."
@@ -295,10 +320,11 @@ cleanup_old_backups() {
     log_info "Cleaning up old backups (keeping last 5)..."
 
     # Find all backup directories and sort by modification time
-    local backups=($(ls -dt postgres/user_backup_* 2>/dev/null || true))
+    local backups
+    mapfile -t backups < <(find postgres/ -maxdepth 1 -type d -name "user_backup_*" -print0 2>/dev/null | xargs -0 ls -dt 2>/dev/null || true)
     local backup_count=${#backups[@]}
 
-    if [ $backup_count -le 5 ]; then
+    if [ "$backup_count" -le 5 ]; then
         log_info "No cleanup needed ($backup_count backups)"
         return 0
     fi
@@ -371,8 +397,8 @@ restore_dump() {
     # Create log directory if needed
     mkdir -p .claude/cache
 
-    # Restore with logging
-    if PGPASSWORD="$TARGET_DB_PASS" pg_restore \
+    # Restore with logging (uses PGPASSFILE environment variable)
+    if pg_restore \
         -h "$TARGET_DB_HOST" \
         -p "$TARGET_DB_PORT" \
         -U "$TARGET_DB_USER" \
@@ -402,8 +428,9 @@ verify_data() {
 
     log_info "Verifying restored data..."
 
-    # Count tables
-    local table_count=$(PGPASSWORD="$TARGET_DB_PASS" psql \
+    # Count tables (uses PGPASSFILE environment variable from previous setup_pgpass call)
+    local table_count
+    table_count=$(psql \
         -h "$TARGET_DB_HOST" \
         -p "$TARGET_DB_PORT" \
         -U "$TARGET_DB_USER" \
@@ -416,7 +443,9 @@ verify_data() {
     local tables=("User" "Order" "Shipper" "Carrier")
 
     for table in "${tables[@]}"; do
-        local count=$(PGPASSWORD="$TARGET_DB_PASS" psql \
+        # Note: Uses PGPASSFILE environment variable from previous setup_pgpass call
+        local count
+        count=$(psql \
             -h "$TARGET_DB_HOST" \
             -p "$TARGET_DB_PORT" \
             -U "$TARGET_DB_USER" \
@@ -473,7 +502,8 @@ rollback() {
     echo ""
 
     # Find most recent backup
-    local recent_backup=$(ls -dt postgres/user_backup_* 2>/dev/null | head -1)
+    local recent_backup
+    recent_backup=$(find postgres/ -maxdepth 1 -type d -name "user_backup_*" -print0 2>/dev/null | xargs -0 ls -dt 2>/dev/null | head -1)
 
     if [ -z "$recent_backup" ]; then
         log_error "No backup found for rollback!"
@@ -507,7 +537,8 @@ rollback() {
 # ============================================================================
 
 main() {
-    local start_time=$(date +%s)
+    local start_time
+    start_time=$(date +%s)
 
     # Print header
     echo ""
@@ -564,7 +595,8 @@ main() {
     # Step 6 is handled by trap
 
     # Calculate elapsed time
-    local end_time=$(date +%s)
+    local end_time
+    end_time=$(date +%s)
     local elapsed=$((end_time - start_time))
     local minutes=$((elapsed / 60))
     local seconds=$((elapsed % 60))

@@ -46,7 +46,8 @@ detect_migrations_dir() {
     log_success "Found migrations directory: $MIGRATIONS_DIR"
 
     # Infer schema path
-    local schema_dir=$(dirname "$MIGRATIONS_DIR")
+    local schema_dir
+    schema_dir=$(dirname "$MIGRATIONS_DIR")
     SCHEMA_PATH="$schema_dir/schema.prisma"
 
     # Verify schema file exists
@@ -74,7 +75,8 @@ list_migrations() {
     echo ""
     log_info "Existing migrations:"
 
-    local migration_count=$(find "$MIGRATIONS_DIR" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
+    local migration_count
+    migration_count=$(find "$MIGRATIONS_DIR" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
 
     if [ "$migration_count" -eq 0 ]; then
         log_info "  No migrations found (this is normal for initial setup)"
@@ -89,7 +91,8 @@ list_migrations() {
         sort -r | \
         head -5 | \
         while read -r migration; do
-            local name=$(basename "$migration")
+            local name
+            name=$(basename "$migration")
             log_info "    - $name"
         done
 }
@@ -106,7 +109,8 @@ check_schema_changes() {
     log_info "Checking Prisma migration status..."
 
     # Check migration status
-    local status_output=$(npx prisma migrate status --schema="$SCHEMA_PATH" 2>&1 || true)
+    local status_output
+    status_output=$(npx prisma migrate status --schema="$SCHEMA_PATH" 2>&1 || true)
 
     # Check if schema is up to date
     if echo "$status_output" | grep -q "Database schema is up to date"; then
@@ -146,7 +150,7 @@ select_environment() {
     echo "  2) Production (apply existing migrations only)"
     echo ""
 
-    read -p "Enter choice (1/2): " env_choice
+    read -r -p "Enter choice (1/2): " env_choice
 
     case "$env_choice" in
         1)
@@ -184,7 +188,8 @@ generate_migration_name() {
     log_info "Analyzing schema changes..."
 
     # Get git diff of schema
-    local diff_output=$(git diff HEAD "$SCHEMA_PATH" 2>/dev/null || echo "")
+    local diff_output
+    diff_output=$(git diff HEAD "$SCHEMA_PATH" 2>/dev/null || echo "")
 
     if [ -z "$diff_output" ]; then
         log_warning "No git diff available, using default name"
@@ -195,10 +200,12 @@ generate_migration_name() {
 
     # Analyze diff for patterns
     if echo "$diff_output" | grep -q "^+.*model "; then
-        local model_name=$(echo "$diff_output" | grep "^+.*model " | head -1 | sed 's/.*model \([A-Za-z0-9_]*\).*/\1/')
+        local model_name
+        model_name=$(echo "$diff_output" | grep "^+.*model " | head -1 | sed 's/.*model \([A-Za-z0-9_]*\).*/\1/')
         MIGRATION_NAME="add_${model_name,,}_table"
     elif echo "$diff_output" | grep -q "^-.*model "; then
-        local model_name=$(echo "$diff_output" | grep "^-.*model " | head -1 | sed 's/.*model \([A-Za-z0-9_]*\).*/\1/')
+        local model_name
+        model_name=$(echo "$diff_output" | grep "^-.*model " | head -1 | sed 's/.*model \([A-Za-z0-9_]*\).*/\1/')
         MIGRATION_NAME="remove_${model_name,,}_table"
     elif echo "$diff_output" | grep -q "@@index"; then
         MIGRATION_NAME="add_index"
@@ -236,7 +243,8 @@ run_migration() {
             log_success "Migration created and applied successfully"
 
             # Verify migration file was created
-            local new_migration=$(find "$MIGRATIONS_DIR" -type d -name "*_${MIGRATION_NAME}" | head -1)
+            local new_migration
+            new_migration=$(find "$MIGRATIONS_DIR" -type d -name "*_${MIGRATION_NAME}" | head -1)
             if [ -n "$new_migration" ]; then
                 log_info "Migration file: $(basename "$new_migration")"
             fi
@@ -288,7 +296,8 @@ show_summary() {
     fi
 
     # Count total migrations
-    local migration_count=$(find "$MIGRATIONS_DIR" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
+    local migration_count
+    migration_count=$(find "$MIGRATIONS_DIR" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
     log_info "Total migrations: $migration_count"
 
     echo ""

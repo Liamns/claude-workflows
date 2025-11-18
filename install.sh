@@ -853,6 +853,30 @@ install_workflows() {
         print_warning ".claude/config/ directory not found in repository"
     fi
 
+    # Copy command configuration files (v3.3.1)
+    if [ -d "$TEMP_DIR/.claude/commands-config" ]; then
+        print_info "Installing Command Configurations..."
+        if [ "$DRY_RUN" = false ]; then
+            mkdir -p "$TARGET_DIR/.claude/commands-config"
+            cp -r "$TEMP_DIR/.claude/commands-config/"* "$TARGET_DIR/.claude/commands-config/" 2>/dev/null || true
+        fi
+        print_success "Command configs installed (14 YAML files)"
+    else
+        print_warning ".claude/commands-config/ directory not found in repository"
+    fi
+
+    # Copy registry files (v3.3.1)
+    if [ -d "$TEMP_DIR/.claude/registry" ]; then
+        print_info "Installing Registry..."
+        if [ "$DRY_RUN" = false ]; then
+            mkdir -p "$TARGET_DIR/.claude/registry"
+            cp -r "$TEMP_DIR/.claude/registry/"* "$TARGET_DIR/.claude/registry/" 2>/dev/null || true
+        fi
+        print_success "Registry installed (command-resource mapping)"
+    else
+        print_warning ".claude/registry/ directory not found in repository"
+    fi
+
     # Create .specify directory structure (optional, created by /start command)
     print_info "Creating .specify directory structure..."
     if [ "$DRY_RUN" = false ]; then

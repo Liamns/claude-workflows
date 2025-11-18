@@ -37,184 +37,6 @@ The command will:
 - Architecture configured (optional)
 - No quality gates enforced
 
-## Examples
-
-### Example 1: Fix Typo
-
-```bash
-/micro
-```
-
-**Prompt:**
-```
-What trivial change are you making?
-> Fix typo in README: "installtion" → "installation"
-```
-
-**Output:**
-```
-⚡ Micro Workflow - Quick Fix
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-📝 Change Analysis
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Type: Documentation fix
-Scope: Single file (README.md)
-Complexity: 1/15 (Micro appropriate)
-Estimated: < 5 minutes
-
-✅ Micro Validation
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-✓ Single file modification
-✓ Cosmetic change only
-✓ No code logic affected
-✓ No tests needed
-
-🔧 Executing Change
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-File: README.md
-Change: "installtion" → "installation" (line 23)
-
-✅ Complete!
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Next steps:
-1. Verify change looks correct
-2. Run: /commit
-
-Expected tokens: ~3,000 (vs 20,000 without Micro)
-Token savings: 85%
-Time saved: 10 minutes
-```
-
-### Example 2: Remove Console Logs
-
-```bash
-/micro
-```
-
-**Task:** "Remove console.log statements from production code"
-
-**Output:**
-```
-⚡ Micro Workflow - Code Cleanup
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-📝 Change Analysis
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Type: Debug code removal
-Scope: 3 files
-Complexity: 2/15 (Micro appropriate)
-Estimated: 10-15 minutes
-
-🔍 Found Console Logs
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-src/features/auth/ui/LoginForm.tsx (2 instances)
-  - Line 42: console.log('User data:', user)
-  - Line 87: console.log('Login success')
-
-src/features/profile/ui/ProfilePage.tsx (1 instance)
-  - Line 156: console.log('Profile loaded')
-
-src/shared/lib/api/apiClient.ts (3 instances)
-  - Line 23: console.log('Request:', config)
-  - Line 45: console.log('Response:', data)
-  - Line 67: console.error('API Error:', error)
-
-🔧 Executing Removal
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-✓ Removed 6 console.log statements
-✓ No logic changes
-✓ Files remain valid
-
-✅ Complete!
-
-Next steps:
-1. Quick smoke test
-2. Run: /commit
-
-Expected tokens: ~2,500
-```
-
-### Example 3: Update Config Value
-
-```bash
-/micro
-```
-
-**Task:** "Change API timeout from 5000ms to 10000ms"
-
-**Output:**
-```
-⚡ Micro Workflow - Configuration Update
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-📝 Change Analysis
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Type: Configuration change
-Scope: 1 file (config.ts)
-Complexity: 1/15 (Micro appropriate)
-Estimated: 2 minutes
-
-🔧 Executing Change
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-File: src/config/api.ts
-Line: 12
-Change: timeout: 5000 → timeout: 10000
-
-✅ Complete!
-
-Verification:
-- Test a slow API call to confirm timeout
-- Monitor for timeout errors
-
-Expected tokens: ~2,000
-```
-
-### Example 4: Auto-Upgrade to Minor
-
-```bash
-/micro
-```
-
-**Task:** "Fix login validation logic"
-
-**Output:**
-```
-⚠️ Scope Too Large for Micro
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Analysis:
-- Type: Logic change (not cosmetic)
-- Scope: Multiple files
-- Complexity: 6/15
-- Tests required: Yes
-
-Reason:
-Validation logic changes affect behavior and require:
-- Root cause analysis
-- Test coverage
-- Regression prevention
-
-💡 Recommendation
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Use /minor instead:
-- Proper issue analysis
-- Related tests validation
-- Documentation
-
-Auto-upgrading to /minor workflow...
-```
-
 ## Implementation
 
 ### Architecture
@@ -264,12 +86,6 @@ The Micro workflow uses minimal agent involvement:
 - No automated tests
 - No quality gates
 - Output: Change summary
-
-### Related Resources
-
-- **Cache**: Smart-cache for file reading
-- **No documents generated**
-- **No quality gates**
 
 ### Token Optimization
 
@@ -480,32 +296,6 @@ The Micro workflow uses minimal agent involvement:
 → Auto-upgrading to /major
 ```
 
-## 에러 처리
-
-### "Change requires tests"
-
-**원인**: 로직 변경이 감지됨
-**해결**:
-```bash
-# 자동으로 /minor로 전환됨
-# 또는 수동으로:
-/minor
-```
-
-### "Scope too large"
-
-**원인**: 복잡도 4+ 또는 여러 파일
-**해결**:
-- 변경 범위 축소
-- 또는 /minor 사용 (자동 전환됨)
-
-### "Breaking change detected"
-
-**원인**: API 변경 또는 인터페이스 수정
-**해결**:
-- 변경 취소
-- /major 사용 (적절한 계획 필요)
-
 ## 사용 제한
 
 ### ✅ Micro 사용 가능
@@ -645,30 +435,6 @@ The Micro workflow uses minimal agent involvement:
 - **Minor로 전환**: 15% (복잡도 과소평가)
 - **그대로 진행**: 85%
 
-## 문제 해결
-
-### "자꾸 /minor로 전환돼요"
-
-**원인**: 변경이 생각보다 복잡함
-**해결**:
-- 실제로 /minor가 적합한 경우일 수 있음
-- 변경 범위 다시 확인
-- 정말 trivial한지 재평가
-
-### "문서가 생성 안 돼요"
-
-**원인**: Micro는 문서 생성 안 함 (의도된 동작)
-**해결**:
-- 문서 필요하면 /minor 사용
-- Micro는 즉시 실행만
-
-### "테스트 실행이 안 돼요"
-
-**원인**: Micro는 테스트 안 함 (의도된 동작)
-**해결**:
-- 테스트 필요하면 /minor 사용
-- 수동으로 npm test 실행 가능
-
 ## 주의사항
 
 ### Breaking Changes
@@ -691,49 +457,59 @@ Micro에서도 breaking changes는 금지:
 - 관련 있는 여러 Micro는 하나의 커밋 가능
 - 커밋 메시지 명확히 작성
 
-## 실전 예시
+## 사용 예시
 
-### 시나리오 1: 긴급 프로덕션 수정
+자세한 시나리오와 실전 예시는 별도 문서 참고:
+- **사용 예시**: [micro-examples.md](examples/micro-examples.md)
+- **문제 해결**: [micro-troubleshooting.md](examples/micro-troubleshooting.md)
+
+## 빠른 참조
+
+### 자주 사용하는 명령어
 
 ```bash
-# 프로덕션에서 오타 발견
+# 기본 실행
 /micro
-> "Fix typo in error message: 'occured' → 'occurred'"
 
-# 즉시 커밋 & 배포
+# 복잡도 먼저 확인
+/triage "작업 설명"
+
+# 연속 실행
+/micro
+/micro
+/micro
 /commit
-git push origin main
 ```
 
-### 시나리오 2: 코드 클린업
+### Micro 적합성 체크
 
-```bash
-# PR 전 마지막 정리
-/micro
-> "Remove console.log statements"
+```
+□ 코스메틱 변경인가?
+□ 1-3개 파일만?
+□ 테스트 불필요?
+□ 5분 이내 완료?
+□ 되돌리기 쉬운가?
 
-/micro
-> "Remove unused imports"
-
-/commit
-/pr
+모두 ✓ → Micro 사용
+하나라도 ✗ → Minor/Major
 ```
 
-### 시나리오 3: 설정 조정
+### 일반적인 에러 해결
 
+**"Auto-upgrading to /minor"**
 ```bash
-# 타임아웃 증가 필요
-/micro
-> "Increase API timeout to 30 seconds"
+# 변경이 복잡함
+/minor  # Minor 사용
+```
 
-# 테스트
-npm run dev
-
-# 확인 후 커밋
-/commit
+**"Breaking change detected"**
+```bash
+# API/인터페이스 변경
+/major  # Major 사용
 ```
 
 ---
 
 **Version**: 3.3.1
 **Last Updated**: 2025-11-18
+**See Also**: [major.md](major.md), [minor.md](minor.md), [epic.md](epic.md)

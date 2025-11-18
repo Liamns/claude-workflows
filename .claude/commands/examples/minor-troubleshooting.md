@@ -694,10 +694,10 @@ Missing sections:
 **방법 2: 수동으로 fix-analysis.md 보완**
 ```bash
 # 생성된 문서 확인
-cat .claude/docs/fixes/issue-name/fix-analysis.md
+cat .specify/fixes/issue-name/fix-analysis.md
 
 # 직접 편집
-code .claude/docs/fixes/issue-name/fix-analysis.md
+code .specify/fixes/issue-name/fix-analysis.md
 
 # 누락된 섹션 추가
 ```

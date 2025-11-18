@@ -4,7 +4,7 @@
 
 Minor 워크플로우가 생성하는 문서는 **fix-analysis.md** 단일 파일입니다.
 
-**생성 위치**: `.claude/docs/fixes/<issue-name>/fix-analysis.md`
+**생성 위치**: `.specify/fixes/<issue-name>/fix-analysis.md`
 
 ---
 

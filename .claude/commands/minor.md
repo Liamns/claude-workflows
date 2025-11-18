@@ -233,7 +233,7 @@ The Minor workflow uses 4 unified agents:
 
 ### fix-analysis.md
 
-**생성 위치**: `.claude/docs/fixes/<issue-name>/fix-analysis.md`
+**생성 위치**: `.specify/fixes/<issue-name>/fix-analysis.md`
 
 **포함 내용:**
 - Issue: 문제 요약, 심각도, 복잡도, 예상 시간

@@ -297,7 +297,7 @@ Micro의 철학:
 > "버그 수정 및 분석 문서 필요"
 
 # 결과:
-# .claude/docs/fixes/issue-name/fix-analysis.md 생성
+# .specify/fixes/issue-name/fix-analysis.md 생성
 ```
 
 **Micro 변경 기록 방법:**

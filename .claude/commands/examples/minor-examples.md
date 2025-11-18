@@ -95,7 +95,7 @@ workflow-gates.json 기준:
 📝 다음 단계
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-생성된 문서: .claude/docs/fixes/login-null-pointer/
+생성된 문서: .specify/fixes/login-null-pointer/
 1. fix-analysis.md 검토
 2. 솔루션 구현 (2-3개 파일)
 3. 관련 테스트 실행
@@ -584,7 +584,7 @@ Quality gates:
 # → fix-analysis.md 생성
 
 # 2. fix-analysis.md 확인
-cat .claude/docs/fixes/login-null-pointer/fix-analysis.md
+cat .specify/fixes/login-null-pointer/fix-analysis.md
 
 # 3. 구현
 # ... 코드 수정 ...
@@ -696,7 +696,7 @@ git push origin feature/auth-validation-fixes
 
 # 3. 구현 중 버그 발견
 /minor "로그인 검증 에러 수정"
-# → .claude/docs/fixes/login-validation/
+# → .specify/fixes/login-validation/
 # ... 수정 ...
 git add .
 git commit -m "fix(auth): 로그인 검증 수정"
@@ -724,7 +724,7 @@ git push origin 009-ecommerce-platform
 /minor
 
 # 문서 확인
-cat .claude/docs/fixes/<issue-name>/fix-analysis.md
+cat .specify/fixes/<issue-name>/fix-analysis.md
 
 # 관련 테스트만 실행
 npm test <ComponentName>

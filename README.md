@@ -1,6 +1,6 @@
 # 🤖 Claude Workflows
 
-[![Version](https://img.shields.io/badge/version-3.3.0-blue.svg)](https://github.com/Liamns/claude-workflows)
+[![Version](https://img.shields.io/badge/version-3.3.1-blue.svg)](https://github.com/Liamns/claude-workflows)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-purple.svg)](https://claude.ai/code)
 [![Validation](https://img.shields.io/badge/validation-automated-success.svg)](https://github.com/Liamns/claude-workflows)
@@ -11,12 +11,20 @@
 
 ## 🆕 최신 기능
 
-### v3.3.0 - Database Tools
+### v3.3.1 - Architecture Templates & Database Tools
 
+**🏗️ Architecture Templates (32개 템플릿)**
+- **Backend**: Clean, DDD, Hexagonal, Layered, Serverless
+- **Frontend**: Atomic, FSD, MVC, Micro-Frontend
+- **Fullstack**: JAMStack, Microservices, Monorepo
+- **Mobile**: Clean Architecture, MVVM
+
+**🗄️ Database Tools**
 - **DB 동기화**: `/db-sync` - .env DB → .env.docker DB 자동 동기화
 - **Prisma 마이그레이션**: `/prisma-migrate` - 스키마 변경 자동 마이그레이션
 - **안전 보장**: 자동 백업, 롤백, 데이터 검증
 - **지능형 네이밍**: Git diff 분석 기반 마이그레이션 이름 자동 생성
+- **멀티 플랫폼**: macOS (Intel/ARM), Linux 자동 감지
 
 ### v3.2.0 - Command Template System
 
@@ -151,7 +159,7 @@ bash .claude/lib/generate-checksums.sh -o .claude/.checksums.json --verbose
 /pr                # PR 자동 생성
 /dashboard         # 📊 실시간 메트릭스 대시보드
 
-# 🗄️ Database Tools (v3.3.0)
+# 🗄️ Database Tools (v3.3.1)
 /db-sync           # Production → Development DB 동기화
 /prisma-migrate    # Prisma 스키마 자동 마이그레이션
 ```
@@ -327,4 +335,4 @@ MIT License - 자유롭게 사용, 수정, 배포 가능
 
 ---
 
-**v3.3.0** | [GitHub](https://github.com/Liamns/claude-workflows) | Made with ❤️ for Claude Code
+**v3.3.1** | [GitHub](https://github.com/Liamns/claude-workflows) | Made with ❤️ for Claude Code

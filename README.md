@@ -118,16 +118,31 @@ retry_failed_files "https://github.com/Liamns/claude-workflows" "main"
 
 ### 체크섬 매니페스트 생성 (개발자용)
 
+**✅ 권장 방법 (Wrapper Script):**
 ```bash
-# 현재 프로젝트의 체크섬 생성
+# 체크섬 재생성 + Git 자동 스테이징
+bash .claude/lib/update-checksums.sh
+
+# 자동으로 수행:
+# 1. 체크섬 생성 (올바른 -o 플래그 사용)
+# 2. Git 스테이징
+# 3. 변경사항 요약 표시
+# 4. 다음 단계 가이드
+```
+
+**수동 방법 (고급 사용자):**
+```bash
+# 직접 체크섬 생성 (주의: -o 플래그 필수!)
 bash .claude/lib/generate-checksums.sh -o .claude/.checksums.json --verbose
 
 # 출력 예시
 # ✓ Checksum manifest generated: .claude/.checksums.json
-#   Version: 2.7.0
-#   Files: 190
-#   Generated at: 2025-01-11T10:00:00Z
+#   Version: 3.3.1
+#   Files: 240
+#   Generated at: 2025-01-18T10:00:00Z
 ```
+
+**⚠️ 주의사항**: `-o` 플래그를 빠뜨리면 파일이 업데이트되지 않고 stdout으로만 출력됩니다. 이를 방지하려면 wrapper script 사용을 권장합니다.
 
 **자세한 내용**: [Installation Verification Guide](.specify/specs/003-install-verification-improvement/quickstart.md)
 

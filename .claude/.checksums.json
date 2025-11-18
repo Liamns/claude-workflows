@@ -1,8 +1,8 @@
 {
   "version": "3.3.1",
-  "generatedAt": "2025-11-18T05:19:57Z",
+  "generatedAt": "2025-11-18T05:35:27Z",
   "files": {
-    ".claude/.checksums.json": "b2738a59616129b6b7a2e997f85df831d7fc609e2c9872f036a6db6464a0ba4a",
+    ".claude/.checksums.json": "fcbb85e59ea9729538a5d7cd3c5cebbbff099a984bfddfbbd2abfefb64cd348d",
     ".claude/.version": "ef2a79c2f7dc37800a73fd9930b307824ce20af920cbc7159323456418e77e6b",
     ".claude/agents/api-designer.md": "8d34ac2f5c3c7d9e25ffe46463b8efa3073a1f023f6226ef2f2d184b1a64c1b5",
     ".claude/agents/architect-unified.md": "509dd35487a5054f559f7ec6536f33a6015f09bfdcc113916718970d2c43f77f",
@@ -177,6 +177,7 @@
     ".claude/lib/sync-architecture-registry.sh": "2fac4be9eb3e82afb18a1c0d9901460e4273889c41e833ef5a1e0e9020f0acbc",
     ".claude/lib/tsconfig.json": "8c245797eef7a93ac79cf01d693aefd4d813e4759d66ada978a5eefcb22c931a",
     ".claude/lib/types/korean-doc-types.ts": "3b271199902f2bb499016a5fcca4c8a9a32a263368b547bce7d6a33d7e85655b",
+    ".claude/lib/update-checksums.sh": "b98a20469b2aafec80246e46811d56dc4077c0a3944cdc8645364f2447595a90",
     ".claude/lib/update-command-registry.sh": "8657547ccefe59eafc30c3b5c1be6b5ac8e648328370d4d4e7c34e60f3f331ab",
     ".claude/lib/validate-command-template.sh": "51ece316fc968de0862319be5bef28c58c6a001604013c5af18ba0b943083a25",
     ".claude/lib/validate-crossref.sh": "7c7a4d4d6943df8bc57dfec05766b999f4c38ee15e805998f3e69b902ca97b91",

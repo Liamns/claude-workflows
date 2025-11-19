@@ -1,8 +1,8 @@
 {
   "version": "3.3.2",
-  "generatedAt": "2025-11-19T06:02:15Z",
+  "generatedAt": "2025-11-19T06:13:39Z",
   "files": {
-    ".claude/.checksums.json": "576da4ac6ca150b6636e868e89cc94a110783d143260cf14c161d02175300051",
+    ".claude/.checksums.json": "d79b65409dbd029e8c3bace28994c6a55e8553991bf60523fd5160d0a5d3bf54",
     ".claude/.checksums.json.backup": "adc1d27d2f0d3273bde79a46e5224ab4eebf60638905af234adfcea0d3f03f50",
     ".claude/.version": "abba5fcd6d1275d62d78e09d88276dcf264d2137f85323ab50eadddcc31aeea9",
     ".claude/agents/api-designer.md": "8d34ac2f5c3c7d9e25ffe46463b8efa3073a1f023f6226ef2f2d184b1a64c1b5",
@@ -231,7 +231,7 @@
     ".claude/lib/check-architecture-compliance.sh": "148eb0a5f406fbd99a5086437b9227ce4a853739cbdc4a0eff695df168cc4353",
     ".claude/lib/checksum-helper.sh": "b3b78b9ef27484653da0344f689baa31247841ef6376fd674e243664c78e4ae8",
     ".claude/lib/command-context-manager.sh": "9eb34d77d2e83b5147c19dfd92b8adc8386daa595fdf1be161aba4ca7a361db7",
-    ".claude/lib/command-recommender.sh": "c66c8f030b1552367686ec79369a1f1fb2abb384fd08174b331e7116f8350608",
+    ".claude/lib/command-recommender.sh": "f157e5b61365f1c9d5cb5cb7516e96e413000a322993f23eea1b0621579c4051",
     ".claude/lib/command-runner.sh": "74aed25f06edba243bc339c50c3b9d44b182089d54aa6cf1beb7719f7c7fe1ef",
     ".claude/lib/commit.sh": "e4d674ffe2b7938beef06c3210e09a351a366d97b260c8fa2c684d3cb77403ed",
     ".claude/lib/common.sh": "48e87c82d6c36a6b3728728ac69cc317bc509fefda97fd137fc56bc734c88df3",

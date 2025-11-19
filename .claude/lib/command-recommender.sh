@@ -84,7 +84,7 @@ read_next_commands_config() {
 # 추천 조건 검사
 # ============================================================================
 
-# 조건 검사 (bash 명령어 실행)
+# 조건 검사 (bash 명령어 실행 - 보안 강화)
 check_recommendation_condition() {
     local condition="$1"
 
@@ -95,7 +95,25 @@ check_recommendation_condition() {
 
     log_debug "Checking condition: $condition"
 
-    # 조건 실행 (안전하게)
+    # 보안: 안전한 조건만 허용
+    # - test 명령어 또는 [ ] 구문만 허용
+    # - 위험한 명령어 차단 (rm, curl, wget, exec, eval 등)
+    local safe_pattern='^(test[[:space:]]|\[|\\[\\[)'
+    local dangerous_pattern='(rm|curl|wget|exec|eval|sudo|bash|sh|source|\||;|&|`|\$\()'
+
+    # 위험한 패턴 검사
+    if [[ "$condition" =~ $dangerous_pattern ]]; then
+        log_warn "Unsafe condition rejected (dangerous command): $condition"
+        return 1
+    fi
+
+    # 안전한 패턴 검사
+    if [[ ! "$condition" =~ $safe_pattern ]]; then
+        log_warn "Unsafe condition rejected (only test/[ allowed): $condition"
+        return 1
+    fi
+
+    # 안전한 조건만 실행
     if eval "$condition" >/dev/null 2>&1; then
         log_debug "Condition passed"
         return 0

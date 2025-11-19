@@ -11,6 +11,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CLAUDE_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 CONFIG_LOADER="${SCRIPT_DIR}/config-loader.sh"
+CONTEXT_MANAGER="${SCRIPT_DIR}/command-context-manager.sh"
 
 # config-loader 로드
 if [[ ! -f "$CONFIG_LOADER" ]]; then
@@ -20,6 +21,12 @@ fi
 
 # shellcheck source=config-loader.sh
 source "$CONFIG_LOADER"
+
+# command-context-manager 로드
+if [[ -f "$CONTEXT_MANAGER" ]]; then
+    # shellcheck source=command-context-manager.sh
+    source "$CONTEXT_MANAGER"
+fi
 
 # ============================================================================
 # 색상 코드
@@ -40,6 +47,7 @@ readonly NC='\033[0m'
 COMMAND_NAME=""
 COMMAND_TYPE=""  # workflow | utility
 CONFIG_FILE=""
+COMMAND_ID=""    # 명령어 실행 ID (컨텍스트 저장용)
 VERBOSE=false
 DRY_RUN=false
 
@@ -231,12 +239,45 @@ run_command() {
     local args=("$@")
 
     COMMAND_NAME="$command"
+    COMMAND_ID="${command}-$(date +%s)"
 
     echo ""
     echo -e "${CYAN}╔════════════════════════════════════════════════════════════════╗${NC}"
     echo -e "${CYAN}║${NC}  Command Runner: /${command}${CYAN}║${NC}"
     echo -e "${CYAN}╚════════════════════════════════════════════════════════════════╝${NC}"
     echo ""
+
+    # 0. 기존 컨텍스트 확인 및 복귀 여부 확인
+    if command -v has_context &> /dev/null && has_context "$command"; then
+        log_info "이전 실행 컨텍스트가 발견되었습니다."
+        log_info "중단되었던 작업을 계속하시겠습니까?"
+        log_info ""
+        log_info "Note: Claude가 이 메시지를 보면 AskUserQuestion을 사용하여 다음 옵션을 제공해야 합니다:"
+        log_info "  1. '계속하기' - 저장된 위치에서 재개"
+        log_info "  2. '새로 시작' - 기존 컨텍스트 삭제하고 새로 시작"
+        log_info ""
+        log_info "사용자가 '새로 시작'을 선택한 경우:"
+        log_info "  CONTEXT_RESUME=false bash command-runner.sh $command"
+        log_info ""
+        log_info "사용자가 '계속하기'를 선택한 경우:"
+        log_info "  CONTEXT_RESUME=true bash command-runner.sh $command"
+        log_info ""
+
+        # 환경 변수로 사용자 선택 받기
+        if [[ "${CONTEXT_RESUME:-true}" == "false" ]]; then
+            log_info "기존 컨텍스트를 삭제하고 새로 시작합니다."
+            if command -v clear_context &> /dev/null; then
+                clear_context "$command"
+            fi
+        else
+            log_info "기존 컨텍스트를 로드합니다."
+            if command -v load_context &> /dev/null; then
+                local context_data
+                context_data=$(load_context "$command")
+                log_debug "Loaded context: $context_data"
+            fi
+        fi
+    fi
 
     # 1. 설정 로드
     log_step "Loading configuration..."
@@ -270,7 +311,23 @@ run_command() {
     # 6. Post-execution hooks
     run_post_hooks "$command" "$exit_code"
 
-    # 7. 결과 출력
+    # 7. 컨텍스트 정리
+    if command -v has_context &> /dev/null && command -v clear_context &> /dev/null; then
+        if [[ $exit_code -eq 0 ]]; then
+            # 성공 시 컨텍스트 삭제
+            if has_context "$command"; then
+                log_debug "명령어가 성공적으로 완료되어 컨텍스트를 삭제합니다."
+                clear_context "$command"
+            fi
+        else
+            # 실패 시 컨텍스트 유지
+            if has_context "$command"; then
+                log_info "명령어가 실패했습니다. 컨텍스트를 유지하여 나중에 복귀할 수 있습니다."
+            fi
+        fi
+    fi
+
+    # 8. 결과 출력
     echo ""
     if [[ $exit_code -eq 0 ]]; then
         echo -e "${GREEN}╔════════════════════════════════════════════════════════════════╗${NC}"

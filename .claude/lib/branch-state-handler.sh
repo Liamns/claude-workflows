@@ -65,9 +65,20 @@ ask_user_action() {
   echo "  5. Cancel                 - Stop workflow"
   echo ""
 
-  # TODO: In Phase 9, integrate with AskUserQuestion tool
-  # For now, return a default action for testing
-  echo "commit"
+  # AskUserQuestion Integration Guide:
+  # Claude가 이 스크립트를 실행하기 전, .md 파일에서 다음 옵션을 제공:
+  #
+  # 옵션:
+  #   1. "커밋 후 계속" → return "commit"
+  #   2. "변경사항과 함께 이동" → return "move_with_changes"
+  #   3. "Stash 후 계속" → return "stash"
+  #   4. "변경사항 삭제 (⚠️ 복구 불가)" → return "discard"
+  #   5. "취소" → return "cancel"
+  #
+  # 사용자 선택을 환경 변수로 전달: BRANCH_ACTION="commit"
+
+  # 기본 동작 (테스트용)
+  echo "${BRANCH_ACTION:-commit}"
 }
 
 # @description: Handle dirty working tree state - provide user choices
@@ -187,23 +198,29 @@ ask_commit_message_review() {
   echo "  3. Cancel              - Return to previous menu"
   echo ""
 
-  # TODO: In Phase 9, integrate with AskUserQuestion tool
-  # For now, return the auto-generated message (simulate "accept" action)
+  # AskUserQuestion Integration Guide:
+  # Claude가 이 스크립트를 실행하기 전, .md 파일에서 다음 옵션을 제공:
   #
-  # Expected AskUserQuestion integration:
-  # - Question: "Choose an action for the commit message:"
-  # - Options:
-  #   1. label: "Use this message", description: "Commit with the suggested message"
-  #   2. label: "Edit message", description: "Modify the commit message"
-  #   3. label: "Cancel", description: "Return to previous menu"
+  # 질문: "커밋 메시지를 어떻게 하시겠습니까?"
+  # 옵션:
+  #   1. "이 메시지 사용" → return auto_generated_message
+  #   2. "메시지 수정" → 텍스트 입력 받아 return user's message
+  #   3. "취소" → return empty string
   #
-  # Based on user selection:
-  # - "Use this message" -> return auto_generated_message
-  # - "Edit message" -> prompt for text input, return user's message
-  # - "Cancel" or "Other" -> return empty string
+  # 사용자 선택을 환경 변수로 전달:
+  # - COMMIT_MESSAGE_ACTION="use" (이 메시지 사용)
+  # - COMMIT_MESSAGE_ACTION="edit" (메시지 수정)
+  # - COMMIT_MESSAGE_ACTION="cancel" (취소)
+  # - CUSTOM_COMMIT_MESSAGE="..." (수정된 메시지, action=edit일 때)
 
-  # Simulate default action (accept)
-  echo "$auto_generated_message"
+  # 기본 동작 (테스트용)
+  if [[ "${COMMIT_MESSAGE_ACTION:-use}" == "edit" && -n "$CUSTOM_COMMIT_MESSAGE" ]]; then
+    echo "$CUSTOM_COMMIT_MESSAGE"
+  elif [[ "${COMMIT_MESSAGE_ACTION:-use}" == "cancel" ]]; then
+    echo ""
+  else
+    echo "$auto_generated_message"
+  fi
 }
 
 # ==============================================================================

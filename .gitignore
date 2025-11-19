@@ -64,3 +64,6 @@ node_modules/
 # ==============================================
 
 todos.md
+
+# Archived unused files
+.claude/deprecated/

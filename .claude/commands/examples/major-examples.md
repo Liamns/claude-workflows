@@ -24,7 +24,7 @@
 > [Enter]
 
 Spec 디렉토리 생성 중...
-✓ .specify/specs/011-user-profile/ 생성
+✓ .specify/features/011-user-profile/ 생성
 ✓ 브랜치 011-user-profile 생성 및 체크아웃
 
 명세서 생성 중...
@@ -115,7 +115,7 @@ features/order/             // 도메인 단위
 📋 Step 1: Spec 디렉토리 및 브랜치 생성
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-✓ .specify/specs/012-payment-integration/ 생성
+✓ .specify/features/012-payment-integration/ 생성
 ✓ 브랜치 012-payment-integration 생성
 
 📋 Step 2: 요구사항 수집
@@ -153,7 +153,7 @@ features/order/             // 도메인 단위
 ✅ 다음 단계
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-문서 생성 위치: .specify/specs/012-payment-integration/
+문서 생성 위치: .specify/features/012-payment-integration/
 1. spec.md에서 요구사항 확인
 2. plan.md의 재사용 권장사항 검토
 3. tasks.md를 단계별로 실행
@@ -169,26 +169,26 @@ features/order/             // 도메인 단위
 ```bash
 # 먼저 Epic 생성
 /epic "전자상거래 플랫폼"
-# → .specify/specs/009-ecommerce-platform/ 생성
+# → .specify/features/009-ecommerce-platform/ 생성
 # → 브랜치 009-ecommerce-platform 생성
 
 # Epic 내부에서 각 Feature를 Major로 구현
 /major "사용자 인증 시스템"
-# → .specify/specs/009-ecommerce-platform/features/001-auth-system/ 생성
+# → .specify/features/009-ecommerce-platform/features/001-auth-system/ 생성
 # → 같은 브랜치(009-ecommerce-platform)에서 작업
 
 /major "상품 카탈로그"
-# → .specify/specs/009-ecommerce-platform/features/002-product-catalog/ 생성
+# → .specify/features/009-ecommerce-platform/features/002-product-catalog/ 생성
 # → 같은 브랜치에서 작업
 
 /major "장바구니"
-# → .specify/specs/009-ecommerce-platform/features/003-shopping-cart/ 생성
+# → .specify/features/009-ecommerce-platform/features/003-shopping-cart/ 생성
 # → 같은 브랜치에서 작업
 ```
 
 **생성된 구조:**
 ```
-.specify/specs/009-ecommerce-platform/
+.specify/features/009-ecommerce-platform/
 ├── epic.md                 # Epic 전체 정의
 ├── progress.md             # 진행 상황 (자동 업데이트)
 ├── roadmap.md              # 로드맵
@@ -226,14 +226,14 @@ Branch: 009-ecommerce-platform (모든 Feature가 이 브랜치에서)
 /major
 
 # 출력:
-# ✓ Spec 디렉토리 생성: .specify/specs/010-auth-system/
+# ✓ Spec 디렉토리 생성: .specify/features/010-auth-system/
 # ✓ 브랜치 생성: 010-auth-system
 # ✓ 문서 생성 완료
 
 # 4. 생성된 문서 검토
-cat .specify/specs/010-auth-system/spec.md
-cat .specify/specs/010-auth-system/plan.md
-cat .specify/specs/010-auth-system/tasks.md
+cat .specify/features/010-auth-system/spec.md
+cat .specify/features/010-auth-system/plan.md
+cat .specify/features/010-auth-system/tasks.md
 
 # 5. tasks.md 따라 구현
 # ... 코딩 작업 ...
@@ -309,7 +309,7 @@ cat .specify/specs/010-auth-system/tasks.md
 
 **생성되는 문서:**
 ```
-.specify/specs/013-membership-system/
+.specify/features/013-membership-system/
 ├── spec.md          # 요구사항
 ├── plan.md          # 구현 계획
 ├── tasks.md         # 작업 목록
@@ -341,8 +341,8 @@ data-model.md 내용:
 /major "Feature 설명"
 
 # 문서 확인
-cat .specify/specs/NNN-feature-name/spec.md
-cat .specify/specs/NNN-feature-name/tasks.md
+cat .specify/features/NNN-feature-name/spec.md
+cat .specify/features/NNN-feature-name/tasks.md
 ```
 
 ### 토큰 절감 효과

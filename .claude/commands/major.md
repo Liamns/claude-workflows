@@ -62,10 +62,17 @@ JWT 기반 사용자 인증 시스템 구현. 로그인, 회원가입, 비밀번
 
 대화형으로 다음을 진행합니다:
 - 요구사항 수집
-- Spec 디렉토리 및 브랜치 생성
+- Feature 디렉토리 및 브랜치 생성
+- **병합 대상 브랜치 선택** (main, develop 등)
 - 재사용 가능 컴포넌트 검색
 - spec.md, plan.md, tasks.md, research.md 생성
 - Constitution 규칙 검증
+
+### Branch Strategy
+
+- **Branch Creation**: 자동 생성
+- **Branch Name**: `NNN-feature-name` (예: `010-auth-system`)
+- **Merge Target**: 실행 시 물어봄 (main, develop 등)
 
 ### Prerequisites
 
@@ -81,17 +88,17 @@ Major 워크플로우가 생성하는 디렉토리 및 파일 구조:
 ### 디렉토리 구조
 
 ```
-.specify/specs/010-auth-system/
+.specify/features/010-auth-system/
 ├── spec.md          # 요구사항 명세서
 ├── plan.md          # 구현 계획 (재사용성 분석 포함)
-├── tasks.md         # 작업 목록
+├── tasks.md         # 작업 목록 (체크박스로 진행도 추적)
 ├── research.md      # 연구 결과
 └── data-model.md    # 데이터 모델 (필요시)
 ```
 
 **Major 워크플로우가 생성:**
-1. Spec 디렉토리 ID 결정 (`.specify/specs/` 내 다음 번호)
-2. `.specify/specs/NNN-feature-name/` 디렉토리 생성
+1. Feature 디렉토리 ID 결정 (`.specify/features/` 내 다음 번호)
+2. `.specify/features/NNN-feature-name/` 디렉토리 생성
 3. `NNN-feature-name` 브랜치 생성 및 체크아웃
 4. 디렉토리 내에 계획 문서 생성
 
@@ -135,7 +142,7 @@ Major 워크플로우가 생성하는 디렉토리 및 파일 구조:
 일반적인 기능 개발:
 
 ```
-.specify/specs/010-auth-system/
+.specify/features/010-auth-system/
 ├── spec.md
 ├── plan.md
 ├── tasks.md
@@ -150,7 +157,7 @@ Branch: 010-auth-system
 Epic의 일부로 실행되는 경우:
 
 ```
-.specify/specs/009-ecommerce-platform/
+.specify/epics/009-ecommerce-platform/
 ├── epic.md          # Epic 정의
 ├── progress.md      # 진행 상황
 ├── roadmap.md       # 로드맵
@@ -201,9 +208,10 @@ Branch: 009-ecommerce-platform (모든 Feature가 이 브랜치에서 작업)
 **Step 1: 디렉토리 및 브랜치 생성** (1-2분)
 - 사용자로부터 기능 설명 입력
 - 요약하여 디렉토리명 생성 (예: 010-auth-system)
-- `.specify/specs/NNN-feature-name/` 디렉토리 생성
+- `.specify/features/NNN-feature-name/` 디렉토리 생성
 - `NNN-feature-name` 브랜치 생성 및 체크아웃
-- Output: Spec 디렉토리 및 브랜치 준비 완료
+- 병합 대상 브랜치 선택 (main, develop 등)
+- Output: Feature 디렉토리 및 브랜치 준비 완료
 
 **Step 2: 요구사항 수집** (5-10분)
 - 대화형 Q&A로 요구사항 수집
@@ -317,8 +325,8 @@ Branch: 009-ecommerce-platform (모든 Feature가 이 브랜치에서 작업)
 # → 문서 생성 완료
 
 # 4. 문서 리뷰
-cat .specify/specs/010-auth-system/spec.md
-cat .specify/specs/010-auth-system/tasks.md
+cat .specify/features/010-auth-system/spec.md
+cat .specify/features/010-auth-system/tasks.md
 
 # 5. 구현 (tasks.md 따라)
 # ... 코딩 작업 ...
@@ -391,8 +399,8 @@ tasks.md의 테스트 작업 먼저 완료:
 /triage "기능 설명"
 
 # 문서 확인
-cat .specify/specs/NNN-feature-name/spec.md
-cat .specify/specs/NNN-feature-name/tasks.md
+cat .specify/features/NNN-feature-name/spec.md
+cat .specify/features/NNN-feature-name/tasks.md
 
 # Epic과 함께 사용
 /epic "대규모 프로젝트"

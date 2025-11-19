@@ -1,8 +1,8 @@
-# /review - Intelligent Code Review System
+# /review - 지능형 코드 리뷰 시스템
 
 ## Overview
 
-Comprehensive code review system analyzing security, quality, performance, and architectural compliance using the reviewer-unified agent.
+보안, 품질, 성능, 아키텍처(architecture) 준수를 분석하는 종합 코드 리뷰(review) 시스템으로, reviewer-unified 에이전트(agent)를 활용합니다.
 
 ## Output Language
 
@@ -45,18 +45,18 @@ Comprehensive code review system analyzing security, quality, performance, and a
   - 엣지 케이스 단위 테스트 추가
 ```
 
-This command provides:
-1. **Multi-Level Analysis**: Basic syntax → Advanced security/performance
-2. **Contextual Review**: Understands codebase patterns and architecture
-3. **Actionable Feedback**: Specific issues with fix suggestions
-4. **Quality Scoring**: Numerical ratings for maintainability and reliability
+이 커맨드는 다음을 제공합니다:
+1. **다층 분석**: 기본 구문 → 고급 보안/성능
+2. **컨텍스트 기반 리뷰**: 코드베이스 패턴과 아키텍처 이해
+3. **실행 가능한 피드백**: 수정 제안이 포함된 구체적 이슈
+4. **품질 점수화**: 유지보수성과 신뢰성에 대한 수치 평가
 
-**Key Features:**
-- OWASP Top 10 security scanning
-- Performance bottleneck detection
-- Architecture pattern compliance
-- Dependency analysis and impact assessment
-- Reusability suggestions from existing codebase
+**주요 기능:**
+- OWASP Top 10 보안 스캔
+- 성능 병목 현상 감지
+- 아키텍처 패턴 준수 확인
+- 의존성(dependency) 분석 및 영향도 평가
+- 기존 코드베이스로부터 재사용성(reusability) 제안
 
 ## Usage
 
@@ -64,23 +64,23 @@ This command provides:
 /review [options] [path]
 ```
 
-### Options
+### 옵션
 
-| Option | Description | Default |
+| 옵션 | 설명 | 기본값 |
 |--------|-------------|---------|
-| `--staged` | Review only staged files | `false` |
-| `--adv` | Advanced review (security + performance) | `false` |
-| `--arch` | Architecture compliance check | `false` |
-| `[path]` | Specific file or directory | Current directory |
+| `--staged` | 스테이징된 파일만 리뷰 | `false` |
+| `--adv` | 고급 리뷰 (보안 + 성능) | `false` |
+| `--arch` | 아키텍처 준수 확인 | `false` |
+| `[path]` | 특정 파일 또는 디렉토리 | 현재 디렉토리 |
 
-### Basic Commands
+### 기본 명령어
 
 ```bash
-/review                  # Review all changes
-/review src/            # Review specific directory
-/review --staged        # Review staged files only
-/review --adv           # Deep security/performance analysis
-/review --arch          # Architecture validation
+/review                  # 모든 변경사항 리뷰
+/review src/            # 특정 디렉토리 리뷰
+/review --staged        # 스테이징된 파일만 리뷰
+/review --adv           # 심층 보안/성능 분석
+/review --arch          # 아키텍처 검증
 ```
 
 ## Examples
@@ -195,181 +195,181 @@ Overall Score:     68/100
 
 ## Implementation
 
-### Architecture
+### 아키텍처(Architecture)
 
-Uses **reviewer-unified** agent which combines:
-- Code quality analysis
-- Security scanning (OWASP Top 10)
-- Performance profiling
-- Impact analysis
+**reviewer-unified** 에이전트(agent)를 사용하며, 다음을 결합합니다:
+- 코드 품질 분석
+- 보안 스캔 (OWASP Top 10)
+- 성능 프로파일링
+- 영향도 분석
 
-### Dependencies
+### 의존성(Dependencies)
 
-**Required:**
-- reviewer-unified agent
-- Grep/Read tools for code analysis
+**필수:**
+- reviewer-unified 에이전트
+- 코드 분석을 위한 Grep/Read 도구
 
-**Optional:**
-- Architecture config: `.specify/config/architecture.json`
-- Quality gates: `workflow-gates.json`
-- npm audit for dependency scanning
+**선택:**
+- 아키텍처 설정: `.specify/config/architecture.json`
+- 품질 게이트(quality gate): `workflow-gates.json`
+- 의존성 스캔을 위한 npm audit
 
-### Workflow Steps
+### 워크플로우 단계
 
-1. **Scope Detection**
-   - Determine files to review (staged, path, or all)
-   - Read architecture configuration
-   - Load quality gate thresholds
+1. **범위 감지**
+   - 리뷰할 파일 결정 (staged, path, 또는 전체)
+   - 아키텍처 설정 읽기
+   - 품질 게이트 임계값 로드
 
-2. **Analysis**
-   - **Basic**: Syntax, naming, structure
-   - **Advanced**: Security vulnerabilities, performance issues
-   - **Architecture**: Pattern compliance, dependency rules
+2. **분석**
+   - **기본**: 구문, 네이밍, 구조
+   - **고급**: 보안 취약점, 성능 이슈
+   - **아키텍처**: 패턴 준수, 의존성 규칙
 
-3. **Scoring**
-   - Calculate quality score (0-100)
-   - Identify critical/high/medium/low issues
-   - Compare against quality gates
+3. **점수 산정**
+   - 품질 점수 계산 (0-100)
+   - 치명적/높음/중간/낮음 이슈 식별
+   - 품질 게이트와 비교
 
-4. **Report Generation**
-   - Format findings with severity levels
-   - Provide specific line numbers and fixes
-   - Suggest existing patterns to reuse
+4. **리포트 생성**
+   - 심각도 수준별로 결과 포맷
+   - 구체적인 라인 번호와 수정 방법 제공
+   - 재사용 가능한 기존 패턴 제안
 
-### Related Resources
+### 관련 리소스
 
-- **Agent**: reviewer-unified.md
-- **Skills**: reusability-enforcer, dependency-tracer
-- **Config**: workflow-gates.json
+- **에이전트**: reviewer-unified.md
+- **스킬**: reusability-enforcer, dependency-tracer
+- **설정**: workflow-gates.json
 
-## Process Flow
+## 프로세스 흐름
 
 ```
-1. Parse Arguments
-   ├─ --staged → Get staged files
-   ├─ --adv    → Enable security/performance scan
-   ├─ --arch   → Enable architecture validation
-   └─ [path]   → Scan specific path
+1. 인자 파싱
+   ├─ --staged → 스테이징된 파일 가져오기
+   ├─ --adv    → 보안/성능 스캔 활성화
+   ├─ --arch   → 아키텍처 검증 활성화
+   └─ [path]   → 특정 경로 스캔
 
-2. Load Context
-   ├─ Read architecture config
-   ├─ Load quality gates
-   └─ Scan for existing patterns
+2. 컨텍스트 로드
+   ├─ 아키텍처 설정 읽기
+   ├─ 품질 게이트 로드
+   └─ 기존 패턴 스캔
 
-3. Execute Review
-   ├─ Basic: Syntax, naming, structure
-   ├─ Security: OWASP Top 10 checks
-   ├─ Performance: Bottleneck detection
-   └─ Architecture: Pattern compliance
+3. 리뷰 실행
+   ├─ 기본: 구문, 네이밍, 구조
+   ├─ 보안: OWASP Top 10 체크
+   ├─ 성능: 병목 현상 감지
+   └─ 아키텍처: 패턴 준수 확인
 
-4. Generate Report
-   ├─ Categorize by severity
-   ├─ Add line numbers and context
-   ├─ Suggest fixes
-   └─ Calculate quality score
+4. 리포트 생성
+   ├─ 심각도별로 분류
+   ├─ 라인 번호 및 컨텍스트 추가
+   ├─ 수정 방법 제안
+   └─ 품질 점수 계산
 ```
 
-## Model Selection Logic
+## 모델 선택 로직
 
-- **Basic Review**: Uses `haiku` for fast analysis
-- **Advanced Review**: Uses `sonnet` for deep security/performance
-- **Architecture Review**: Uses `sonnet` for pattern understanding
+- **기본 리뷰**: 빠른 분석을 위해 `haiku` 사용
+- **고급 리뷰**: 심층 보안/성능 분석을 위해 `sonnet` 사용
+- **아키텍처 리뷰**: 패턴 이해를 위해 `sonnet` 사용
 
-Auto-upgrades to `sonnet` when:
-- Security issues detected
-- Complex architectural patterns
-- Performance optimization needed
+다음의 경우 자동으로 `sonnet`으로 업그레이드:
+- 보안 이슈 감지
+- 복잡한 아키텍처 패턴
+- 성능 최적화 필요
 
-## Integration Points
+## 통합 지점
 
-### With Workflows
+### 워크플로우와 함께
 
 ```bash
-# Before committing
+# 커밋 전
 /review --staged
 /commit
 
-# During feature development
+# 기능 개발 중
 /major "new feature"
-# ... implementation ...
-/review --adv     # Deep review before PR
+# ... 구현 ...
+/review --adv     # PR 전 심층 리뷰
 /pr
 ```
 
-### With Quality Gates
+### 품질 게이트와 함께
 
-Respects thresholds from `workflow-gates.json`:
-- Code quality: 80%+
-- Test coverage: 80%+
-- Security: No high/critical issues
-- Performance: No blocking issues
+`workflow-gates.json`의 임계값을 준수합니다:
+- 코드 품질: 80% 이상
+- 테스트 커버리지: 80% 이상
+- 보안: 높음/치명적 이슈 없음
+- 성능: 차단 이슈 없음
 
-### With Architecture Validation
+### 아키텍처 검증과 함께
 
-Automatically enforces rules for:
+다음에 대한 규칙을 자동으로 강제합니다:
 - FSD (Feature-Sliced Design)
 - Clean Architecture
 - Hexagonal Architecture
 - DDD (Domain-Driven Design)
 
-## Error Handling
+## 에러 처리
 
 ### "No files to review"
-- **Cause**: Empty directory or no changes
-- **Fix**: Stage files or specify valid path
+- **원인**: 빈 디렉토리 또는 변경사항 없음
+- **해결**: 파일 스테이징 또는 유효한 경로 지정
 
 ### "Architecture config not found"
-- **Cause**: Missing `.specify/config/architecture.json`
-- **Fix**: Run `/start` to initialize or create manually
+- **원인**: `.specify/config/architecture.json` 파일 누락
+- **해결**: `/start` 실행으로 초기화 또는 수동 생성
 
 ### "Quality gate failed"
-- **Cause**: Score below threshold
-- **Fix**: Address high/critical issues first, then retry
+- **원인**: 임계값 이하의 점수
+- **해결**: 높음/치명적 이슈를 먼저 해결 후 재시도
 
-## Tips & Best Practices
+## 팁 및 모범 사례
 
-### When to Use Each Mode
+### 각 모드 사용 시점
 
-**Basic Review** (`/review`)
-- Quick syntax and style check
-- Before committing
-- During development
+**기본 리뷰** (`/review`)
+- 빠른 구문 및 스타일 검사
+- 커밋 전
+- 개발 중
 
-**Advanced Review** (`/review --adv`)
-- Before PR creation
-- After adding security-sensitive code
-- Performance-critical features
+**고급 리뷰** (`/review --adv`)
+- PR 생성 전
+- 보안에 민감한 코드 추가 후
+- 성능 중요 기능(feature)
 
-**Architecture Review** (`/review --arch`)
-- After major refactoring
-- New developer onboarding
-- Quarterly codebase health check
+**아키텍처 리뷰** (`/review --arch`)
+- 대규모 리팩토링 후
+- 신규 개발자 온보딩
+- 분기별 코드베이스 건강도 확인
 
-### Optimal Workflow
+### 최적의 워크플로우
 
 ```bash
-# Development cycle
-1. Implement feature
-2. /review --staged          # Quick check
-3. Fix issues
-4. /review --adv            # Deep analysis
-5. Address security/performance
+# 개발 사이클
+1. 기능 구현
+2. /review --staged          # 빠른 확인
+3. 이슈 수정
+4. /review --adv            # 심층 분석
+5. 보안/성능 문제 해결
 6. /commit
 7. /pr
 ```
 
-### Performance Tips
+### 성능 팁
 
-- Review specific paths instead of entire codebase
-- Use `--staged` for incremental reviews
-- Run `--arch` only when needed (slower)
+- 전체 코드베이스 대신 특정 경로 리뷰
+- 증분 리뷰를 위해 `--staged` 사용
+- 필요할 때만 `--arch` 실행 (느림)
 
-## Related Commands
+## 관련 커맨드
 
-- `/commit` - Auto-commit after review passes
-- `/pr` - Create PR after successful review
-- `/major` - Includes built-in review steps
-- `/minor` - Includes targeted review
+- `/commit` - 리뷰 통과 후 자동 커밋
+- `/pr` - 리뷰 성공 후 PR 생성
+- `/major` - 내장 리뷰 단계 포함
+- `/minor` - 타겟 리뷰 포함
 
 ---
 

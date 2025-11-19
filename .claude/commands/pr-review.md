@@ -2,7 +2,7 @@
 
 ## Overview
 
-Automated pull request review with codebase context and intelligent analysis of specific PR changes.
+코드베이스 컨텍스트와 특정 PR 변경 사항의 지능형 분석을 통한 자동화된 Pull Request 리뷰입니다.
 
 ## Output Language
 
@@ -62,18 +62,18 @@ Automated pull request review with codebase context and intelligent analysis of 
 권장사항: ✅ 경미한 수정 후 승인
 ```
 
-This command:
-1. **Fetches PR**: Downloads PR details using GitHub CLI
-2. **Analyzes Changes**: Reviews diff and commit history
-3. **Contextual Review**: Understands impact on existing codebase
-4. **Provides Feedback**: Security, quality, architecture, performance analysis
+이 커맨드는 다음을 수행합니다:
+1. **PR 가져오기**: GitHub CLI를 사용하여 PR 세부 정보 다운로드
+2. **변경 분석**: diff 및 커밋 히스토리 검토
+3. **컨텍스트 기반 리뷰**: 기존 코드베이스에 미치는 영향 이해
+4. **피드백 제공**: 보안, 품질, 아키텍처(architecture), 성능 분석
 
-**Key Features:**
-- OWASP Top 10 security scanning
-- Breaking change detection
-- Performance impact analysis
-- Architecture compliance check
-- Reusability suggestions
+**주요 기능:**
+- OWASP Top 10 보안 스캔
+- Breaking change 감지
+- 성능 영향 분석
+- 아키텍처(architecture) 준수 확인
+- 재사용성(reusability) 제안
 
 ## Usage
 
@@ -83,18 +83,18 @@ This command:
 
 ### Options
 
-| Option | Description | Default |
+| 옵션 | 설명 | 기본값 |
 |--------|-------------|---------|
-| `<pr-number>` | PR number to review | Required |
-| `--full` | Full detailed review | `false` |
-| `--security` | Security-focused review | `false` |
+| `<pr-number>` | 리뷰할 PR 번호 | 필수 |
+| `--full` | 전체 상세 리뷰 | `false` |
+| `--security` | 보안 중심 리뷰 | `false` |
 
 ### Basic Commands
 
 ```bash
-/pr-review 42              # Review PR #42
-/pr-review 42 --full       # Detailed review
-/pr-review 42 --security   # Security-focused
+/pr-review 42              # PR #42 리뷰
+/pr-review 42 --full       # 상세 리뷰
+/pr-review 42 --security   # 보안 중심 리뷰
 ```
 
 ## Examples
@@ -201,154 +201,154 @@ Critical issues must be fixed before merge
 /pr-review 42 --full
 ```
 
-**Includes:**
-- Code quality analysis
-- Security scan
-- Performance impact
-- Architecture compliance
-- Breaking changes detection
-- Test coverage analysis
-- Documentation completeness
+**포함 항목:**
+- 코드 품질 분석
+- 보안 스캔
+- 성능 영향
+- 아키텍처(architecture) 준수
+- Breaking change 감지
+- 테스트 커버리지 분석
+- 문서화 완성도
 
 ## Implementation
 
 ### Architecture
 
-Uses **reviewer-unified** agent which provides:
-- Multi-level analysis (basic → advanced)
-- Codebase context understanding
-- Pattern matching against existing code
-- Impact assessment
+다음을 제공하는 **reviewer-unified** 에이전트(agent)를 사용합니다:
+- 다층 분석 (기본 → 고급)
+- 코드베이스 컨텍스트 이해
+- 기존 코드와의 패턴 매칭
+- 영향도 평가
 
 ### Dependencies
 
-**Required:**
-- GitHub CLI (`gh`) for PR fetching
-- reviewer-unified agent
-- Git repository with remote
+**필수:**
+- PR 가져오기를 위한 GitHub CLI (`gh`)
+- reviewer-unified 에이전트(agent)
+- 리모트가 있는 Git 저장소
 
-**Optional:**
-- Architecture config: `.specify/config/architecture.json`
-- Quality gates: `workflow-gates.json`
-- npm audit for dependency scanning
+**선택:**
+- 아키텍처 설정: `.specify/config/architecture.json`
+- 품질 게이트(quality gate): `workflow-gates.json`
+- 의존성(dependency) 스캔을 위한 npm audit
 
 ### Workflow Steps
 
-1. **Fetch PR Data**
-   - Use `gh pr view <number>` for PR details
-   - Get `gh pr diff <number>` for changes
-   - Read commit messages
+1. **PR 데이터 가져오기**
+   - PR 세부 정보를 위해 `gh pr view <number>` 사용
+   - 변경 사항을 위해 `gh pr diff <number>` 가져오기
+   - 커밋 메시지 읽기
 
-2. **Context Loading**
-   - Load architecture configuration
-   - Read quality gate thresholds
-   - Scan existing patterns in codebase
+2. **컨텍스트 로드**
+   - 아키텍처(architecture) 설정 로드
+   - 품질 게이트(quality gate) 임계값 읽기
+   - 코드베이스의 기존 패턴 스캔
 
-3. **Analysis**
-   - **Code Quality**: Style, structure, naming
-   - **Security**: OWASP Top 10, dependency vulnerabilities
-   - **Performance**: N+1 queries, memory leaks, inefficient algorithms
-   - **Architecture**: Pattern compliance, layer violations
-   - **Breaking Changes**: API changes, interface modifications
+3. **분석**
+   - **코드 품질**: 스타일, 구조, 네이밍
+   - **보안**: OWASP Top 10, 의존성 취약점
+   - **성능**: N+1 쿼리, 메모리 누수, 비효율적 알고리즘
+   - **아키텍처**: 패턴 준수, 레이어 위반
+   - **Breaking Changes**: API 변경, 인터페이스 수정
 
-4. **Report Generation**
-   - Categorize findings by severity
-   - Provide line numbers and context
-   - Suggest specific fixes
-   - Calculate overall score
+4. **리포트 생성**
+   - 심각도별로 발견 사항 분류
+   - 라인 번호와 컨텍스트 제공
+   - 구체적인 수정 방법 제안
+   - 전체 점수 계산
 
 ### Related Resources
 
-- **Agent**: reviewer-unified.md
+- **에이전트(Agent)**: reviewer-unified.md
 - **CLI**: GitHub CLI (`gh`)
-- **Skills**: dependency-tracer, reusability-enforcer
+- **스킬(Skills)**: dependency-tracer, reusability-enforcer
 
 ## Review Criteria
 
-### Code Quality (Weight: 30%)
-- Readability and maintainability
-- Consistent style and naming
-- Proper error handling
-- Code duplication
+### Code Quality (가중치: 30%)
+- 가독성과 유지보수성
+- 일관된 스타일과 네이밍
+- 적절한 에러 처리
+- 코드 중복
 
-### Security (Weight: 30%)
-- OWASP Top 10 vulnerabilities
-- Authentication and authorization
-- Input validation
-- Dependency vulnerabilities
+### Security (가중치: 30%)
+- OWASP Top 10 취약점
+- 인증 및 권한 부여
+- 입력 검증
+- 의존성(dependency) 취약점
 
-### Architecture (Weight: 20%)
-- Pattern compliance (FSD, Clean, etc.)
-- Layer separation
-- Dependency rules
-- Breaking changes
+### Architecture (가중치: 20%)
+- 패턴 준수 (FSD, Clean 등)
+- 레이어 분리
+- 의존성 규칙
+- Breaking change
 
-### Performance (Weight: 20%)
-- Query optimization
-- Algorithm efficiency
-- Memory management
-- Caching opportunities
+### Performance (가중치: 20%)
+- 쿼리 최적화
+- 알고리즘 효율성
+- 메모리 관리
+- 캐싱 기회
 
 ## Review Grades
 
-**90-100**: Excellent
-- No major issues
-- Best practices followed
-- Comprehensive tests
-- **Action**: Approve immediately
+**90-100**: 우수
+- 주요 이슈 없음
+- 모범 사례 준수
+- 포괄적인 테스트
+- **조치**: 즉시 승인
 
-**75-89**: Good
-- Minor improvements needed
-- Overall solid implementation
-- **Action**: Approve with comments
+**75-89**: 양호
+- 경미한 개선 필요
+- 전반적으로 견고한 구현
+- **조치**: 코멘트와 함께 승인
 
-**60-74**: Acceptable
-- Several issues to address
-- Functional but needs refinement
-- **Action**: Request changes (non-blocking)
+**60-74**: 수용 가능
+- 해결해야 할 여러 이슈
+- 기능적이지만 개선 필요
+- **조치**: 변경 요청 (비차단)
 
-**Below 60**: Needs Work
-- Critical issues present
-- Security or performance concerns
-- **Action**: Request changes (blocking)
+**60 미만**: 추가 작업 필요
+- 치명적 이슈 존재
+- 보안 또는 성능 우려
+- **조치**: 변경 요청 (차단)
 
 ## Error Handling
 
 ### "PR not found"
-- **Cause**: Invalid PR number or no access
-- **Fix**: Verify PR number with `gh pr list`
+- **원인**: 잘못된 PR 번호 또는 접근 권한 없음
+- **해결**: `gh pr list`로 PR 번호 확인
 
 ### "gh not authenticated"
-- **Cause**: GitHub CLI not logged in
-- **Fix**: Run `gh auth login`
+- **원인**: GitHub CLI에 로그인하지 않음
+- **해결**: `gh auth login` 실행
 
 ### "Cannot fetch PR diff"
-- **Cause**: PR closed or merged
-- **Fix**: Check PR status on GitHub
+- **원인**: PR이 닫혔거나 병합됨
+- **해결**: GitHub에서 PR 상태 확인
 
 ## Tips & Best Practices
 
 ### When to Use Each Mode
 
-**Basic Review** (`/pr-review <number>`)
-- Quick check before merging
-- Standard PR review process
-- Daily development workflow
+**기본 리뷰** (`/pr-review <number>`)
+- 병합 전 빠른 확인
+- 표준 PR 리뷰 프로세스
+- 일상적인 개발 워크플로우(workflow)
 
-**Security Focus** (`/pr-review <number> --security`)
-- Authentication/authorization changes
-- API endpoint additions
-- External library integrations
+**보안 중심** (`/pr-review <number> --security`)
+- 인증/권한 변경
+- API 엔드포인트 추가
+- 외부 라이브러리 통합
 
-**Full Review** (`/pr-review <number> --full`)
-- Major features
-- Before production deployment
-- Quarterly code audits
+**전체 리뷰** (`/pr-review <number> --full`)
+- 주요 기능(feature)
+- 프로덕션 배포 전
+- 분기별 코드 감사
 
 ### Integration with CI/CD
 
 ```bash
-# In GitHub Actions
+# GitHub Actions에서
 - name: Automated PR Review
   run: /pr-review ${{ github.event.pull_request.number }}
 ```
@@ -356,24 +356,24 @@ Uses **reviewer-unified** agent which provides:
 ### Optimal Workflow
 
 ```bash
-# As PR author
-1. Create PR: /pr
-2. Self-review: /pr-review <number>
-3. Fix issues
-4. Push updates
+# PR 작성자로서
+1. PR 생성: /pr
+2. 셀프 리뷰: /pr-review <number>
+3. 이슈 수정
+4. 업데이트 푸시
 
-# As reviewer
-1. Review: /pr-review <number> --full
-2. Leave comments on GitHub
-3. Approve or request changes
+# 리뷰어로서
+1. 리뷰: /pr-review <number> --full
+2. GitHub에 코멘트 남기기
+3. 승인 또는 변경 요청
 ```
 
 ## Related Commands
 
-- `/pr` - Create PR before review
-- `/review` - Review local changes before PR
-- `/commit` - Commit changes after addressing review
-- `/major`, `/minor`, `/micro` - Include PR creation and review
+- `/pr` - 리뷰 전 PR 생성
+- `/review` - PR 전 로컬 변경 사항 리뷰
+- `/commit` - 리뷰 수정 후 변경 사항 커밋
+- `/major`, `/minor`, `/micro` - PR 생성 및 리뷰 포함
 
 ---
 

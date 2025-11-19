@@ -2,7 +2,7 @@
 
 ## Overview
 
-Automatically generates semantic commit messages following Conventional Commits format by analyzing staged changes.
+스테이징된 변경사항을 분석하여 Conventional Commits 형식을 따르는 의미 있는 커밋(commit) 메시지를 자동으로 생성합니다.
 
 ## Output Language
 
@@ -32,18 +32,18 @@ feat(auth): JWT 인증 시스템 추가
 Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
-This command:
-1. **Analyzes Changes**: Reviews all staged files and their modifications
-2. **Generates Message**: Creates a concise, descriptive commit message
-3. **Follows Standards**: Uses Conventional Commits format (feat, fix, chore, etc.)
-4. **Includes Context**: Adds detailed body and co-authored-by information
+이 커맨드는 다음을 수행합니다:
+1. **변경사항 분석**: 모든 스테이징된 파일과 수정 내용을 검토합니다
+2. **메시지 생성**: 간결하고 설명적인 커밋 메시지를 작성합니다
+3. **표준 준수**: Conventional Commits 형식을 사용합니다 (feat, fix, chore 등)
+4. **컨텍스트 포함**: 상세한 본문(body)과 co-authored-by 정보를 추가합니다
 
-**Key Features:**
-- Automatic commit type detection (feat, fix, chore, docs, etc.)
-- Scope inference from changed files
-- Breaking change detection
-- Multi-line body for complex changes
-- Notion integration for changelog tracking
+**주요 기능:**
+- 자동 커밋 타입 감지 (feat, fix, chore, docs 등)
+- 변경된 파일로부터 스코프 추론
+- 호환성 파괴 변경(breaking change) 감지
+- 복잡한 변경사항을 위한 여러 줄 본문
+- Notion 연동을 통한 변경 로그(changelog) 추적
 
 ## Usage
 
@@ -51,17 +51,17 @@ This command:
 /commit
 ```
 
-The command will:
-- Check git status
-- Analyze staged changes
-- Generate commit message
-- Create commit with proper format
+이 커맨드는 다음을 수행합니다:
+- Git 상태 확인
+- 스테이징된 변경사항 분석
+- 커밋 메시지 생성
+- 올바른 형식으로 커밋 생성
 
-### Prerequisites
+### 사전 요구사항
 
-- Git repository initialized
-- Changes staged (`git add` already run)
-- Clean working directory (all changes either staged or ignored)
+- Git 저장소 초기화됨
+- 변경사항 스테이징됨 (`git add` 이미 실행)
+- 깨끗한 작업 디렉토리 (모든 변경사항이 스테이징되었거나 무시됨)
 
 ## Examples
 
@@ -127,62 +127,62 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 ## Implementation
 
-### Architecture
+### 아키텍처(Architecture)
 
-The command leverages the **documenter-unified** agent which combines:
-- Changelog analysis for consistent style
-- Git diff parsing for accurate change detection
-- Conventional Commits format enforcement
+이 커맨드는 **documenter-unified** 에이전트(agent)를 활용하며, 다음을 결합합니다:
+- 일관된 스타일을 위한 변경 로그 분석
+- 정확한 변경 감지를 위한 Git diff 파싱
+- Conventional Commits 형식 강제
 
-### Dependencies
+### 의존성(Dependencies)
 
-**Required:**
-- Git: Version control system
-- documenter-unified agent: Commit message generation
+**필수:**
+- Git: 버전 관리 시스템
+- documenter-unified 에이전트: 커밋 메시지 생성
 
-**Optional:**
-- Notion MCP: For automatic changelog updates
+**선택:**
+- Notion MCP: 자동 변경 로그 업데이트
 
-### Workflow Steps
+### 워크플로우 단계
 
-1. **Pre-checks**
-   - Verify git repository exists
-   - Confirm changes are staged
-   - Check for conflicts or issues
+1. **사전 점검**
+   - Git 저장소 존재 여부 확인
+   - 변경사항 스테이징 확인
+   - 충돌 또는 이슈 확인
 
-2. **Analysis**
-   - Read git diff for staged changes
-   - Review recent commits for style consistency
-   - Identify change patterns and scope
+2. **분석**
+   - 스테이징된 변경사항의 Git diff 읽기
+   - 스타일 일관성을 위한 최근 커밋 검토
+   - 변경 패턴 및 스코프 식별
 
-3. **Generation**
-   - Determine commit type (feat/fix/chore/etc.)
-   - Extract scope from file paths
-   - Write concise subject line (max 72 chars)
-   - Create detailed body if needed
+3. **생성**
+   - 커밋 타입 결정 (feat/fix/chore 등)
+   - 파일 경로에서 스코프 추출
+   - 간결한 제목 줄 작성 (최대 72자)
+   - 필요 시 상세한 본문 작성
 
-4. **Commit**
-   - Execute git commit with generated message
-   - Add co-authored-by information
-   - Run post-commit hooks if configured
+4. **커밋**
+   - 생성된 메시지로 git commit 실행
+   - Co-authored-by 정보 추가
+   - 설정된 경우 post-commit 훅 실행
 
-### Related Resources
+### 관련 리소스
 
-- **Agents**: documenter-unified
-- **Format**: [Conventional Commits](https://www.conventionalcommits.org/)
-- **Integration**: Notion MCP for changelog tracking
+- **에이전트**: documenter-unified
+- **형식**: [Conventional Commits](https://www.conventionalcommits.org/)
+- **연동**: 변경 로그 추적을 위한 Notion MCP
 
-### Configuration
+### 설정(Configuration)
 
-Uses Conventional Commits format:
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation changes
-- `style`: Code style changes (formatting, etc.)
-- `refactor`: Code refactoring
-- `perf`: Performance improvements
-- `test`: Test additions or modifications
-- `chore`: Build process or auxiliary tool changes
+Conventional Commits 형식 사용:
+- `feat`: 새 기능(feature)
+- `fix`: 버그 수정
+- `docs`: 문서 변경
+- `style`: 코드 스타일 변경 (포매팅 등)
+- `refactor`: 코드 리팩토링
+- `perf`: 성능 개선
+- `test`: 테스트 추가 또는 수정
+- `chore`: 빌드 프로세스 또는 보조 도구 변경
 
 ## 프로세스
 

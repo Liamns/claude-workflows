@@ -8,7 +8,7 @@ usage: "/db-sync"
 
 ## Overview
 
-Synchronizes the database from production (source) to development (target) environment.
+프로덕션(소스)에서 개발(타겟) 환경으로 데이터베이스를 동기화합니다.
 
 ## Output Language
 
@@ -47,49 +47,49 @@ Synchronizes the database from production (source) to development (target) envir
 ✓ 데이터 검증 완료
 ```
 
-This command performs a complete database synchronization with the following steps:
+이 커맨드는 다음 단계로 완전한 데이터베이스 동기화를 수행합니다:
 
-1. **Connection Check**: Verifies connectivity to both source and target databases
-2. **Create Dump**: Creates a backup dump from the source database
-3. **Create Backup**: Backs up the current target database (keeps last 5 backups)
-4. **Initialize Target**: Stops and reinitializes the target database
-5. **Restore Data**: Restores the dump to the target database
-6. **Verify Data**: Validates the restored data integrity
-7. **Cleanup**: Removes temporary files and releases locks
+1. **연결 확인**: 소스 및 타겟 데이터베이스 연결 확인
+2. **덤프 생성**: 소스 데이터베이스에서 백업 덤프 생성
+3. **백업 생성**: 현재 타겟 데이터베이스 백업 (최근 5개 백업 유지)
+4. **타겟 초기화**: 타겟 데이터베이스 중지 및 재초기화
+5. **데이터 복원**: 타겟 데이터베이스에 덤프 복원
+6. **데이터 검증**: 복원된 데이터 무결성 확인
+7. **정리**: 임시 파일 제거 및 잠금 해제
 
 ## Prerequisites
 
-- Docker and docker-compose must be running
-- PostgreSQL@16 tools must be installed (`brew install postgresql@16`)
-- `.env` file must exist with source DATABASE_URL
-- `.env.docker` file must exist with target DATABASE_URL
+- Docker와 docker-compose가 실행 중이어야 함
+- PostgreSQL@16 도구가 설치되어 있어야 함 (`brew install postgresql@16`)
+- 소스 DATABASE_URL이 포함된 `.env` 파일이 존재해야 함
+- 타겟 DATABASE_URL이 포함된 `.env.docker` 파일이 존재해야 함
 
 ## Safety Features
 
-- **Automatic Backup**: Creates a timestamped backup before any changes
-- **Automatic Rollback**: Reverts to the latest backup if restoration fails
-- **Lock File**: Prevents multiple simultaneous sync operations
-- **Data Verification**: Validates restored data after sync
+- **자동 백업**: 변경 전 타임스탬프가 포함된 백업 생성
+- **자동 롤백**: 복원 실패 시 최신 백업으로 되돌림
+- **잠금 파일**: 여러 동기화 작업이 동시에 실행되는 것을 방지
+- **데이터 검증**: 동기화 후 복원된 데이터 검증
 
 ## Usage
 
-Simply run:
+다음과 같이 실행합니다:
 
 ```bash
 /db-sync
 ```
 
-The command will:
-- Display progress for each step
-- Show detailed logs in `.claude/cache/db-sync.log`
-- Report elapsed time upon completion
+커맨드는 다음을 수행합니다:
+- 각 단계의 진행 상황 표시
+- `.claude/cache/db-sync.log`에 상세 로그 표시
+- 완료 시 경과 시간 보고
 
 ## Error Handling
 
-If any step fails:
-- The script will attempt automatic rollback
-- Error messages will indicate the specific failure point
-- Check the log file for detailed error information
+단계가 실패하는 경우:
+- 스크립트가 자동 롤백 시도
+- 에러 메시지가 구체적인 실패 지점 표시
+- 상세한 에러 정보는 로그 파일 확인
 
 ## Examples
 

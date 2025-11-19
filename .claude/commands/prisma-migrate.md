@@ -8,7 +8,7 @@ usage: "/prisma-migrate"
 
 ## Overview
 
-Automates Prisma schema migrations with intelligent detection and naming.
+지능형 감지와 네이밍을 통해 Prisma 스키마 마이그레이션(migration)을 자동화합니다.
 
 ## Output Language
 
@@ -73,65 +73,65 @@ Automates Prisma schema migrations with intelligent detection and naming.
 ℹ️  총 마이그레이션: 13개
 ```
 
-This command performs automated Prisma migrations with the following steps:
+이 커맨드는 다음 단계로 Prisma 마이그레이션(migration)을 자동화합니다:
 
-1. **Detect Migrations**: Automatically finds your Prisma schema and migrations directory
-2. **Check Changes**: Detects schema changes and pending migrations
-3. **Select Environment**: Prompts for development or production environment
-4. **Generate Name**: Automatically generates meaningful migration names (dev only)
-5. **Run Migration**: Executes `prisma migrate dev` or `prisma migrate deploy`
-6. **Verify**: Confirms migration file creation and application
+1. **마이그레이션 감지**: Prisma 스키마와 마이그레이션 디렉토리를 자동으로 찾습니다
+2. **변경 확인**: 스키마 변경 사항과 대기 중인 마이그레이션을 감지합니다
+3. **환경 선택**: 개발(development) 또는 프로덕션(production) 환경을 선택하도록 안내합니다
+4. **이름 생성**: 의미 있는 마이그레이션 이름을 자동으로 생성합니다 (개발 환경만)
+5. **마이그레이션 실행**: `prisma migrate dev` 또는 `prisma migrate deploy`를 실행합니다
+6. **검증**: 마이그레이션 파일 생성 및 적용을 확인합니다
 
 ## Prerequisites
 
-- Node.js and npm must be installed
-- Prisma must be installed as a dev dependency
-- Prisma schema must exist in `prisma/` directory
+- Node.js와 npm이 설치되어 있어야 함
+- Prisma가 개발 의존성(dev dependency)으로 설치되어 있어야 함
+- Prisma 스키마가 `prisma/` 디렉토리에 존재해야 함
 
 ## Migration Name Generation
 
-The tool intelligently generates migration names based on schema changes:
+도구가 스키마 변경 사항을 기반으로 마이그레이션 이름을 지능적으로 생성합니다:
 
-- **Add Model**: `add_user_table` (detects new model)
-- **Remove Model**: `remove_post_table` (detects deleted model)
-- **Add Index**: `add_index` (detects index changes)
-- **Generic**: `schema_update_20250118_143052` (fallback with timestamp)
+- **모델 추가**: `add_user_table` (새 모델 감지)
+- **모델 제거**: `remove_post_table` (삭제된 모델 감지)
+- **인덱스 추가**: `add_index` (인덱스 변경 감지)
+- **일반**: `schema_update_20250118_143052` (타임스탬프가 포함된 기본값)
 
 ## Environment Modes
 
 ### Development Mode
-- Creates a new migration file with auto-generated name
-- Applies the migration to the database
-- Suitable for local development and testing
+- 자동 생성된 이름으로 새 마이그레이션 파일 생성
+- 데이터베이스에 마이그레이션 적용
+- 로컬 개발 및 테스트에 적합
 
 ### Production Mode
-- Applies existing migrations only (no new migration file)
-- Used for deploying to production databases
-- Skips migration name generation
+- 기존 마이그레이션만 적용 (새 마이그레이션 파일 생성 안 함)
+- 프로덕션 데이터베이스 배포에 사용
+- 마이그레이션 이름 생성 생략
 
 ## Safety Features
 
-- **Auto-detection**: Finds schema and migrations automatically
-- **Change Detection**: Only runs if changes are detected
-- **Interactive**: Prompts for environment selection
-- **Logging**: Saves detailed logs to `.claude/cache/prisma-migrate.log`
+- **자동 감지**: 스키마와 마이그레이션을 자동으로 찾습니다
+- **변경 감지**: 변경 사항이 감지된 경우에만 실행
+- **대화형**: 환경 선택을 위한 프롬프트 제공
+- **로깅**: 상세 로그를 `.claude/cache/prisma-migrate.log`에 저장
 
 ## Usage
 
-Simply run:
+다음과 같이 실행합니다:
 
 ```bash
 /prisma-migrate
 ```
 
-The command will:
-1. Detect your Prisma setup automatically
-2. Show existing migrations
-3. Check for schema changes
-4. Prompt for environment (dev/prod)
-5. Generate migration name (if dev)
-6. Execute the migration
-7. Display summary
+커맨드는 다음을 수행합니다:
+1. Prisma 설정을 자동으로 감지
+2. 기존 마이그레이션 표시
+3. 스키마 변경 사항 확인
+4. 환경(dev/prod) 선택 프롬프트
+5. 마이그레이션 이름 생성 (개발 환경인 경우)
+6. 마이그레이션 실행
+7. 요약 표시
 
 ## Examples
 
@@ -141,22 +141,22 @@ The command will:
 /prisma-migrate
 ```
 
-The command will interactively prompt you to select the environment (development or production).
+커맨드가 환경(개발 또는 프로덕션)을 선택하도록 대화형으로 안내합니다.
 
 ### Development Mode Example
 
 ```bash
 /prisma-migrate
-# Select option 1 for development
-# Creates and applies new migration
+# 개발 환경을 위해 옵션 1 선택
+# 새 마이그레이션 생성 및 적용
 ```
 
 ### Production Mode Example
 
 ```bash
 /prisma-migrate
-# Select option 2 for production
-# Applies existing migrations only
+# 프로덕션을 위해 옵션 2 선택
+# 기존 마이그레이션만 적용
 ```
 
 ### Example Output
@@ -209,11 +209,11 @@ Enter choice (1/2): 1
 
 ## Error Handling
 
-If migration fails:
-- Check the log file at `.claude/cache/prisma-migrate.log`
-- Verify your database is running and accessible
-- Ensure schema syntax is correct
-- Check for conflicts with existing migrations
+마이그레이션이 실패하는 경우:
+- `.claude/cache/prisma-migrate.log`의 로그 파일 확인
+- 데이터베이스가 실행 중이고 접근 가능한지 확인
+- 스키마 문법이 올바른지 확인
+- 기존 마이그레이션과의 충돌 확인
 
 ## Implementation
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-AI-powered workflow selection that automatically analyzes your task and recommends the optimal workflow (Major/Minor/Micro).
+AI 기반 워크플로우(workflow) 선택기로, 작업(task)을 자동으로 분석하여 최적의 워크플로우(Major/Minor/Micro)를 추천합니다.
 
 ## Output Language
 
@@ -22,18 +22,18 @@ AI-powered workflow selection that automatically analyzes your task and recommen
 
 **예시는 이미 문서 내에 한글로 작성되어 있습니다.**
 
-This command:
-1. **Analyzes Complexity**: Evaluates scope, impact, and estimated effort
-2. **Recommends Workflow**: Suggests Major (60% savings), Minor (75%), or Micro (85%)
-3. **Provides Guidance**: Offers Plan Mode tips for complex tasks
-4. **Auto-Execution**: Optionally starts the recommended workflow immediately
+이 커맨드는 다음을 수행합니다:
+1. **복잡도 분석**: 범위, 영향도, 예상 작업량 평가
+2. **워크플로우 추천**: Major (60% 절감), Minor (75%), Micro (85%) 제안
+3. **가이드 제공**: 복잡한 작업(task)을 위한 Plan Mode 팁 제공
+4. **자동 실행**: 추천된 워크플로우를 선택적으로 즉시 시작
 
-**Key Features:**
-- Intelligent complexity scoring (0-15 scale)
-- Automatic workflow selection based on criteria
-- Plan Mode guidance for Major tasks (complexity 5+)
-- Learning from past decisions
-- Token efficiency optimization
+**주요 기능:**
+- 지능형 복잡도 점수 산정 (0-15 척도)
+- 기준 기반 자동 워크플로우 선택
+- Major 작업을 위한 Plan Mode 가이드 (복잡도 5+)
+- 과거 결정으로부터 학습
+- 토큰(token) 효율성 최적화
 
 ## Usage
 
@@ -41,19 +41,19 @@ This command:
 /triage "task description"
 ```
 
-The command will:
-- Analyze task complexity and scope
-- Recommend optimal workflow
-- Provide execution guidance
-- Show expected token savings
+이 커맨드는 다음을 수행합니다:
+- 작업(task) 복잡도 및 범위 분석
+- 최적의 워크플로우 추천
+- 실행 가이드 제공
+- 예상 토큰 절감량 표시
 
-### Decision Criteria
+### 결정 기준
 
-| Score | Workflow | Duration | Characteristics |
+| 점수 | 워크플로우 | 소요 시간 | 특징 |
 |-------|----------|----------|----------------|
-| 0-3   | **Micro** | < 30min | Typos, config, logs, comments |
-| 4-7   | **Minor** | < 1 day | Bug fixes, improvements, refactors |
-| 8-15  | **Major** | 2+ days | New features, architecture changes |
+| 0-3   | **Micro** | < 30분 | 오타, 설정, 로그, 주석 |
+| 4-7   | **Minor** | < 1일 | 버그 수정, 개선, 리팩토링 |
+| 8-15  | **Major** | 2일 이상 | 신규 기능, 아키텍처 변경 |
 
 ## Examples
 
@@ -179,64 +179,64 @@ Expected Tokens: ~80,000 (vs 200,000 without triage)
 
 ## Implementation
 
-### Architecture
+### 아키텍처(Architecture)
 
-The command uses the **architect-unified** agent which:
-- Analyzes task description semantics
-- Evaluates project context
-- Applies decision tree logic
-- Recommends optimal workflow
+이 커맨드는 **architect-unified** 에이전트(agent)를 사용하며, 다음을 수행합니다:
+- 작업(task) 설명의 의미 분석
+- 프로젝트 컨텍스트 평가
+- 의사결정 트리 로직 적용
+- 최적의 워크플로우 추천
 
-### Dependencies
+### 의존성(Dependencies)
 
-**Required:**
-- architect-unified agent: Complexity analysis
-- workflow-gates.json: Decision criteria
+**필수:**
+- architect-unified 에이전트: 복잡도 분석
+- workflow-gates.json: 결정 기준
 
-**Optional:**
-- Git history: Learning from past tasks
-- Project metrics: Context-aware scoring
+**선택:**
+- Git 히스토리: 과거 작업으로부터 학습
+- 프로젝트 메트릭: 컨텍스트 기반 점수 산정
 
-### Workflow Steps
+### 워크플로우 단계
 
-1. **Task Analysis**
-   - Parse task description
-   - Extract key requirements
-   - Identify affected areas
+1. **작업 분석**
+   - 작업 설명 파싱
+   - 핵심 요구사항 추출
+   - 영향 받는 영역 식별
 
-2. **Complexity Scoring**
-   - Evaluate scope (files, components)
-   - Assess technical complexity
-   - Estimate time and effort
-   - Calculate impact radius
+2. **복잡도 점수 산정**
+   - 범위 평가 (파일, 컴포넌트)
+   - 기술적 복잡도 평가
+   - 시간 및 작업량 예상
+   - 영향 범위 계산
 
-3. **Workflow Selection**
-   - Match score to criteria
-   - Consider project context
-   - Apply quality requirements
-   - Generate recommendation
+3. **워크플로우 선택**
+   - 점수를 기준에 매칭
+   - 프로젝트 컨텍스트 고려
+   - 품질 요구사항 적용
+   - 추천 생성
 
-4. **Guidance Generation**
-   - Provide next steps
-   - Show token estimates
-   - Offer Plan Mode tips (if applicable)
-   - Suggest related commands
+4. **가이드 생성**
+   - 다음 단계 제공
+   - 토큰 예상치 표시
+   - Plan Mode 팁 제공 (해당 시)
+   - 관련 커맨드 제안
 
-### Related Resources
+### 관련 리소스
 
-- **Agents**: architect-unified
-- **Configuration**: workflow-gates.json
-- **Workflows**: /major, /minor, /micro
-- **Metrics**: /dashboard
+- **에이전트**: architect-unified
+- **설정**: workflow-gates.json
+- **워크플로우**: /major, /minor, /micro
+- **메트릭**: /dashboard
 
-### Scoring Algorithm
+### 점수 산정 알고리즘
 
 ```javascript
 complexity_score =
-  scope_factor (0-5) +        // Files, components affected
-  technical_factor (0-5) +    // Architecture, new tech
-  impact_factor (0-3) +       // User/system impact
-  effort_factor (0-2)         // Estimated hours
+  scope_factor (0-5) +        // 파일, 컴포넌트 영향
+  technical_factor (0-5) +    // 아키텍처, 신규 기술
+  impact_factor (0-3) +       // 사용자/시스템 영향
+  effort_factor (0-2)         // 예상 소요 시간
 ```
 
 ## 작동 프로세스

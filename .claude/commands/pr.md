@@ -1,8 +1,8 @@
-# /pr - Pull Request Auto-Creation
+# /pr - Pull Request 자동 생성
 
 ## Overview
 
-Automatically creates pull requests with intelligent descriptions based on commit history and code changes.
+커밋(commit) 히스토리와 코드 변경사항을 기반으로 지능형 설명과 함께 Pull Request를 자동으로 생성합니다.
 
 ## Output Language
 
@@ -42,18 +42,18 @@ Automatically creates pull requests with intelligent descriptions based on commi
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 ```
 
-This command:
-1. **Analyzes Branch**: Reviews all commits since divergence from base
-2. **Generates Summary**: Creates comprehensive PR description
-3. **Creates PR**: Uses GitHub CLI to submit pull request
-4. **Returns URL**: Provides direct link to created PR
+이 커맨드는 다음을 수행합니다:
+1. **브랜치(branch) 분석**: 베이스에서 분기한 이후 모든 커밋 검토
+2. **요약 생성**: 포괄적인 PR 설명 작성
+3. **PR 생성**: GitHub CLI를 사용하여 Pull Request 제출
+4. **URL 반환**: 생성된 PR에 대한 직접 링크 제공
 
-**Key Features:**
-- Auto-detect base branch (main/master)
-- Smart PR title from commit messages
-- Detailed body with change summary
-- Test plan generation
-- Automatic labeling support
+**주요 기능:**
+- 베이스 브랜치 자동 감지 (main/master)
+- 커밋 메시지로부터 스마트한 PR 제목 생성
+- 변경 요약이 포함된 상세한 본문
+- 테스트 계획(test plan) 생성
+- 자동 라벨링 지원
 
 ## Usage
 
@@ -61,20 +61,20 @@ This command:
 /pr [options]
 ```
 
-### Options
+### 옵션
 
-| Option | Description | Default |
+| 옵션 | 설명 | 기본값 |
 |-----------|-------------|---------|
-| `--base <branch>` | Target branch | `main` or `master` (auto-detected) |
-| `--draft` | Create as draft PR | `false` |
-| `--no-push` | Don't push before creating PR | `false` |
+| `--base <branch>` | 대상 브랜치 | `main` 또는 `master` (자동 감지) |
+| `--draft` | 드래프트 PR 생성 | `false` |
+| `--no-push` | PR 생성 전 푸시하지 않음 | `false` |
 
-### Basic Commands
+### 기본 명령어
 
 ```bash
-/pr                      # Create PR to main branch
-/pr --base develop       # Create PR to develop
-/pr --draft              # Create draft PR
+/pr                      # main 브랜치로 PR 생성
+/pr --base develop       # develop으로 PR 생성
+/pr --draft              # 드래프트 PR 생성
 ```
 
 ## Examples
@@ -142,56 +142,56 @@ URL: https://github.com/user/repo/pull/43
 
 ## Implementation
 
-### Architecture
+### 아키텍처(Architecture)
 
-Uses **documenter-unified** agent for:
-- Commit message analysis
-- PR description generation
-- Change categorization
+**documenter-unified** 에이전트(agent)를 다음을 위해 사용합니다:
+- 커밋 메시지 분석
+- PR 설명 생성
+- 변경사항 분류
 
-### Dependencies
+### 의존성(Dependencies)
 
-**Required:**
-- Git repository with remote
-- GitHub CLI (`gh`) installed and authenticated
-- Branch pushed to remote (or use without `--no-push`)
+**필수:**
+- 리모트가 있는 Git 저장소
+- GitHub CLI (`gh`) 설치 및 인증
+- 리모트에 푸시된 브랜치 (또는 `--no-push` 없이 사용)
 
-**Optional:**
-- PR template: `.github/pull_request_template.md`
-- GitHub Actions for automated checks
+**선택:**
+- PR 템플릿: `.github/pull_request_template.md`
+- 자동화된 검사를 위한 GitHub Actions
 
-### Workflow Steps
+### 워크플로우 단계
 
-1. **Pre-checks**
-   - Verify git repository
-   - Check GitHub CLI authentication
-   - Ensure branch exists and has commits
+1. **사전 점검**
+   - Git 저장소 확인
+   - GitHub CLI 인증 확인
+   - 브랜치 존재 및 커밋 확인
 
-2. **Analysis**
-   - Get commit history: `git log base...HEAD`
-   - Diff changes: `git diff base...HEAD`
-   - Identify change patterns
+2. **분석**
+   - 커밋 히스토리 가져오기: `git log base...HEAD`
+   - 변경사항 Diff: `git diff base...HEAD`
+   - 변경 패턴 식별
 
-3. **Generation**
-   - Create PR title from commits
-   - Generate summary bullets
-   - Add test plan section
-   - Include checklist if template exists
+3. **생성**
+   - 커밋으로부터 PR 제목 생성
+   - 요약 항목 생성
+   - 테스트 계획 섹션 추가
+   - 템플릿이 있으면 체크리스트 포함
 
-4. **Creation**
-   - Push branch if needed
-   - Execute: `gh pr create --title "..." --body "..."`
-   - Return PR URL
+4. **생성**
+   - 필요시 브랜치 푸시
+   - 실행: `gh pr create --title "..." --body "..."`
+   - PR URL 반환
 
-### Related Resources
+### 관련 리소스
 
-- **Agent**: documenter-unified.md
+- **에이전트**: documenter-unified.md
 - **CLI**: GitHub CLI (`gh`)
-- **Template**: `.github/pull_request_template.md`
+- **템플릿**: `.github/pull_request_template.md`
 
-## PR Description Format
+## PR 설명 형식
 
-### Auto-Generated Structure
+### 자동 생성 구조
 
 ```markdown
 ## Summary
@@ -216,102 +216,102 @@ Closes #123
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 ```
 
-### Custom Template Support
+### 커스텀 템플릿 지원
 
-If `.github/pull_request_template.md` exists:
-- Sections from template are preserved
-- Auto-generated content fills in placeholders
-- Checklist items added automatically
+`.github/pull_request_template.md`가 존재하는 경우:
+- 템플릿의 섹션 보존
+- 자동 생성된 컨텐츠가 플레이스홀더 채움
+- 체크리스트 항목 자동 추가
 
-## Tips & Best Practices
+## 팁 및 모범 사례
 
-### Before Creating PR
+### PR 생성 전
 
 ```bash
-# 1. Review changes locally
+# 1. 로컬에서 변경사항 리뷰
 /review --adv
 
-# 2. Ensure tests pass
+# 2. 테스트 통과 확인
 npm test
 
-# 3. Create commit
+# 3. 커밋 생성
 /commit
 
-# 4. Create PR
+# 4. PR 생성
 /pr
 ```
 
-### PR Title Conventions
+### PR 제목 규칙
 
-Auto-detected from commits:
-- `feat:` → Feature addition
-- `fix:` → Bug fix
-- `docs:` → Documentation
-- `refactor:` → Code refactoring
-- `perf:` → Performance improvement
+커밋으로부터 자동 감지:
+- `feat:` → 기능(feature) 추가
+- `fix:` → 버그 수정
+- `docs:` → 문서
+- `refactor:` → 코드 리팩토링
+- `perf:` → 성능 개선
 
-### When to Use Draft
+### 드래프트 사용 시점
 
-- Work in progress
-- Need early feedback
-- Blocked by dependencies
-- Experimental changes
+- 진행 중인 작업(work in progress)
+- 조기 피드백 필요
+- 의존성(dependency)에 의해 차단됨
+- 실험적 변경사항
 
-## Error Handling
+## 에러 처리
 
 ### "gh not found"
-- **Cause**: GitHub CLI not installed
-- **Fix**: Install with `brew install gh` (macOS) or see https://cli.github.com/
+- **원인**: GitHub CLI가 설치되지 않음
+- **해결**: `brew install gh` (macOS) 설치 또는 https://cli.github.com/ 참조
 
 ### "Not authenticated"
-- **Cause**: GitHub CLI not logged in
-- **Fix**: Run `gh auth login`
+- **원인**: GitHub CLI에 로그인하지 않음
+- **해결**: `gh auth login` 실행
 
 ### "No commits to create PR"
-- **Cause**: Branch same as base
-- **Fix**: Make commits first or check base branch
+- **원인**: 브랜치가 베이스와 동일
+- **해결**: 먼저 커밋 생성 또는 베이스 브랜치 확인
 
 ### "Remote branch not found"
-- **Cause**: Branch not pushed
-- **Fix**: Let command auto-push or run `git push -u origin <branch>`
+- **원인**: 브랜치가 푸시되지 않음
+- **해결**: 커맨드가 자동 푸시하도록 하거나 `git push -u origin <branch>` 실행
 
-## Integration with Workflows
+## 워크플로우와의 통합
 
-### Major Workflow
+### Major 워크플로우
 
 ```bash
 /major "new feature"
-# ... development ...
+# ... 개발 ...
 /commit
-/pr  # Auto-creates PR at the end
+/pr  # 마지막에 자동으로 PR 생성
 ```
 
-### Minor/Micro Workflows
+### Minor/Micro 워크플로우
 
 ```bash
 /minor "fix login bug"
-# ... fix applied ...
+# ... 수정 적용 ...
 /commit
 /pr
 ```
 
-### Manual Workflow
+### 수동 워크플로우
 
 ```bash
-# Make changes
+# 변경사항 만들기
 git add .
 /commit
-/pr --draft  # Early feedback
-# ... address comments ...
-gh pr ready  # Mark as ready for review
+/pr --draft  # 조기 피드백
+# ... 코멘트 반영 ...
+gh pr ready  # 리뷰 준비 완료로 표시
 ```
 
-## Related Commands
+## 관련 커맨드
 
-- `/commit` - Create commit before PR
-- `/review` - Review code before creating PR
-- `/pr-review <number>` - Review existing PR
-- `/major`, `/minor`, `/micro` - Include PR creation
+- `/commit` - PR 전 커밋 생성
+- `/review` - PR 생성 전 코드 리뷰
+- `/pr-review <number>` - 기존 PR 리뷰
+- `/major`, `/minor`, `/micro` - PR 생성 포함
 
 ---
 

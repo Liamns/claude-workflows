@@ -2,7 +2,7 @@
 
 ## Overview
 
-Manages complex multi-feature initiatives by breaking them into Features and Tasks with dependency tracking and progress management.
+복잡한 다중 기능(feature) 이니셔티브를 Feature와 Task로 분해하고 의존성(dependency) 추적 및 진행 상황 관리를 제공합니다.
 
 ## Output Language
 
@@ -35,19 +35,19 @@ Manages complex multi-feature initiatives by breaking them into Features and Tas
 ...
 ```
 
-This command provides:
-1. **Epic Planning**: High-level initiative breakdown
-2. **Feature Decomposition**: Epic → 3-5 Features → Multiple Tasks
-3. **Dependency Management**: DAG-based dependency validation
-4. **Progress Tracking**: Auto-updated progress.md and roadmap.md
-5. **Quality Gates**: Ensures all features meet standards
+이 커맨드는 다음을 제공합니다:
+1. **Epic 계획**: 상위 수준 이니셔티브 분해
+2. **Feature 분해**: Epic → 3-5개 Feature → 다수의 Task
+3. **의존성(Dependency) 관리**: DAG 기반 의존성(dependency) 검증
+4. **진행 상황 추적**: progress.md 및 roadmap.md 자동 업데이트
+5. **품질 게이트(Quality Gate)**: 모든 기능(feature)이 표준 충족하도록 보장
 
-**Key Features:**
-- Complexity 10+ projects automatically structured
-- Dependency graph prevents circular dependencies
-- Auto-generates epic.md, progress.md, roadmap.md
-- Integration with /major for feature implementation
-- Success criteria tracking
+**주요 기능:**
+- 복잡도(complexity) 10+ 프로젝트 자동 구조화
+- 의존성(dependency) 그래프가 순환 의존성(circular dependency) 방지
+- epic.md, progress.md, roadmap.md 자동 생성
+- 기능(feature) 구현을 위한 /major와 통합
+- 성공 기준 추적
 
 ## Usage
 
@@ -55,18 +55,27 @@ This command provides:
 /epic "initiative description"
 ```
 
-The command will:
-- Create `.specify/specs/<epic-id>/` directory
-- Generate epic.md with decomposition
-- Create progress.md for tracking
-- Generate roadmap.md with timeline
-- Set up dependency graph
+이 커맨드는 다음을 수행합니다:
+- `.specify/epics/<epic-id>/` 디렉토리 생성
+- **Epic 브랜치 생성** (`NNN-epic-name`)
+- **병합 대상 브랜치 물어봄** (main, develop 등)
+- 분해 내용이 포함된 epic.md 생성
+- 추적을 위한 progress.md 생성
+- 타임라인이 포함된 roadmap.md 생성
+- 의존성(dependency) 그래프 설정
+
+### Branch Strategy
+
+- **Branch Creation**: 자동 생성
+- **Branch Name**: `NNN-epic-name` (예: `009-ecommerce-platform`)
+- **Merge Target**: 실행 시 물어봄 (main, develop 등)
+- **Features**: 모든 하위 features는 동일한 Epic 브랜치에서 작업
 
 ### Prerequisites
 
-- Complex initiative (complexity >= 10)
-- Clear high-level description
-- Understanding of overall goals
+- 복잡한 이니셔티브 (복잡도(complexity) >= 10)
+- 명확한 상위 수준 설명
+- 전체 목표에 대한 이해
 
 ## Examples
 
@@ -76,19 +85,19 @@ The command will:
 /epic "Migrate from monolith to microservices architecture"
 ```
 
-**Generated Structure:**
+**생성되는 구조:**
 ```
-.specify/specs/011-microservices-migration/
-├── epic.md                 # Epic definition
-├── progress.md             # Progress tracking
-├── roadmap.md              # Timeline and dependencies
+.specify/epics/011-microservices-migration/
+├── epic.md                 # Epic 정의
+├── progress.md             # 진행 상황 추적
+├── roadmap.md              # 타임라인 및 의존성
 ├── features/
 │   ├── 001-api-gateway.md
 │   ├── 002-auth-service.md
 │   ├── 003-user-service.md
 │   ├── 004-order-service.md
 │   └── 005-deployment.md
-└── dependencies.json       # Dependency graph
+└── dependencies.json       # 의존성 그래프
 ```
 
 **epic.md Content:**
@@ -148,11 +157,11 @@ Transform monolithic application into scalable microservices architecture
 ```
 
 **Features:**
-1. Offline data sync engine
-2. iOS native app (Swift UI)
-3. Android native app (Jetpack Compose)
-4. Backend API for sync
-5. App store deployment pipeline
+1. 오프라인 데이터 동기화 엔진
+2. iOS 네이티브 앱 (Swift UI)
+3. Android 네이티브 앱 (Jetpack Compose)
+4. 동기화를 위한 백엔드 API
+5. 앱 스토어 배포 파이프라인
 
 ### Example 3: Security Overhaul
 
@@ -161,32 +170,32 @@ Transform monolithic application into scalable microservices architecture
 ```
 
 **Features:**
-1. Vulnerability assessment and prioritization
-2. Authentication system hardening
-3. Data encryption implementation
-4. Security monitoring and alerts
-5. Compliance documentation
+1. 취약점 평가 및 우선순위 지정
+2. 인증 시스템 강화
+3. 데이터 암호화 구현
+4. 보안 모니터링 및 알림
+5. 규정 준수 문서화
 
 ## Implementation
 
 ### Architecture
 
-Epic workflow uses:
-- **architect-unified**: For high-level design
-- **Major workflow**: For each feature implementation
-- **Progress tracking**: Auto-updated markdown files
-- **Dependency validation**: Prevents circular deps
+Epic 워크플로우(workflow)는 다음을 사용합니다:
+- **architect-unified**: 상위 수준 설계용
+- **Major 워크플로우(workflow)**: 각 기능(feature) 구현용
+- **진행 상황 추적**: 자동 업데이트되는 마크다운 파일
+- **의존성(Dependency) 검증**: 순환 의존성(circular dependency) 방지
 
 ### Dependencies
 
-**Required:**
-- `.specify/` directory structure
-- Git repository
-- All unified agents
+**필수:**
+- `.specify/` 디렉토리 구조
+- Git 저장소
+- 모든 통합 에이전트(unified agent)
 
-**Optional:**
-- Project management integration (Notion, Jira)
-- CI/CD pipeline for features
+**선택:**
+- 프로젝트 관리 통합 (Notion, Jira)
+- 기능(feature)을 위한 CI/CD 파이프라인
 
 ### Workflow Steps
 
@@ -221,7 +230,7 @@ Epic workflow uses:
 
 - **Agents**: architect-unified, all unified agents
 - **Commands**: /major (for feature implementation)
-- **Files**: .specify/specs/<epic-id>/
+- **Files**: .specify/epics/<epic-id>/
 
 ## Epic vs Major
 
@@ -244,11 +253,13 @@ Epic workflow uses:
 ### Relationship
 
 ```
-Epic: Microservices Migration
+Epic: Microservices Migration (.specify/epics/011-microservices-migration/)
 ├── Feature 1: API Gateway → /major "API Gateway"
 ├── Feature 2: Auth Service → /major "Auth Service"
 ├── Feature 3: User Service → /major "User Service"
 └── Feature 4: Deployment → /major "Deployment Pipeline"
+
+All features work in the same Epic branch: 011-microservices-migration
 ```
 
 ## Progress Tracking
@@ -366,7 +377,7 @@ Progress is automatically updated when:
 /major "Feature 002"  # Depends on 001
 
 # Check progress anytime
-cat .specify/specs/<epic-id>/progress.md
+cat .specify/epics/<epic-id>/progress.md
 
 # Update roadmap as needed
 # Edit roadmap.md manually or regenerate

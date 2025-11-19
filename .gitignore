@@ -54,7 +54,7 @@ node_modules/
 # ==============================================
 
 # Generated specs (project-specific work)
-.specify/specs/
+.specify/
 
 # Keep templates and memory (team-shared)
 # These are intentionally tracked

@@ -108,20 +108,20 @@ mkdir -p .specify/memory
 
 **올바른 경로:**
 ```
-✓ .specify/specs/010-auth-system/
+✓ .specify/features/010-auth-system/
 ```
 
 **Major 워크플로우가 생성하는 경로:**
 1. 사용자로부터 기능 설명 입력 받음
 2. 다음 spec ID 계산 (예: 010)
 3. kebab-case로 이름 변환 (예: auth-system)
-4. `.specify/specs/010-auth-system/` 디렉토리 생성
+4. `.specify/features/010-auth-system/` 디렉토리 생성
 5. `010-auth-system` 브랜치 생성 및 체크아웃
 
 **확인 방법:**
 ```bash
 # Spec 디렉토리 확인
-ls -la .specify/specs/
+ls -la .specify/features/
 
 # 출력 예시:
 # drwxr-xr-x  010-auth-system
@@ -152,7 +152,7 @@ fatal: A branch named '010-auth-system' already exists
 git checkout 010-auth-system
 
 # 기존 spec 디렉토리 확인
-ls .specify/specs/010-auth-system/
+ls .specify/features/010-auth-system/
 
 # 기존 작업이 있다면 계속 진행
 # 새로 시작하려면 해결 방법 2 참고
@@ -170,7 +170,7 @@ git checkout main
 git branch -D 010-auth-system
 
 # spec 디렉토리도 삭제 (주의!)
-rm -rf .specify/specs/010-auth-system/
+rm -rf .specify/features/010-auth-system/
 
 # Major 재실행
 /major
@@ -189,7 +189,7 @@ rm -rf .specify/specs/010-auth-system/
 
 **증상:**
 ```
-⚠️  .specify/specs/010-auth-system/ 디렉토리가 이미 존재합니다
+⚠️  .specify/features/010-auth-system/ 디렉토리가 이미 존재합니다
 ```
 
 **원인:**
@@ -199,14 +199,14 @@ rm -rf .specify/specs/010-auth-system/
 **해결:**
 ```bash
 # 기존 디렉토리 내용 확인
-ls -la .specify/specs/010-auth-system/
+ls -la .specify/features/010-auth-system/
 
 # 내용이 있고 유지하려면
 git checkout -b 010-auth-system  # 브랜치 재생성
 # 기존 문서 확인 후 계속 작업
 
 # 내용을 버리려면
-rm -rf .specify/specs/010-auth-system/
+rm -rf .specify/features/010-auth-system/
 /major  # 재실행
 ```
 
@@ -423,7 +423,7 @@ yarn test --coverage
 **2단계: 누락된 테스트 식별**
 ```bash
 # tasks.md에서 테스트 작업 확인
-cat .specify/specs/010-auth-system/tasks.md | grep -A5 "테스트"
+cat .specify/features/010-auth-system/tasks.md | grep -A5 "테스트"
 
 # 예시:
 # - [ ] Task 1.3: Login API 테스트 작성
@@ -640,7 +640,7 @@ git rm src/features/auth/lib/apiClient.ts
 
 **1단계: plan.md 재사용 권장사항 확인**
 ```bash
-cat .specify/specs/010-auth-system/plan.md | grep -A10 "재사용"
+cat .specify/features/010-auth-system/plan.md | grep -A10 "재사용"
 
 # 출력:
 # ## Reusability Analysis
@@ -695,7 +695,7 @@ git branch --show-current
 
 # 3. Major 실행
 /major "사용자 인증"
-# → .specify/specs/009-ecommerce-platform/features/001-auth/ 생성
+# → .specify/features/009-ecommerce-platform/features/001-auth/ 생성
 ```
 
 ---
@@ -704,7 +704,7 @@ git branch --show-current
 
 **잘못된 구조:**
 ```
-.specify/specs/
+.specify/features/
 ├── 009-ecommerce-platform/
 │   ├── epic.md
 │   ├── 001-auth-system/        # ✗ 잘못됨
@@ -717,7 +717,7 @@ git branch --show-current
 
 **올바른 구조:**
 ```
-.specify/specs/
+.specify/features/
 ├── 009-ecommerce-platform/
 │   ├── epic.md
 │   ├── progress.md
@@ -736,7 +736,7 @@ git branch --show-current
 **수정:**
 ```bash
 # Epic 디렉토리로 이동
-cd .specify/specs/009-ecommerce-platform/
+cd .specify/features/009-ecommerce-platform/
 
 # features 디렉토리 생성
 mkdir -p features
@@ -817,7 +817,7 @@ git pull origin main
 
 **증상:**
 ```bash
-cat .specify/specs/010-auth-system/spec.md
+cat .specify/features/010-auth-system/spec.md
 # (빈 파일 또는 헤더만 있음)
 ```
 
@@ -885,7 +885,7 @@ cat .specify/specs/010-auth-system/spec.md
 **재생성 방법:**
 ```bash
 # 1. tasks.md 백업
-cp .specify/specs/010-auth-system/tasks.md tasks.md.bak
+cp .specify/features/010-auth-system/tasks.md tasks.md.bak
 
 # 2. tasks.md 재생성 요청
 # Major 워크플로우 내에서 "작업 분해" 단계 재실행
@@ -917,7 +917,7 @@ cp .specify/specs/010-auth-system/tasks.md tasks.md.bak
 **1단계: 재사용성 권장사항 따르기**
 ```bash
 # plan.md의 재사용 권장사항 확인
-cat .specify/specs/010-auth-system/plan.md | grep -A20 "Reusability"
+cat .specify/features/010-auth-system/plan.md | grep -A20 "Reusability"
 
 # 권장사항:
 # - apiClient 재사용 → -15,000 토큰
@@ -1069,7 +1069,7 @@ git branch --show-current
 git log --oneline -5
 
 # Spec 디렉토리 구조
-tree .specify/specs/ -L 3
+tree .specify/features/ -L 3
 
 # 브랜치 목록
 git branch -a

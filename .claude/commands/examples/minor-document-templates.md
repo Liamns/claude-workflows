@@ -4,7 +4,7 @@
 
 Minor 워크플로우가 생성하는 문서는 **fix-analysis.md** 단일 파일입니다.
 
-**생성 위치**: `.specify/fixes/<issue-name>/fix-analysis.md`
+**생성 위치**: `.specify/fixes/<NNN-issue-name>/fix-analysis.md`
 
 ---
 
@@ -50,6 +50,13 @@ Minor 워크플로우가 생성하는 문서는 **fix-analysis.md** 단일 파�
 **재사용 가능 컴포넌트:**
 - [기존 유틸리티/컴포넌트 1] ✓
 - [기존 패턴 참고처]
+
+## Tasks
+- [ ] Task 1 설명
+- [ ] Task 2 설명
+- [ ] Task 3 설명
+- [ ] Task 4 설명
+- [ ] Task 5 설명
 
 ## Files to Change
 1. [file_path_1]
@@ -131,6 +138,13 @@ Minor 워크플로우가 생성하는 문서는 **fix-analysis.md** 단일 파�
 **재사용 가능 컴포넌트:**
 - shared/lib/validation/emailValidator.ts ✓
 - features/register/ui/RegisterForm.tsx의 패턴 참고
+
+## Tasks
+- [ ] shared/lib에서 emailValidator import 추가
+- [ ] LoginForm.tsx 42-45줄 인라인 검증 교체
+- [ ] null/빈 값 early return 추가
+- [ ] LoginForm.test.tsx에 테스트 3개 추가
+- [ ] 테스트 실행 및 통과 확인
 
 ## Files to Change
 1. src/features/auth/ui/LoginForm.tsx
@@ -235,6 +249,16 @@ new Date(timestamp).toLocaleDateString('en-US', {
 **재사용 가능 컴포넌트:**
 - shared/lib/date/formatDate.ts (이미 존재!) ✓
 - 새 formatRelativeDate 함수 추가만 하면 됨
+
+## Tasks
+- [ ] formatDate.ts에 formatRelativeDate 함수 추가
+- [ ] formatRelativeDate 테스트 6개 작성
+- [ ] PostCard.tsx의 3곳 인라인 포맷팅 교체
+- [ ] Comment.tsx의 2곳 인라인 포맷팅 교체
+- [ ] NotificationItem.tsx의 1곳 인라인 포맷팅 교체
+- [ ] 각 컴포넌트 테스트 업데이트
+- [ ] 전체 테스트 실행 및 통과 확인
+- [ ] 각 페이지 시각적 확인
 
 ## Files to Change
 1. src/shared/lib/date/formatDate.ts
@@ -352,6 +376,18 @@ N/A (신규 기능)
 - shared/ui/Checkbox.tsx ✓
 - shared/lib/storage/localStorage.ts ✓
 - features/auth/model/useAuth.ts (확장)
+
+## Tasks
+- [ ] LoginForm.tsx에 rememberMe state 추가
+- [ ] Checkbox 컴포넌트 import 및 렌더링
+- [ ] handleSubmit에 rememberMe 전달
+- [ ] useAuth.ts에 rememberMe 파라미터 추가
+- [ ] 토큰 만료 시간 조건부 설정 로직
+- [ ] localStorage에 설정 저장 로직
+- [ ] LoginForm.test.tsx 테스트 4개 추가
+- [ ] useAuth.test.ts 테스트 4개 추가
+- [ ] 전체 테스트 실행 및 통과 확인
+- [ ] UI 및 기능 수동 테스트
 
 ## Files to Change
 1. src/features/auth/ui/LoginForm.tsx
@@ -638,6 +674,7 @@ fix-analysis.md 작성 시 다음 섹션이 모두 있는지 확인:
 - [ ] Issue (심각도, 복잡도, 예상 시간)
 - [ ] Root Cause (파일, 라인, 구체적 문제)
 - [ ] Solution (단계별, 재사용 컴포넌트 명시)
+- [ ] Tasks (체크박스로 수행 항목 나열)
 - [ ] Files to Change (수정 내용 포함)
 - [ ] Related Tests (기존 + 추가할 테스트)
 - [ ] Verification Steps (5단계 이상)

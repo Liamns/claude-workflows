@@ -2,7 +2,7 @@
 
 ## 생성되는 문서 목록
 
-Major 워크플로우는 다음 문서를 `.specify/specs/NNN-feature-name/` 경로에 생성합니다:
+Major 워크플로우는 다음 문서를 `.specify/features/NNN-feature-name/` 경로에 생성합니다:
 
 1. **spec.md** - 요구사항 명세서 (필수)
 2. **plan.md** - 구현 계획 (필수, 재사용성 분석 포함)
@@ -93,7 +93,7 @@ Major 워크플로우는 다음 문서를 `.specify/specs/NNN-feature-name/` 경
 - Estimated: 3-5 days
 - Created: 2025-11-18
 - Branch: 010-auth-system
-- Location: .specify/specs/010-auth-system/
+- Location: .specify/features/010-auth-system/
 
 ## Overview
 JWT 기반 사용자 인증 시스템 구현. 로그인, 회원가입, 비밀번호 재설정 기능 포함.
@@ -488,7 +488,7 @@ features/auth/              // ✅ Domain-centric
 - Total Tasks: 12
 - Completed: 0/12 (0%)
 - Estimated: 5 days
-- Location: .specify/specs/010-auth-system/
+- Location: .specify/features/010-auth-system/
 
 ## Phase 1: Setup & Prerequisites
 

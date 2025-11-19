@@ -691,7 +691,7 @@ git push origin feature/auth-validation-fixes
 
 # 2. Epic 내부에서 Feature 구현 (Major)
 /major "사용자 인증 시스템"
-# → .specify/specs/009-ecommerce-platform/features/001-auth/
+# → .specify/epics/009-ecommerce-platform/features/001-auth/
 # ... 구현 ...
 
 # 3. 구현 중 버그 발견

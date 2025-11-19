@@ -513,6 +513,6 @@ fix-analysis.md의 재사용 권장사항 확인
 
 ---
 
-**Version**: 3.3.1
+**Version**: 3.3.2
 **Last Updated**: 2025-11-18
 **See Also**: [major.md](major.md), [micro.md](micro.md), [epic.md](epic.md)

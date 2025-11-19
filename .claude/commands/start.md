@@ -704,5 +704,5 @@ curl -fsSL https://raw.githubusercontent.com/Liamns/claude-workflows/main/instal
 
 ---
 
-**Version**: 3.3.1
+**Version**: 3.3.2
 **Last Updated**: 2025-11-18

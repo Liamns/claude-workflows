@@ -1199,6 +1199,6 @@ mkdir -p .claude/cache/{metrics,files,tests}
 
 ---
 
-**Version**: 3.3.1
+**Version**: 3.3.2
 **Last Updated**: 2025-11-18
 **See Also**: [minor.md](../minor.md), [minor-examples.md](minor-examples.md), [minor-document-templates.md](minor-document-templates.md)

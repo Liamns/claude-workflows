@@ -391,5 +391,5 @@ Critical issues must be fixed before merge
 
 ---
 
-**Version**: 3.3.1
+**Version**: 3.3.2
 **Last Updated**: 2025-11-18

@@ -329,5 +329,5 @@ gh pr ready  # 리뷰 준비 완료로 표시
 
 ---
 
-**Version**: 3.3.1
+**Version**: 3.3.2
 **Last Updated**: 2025-11-18

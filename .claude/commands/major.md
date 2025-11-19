@@ -485,6 +485,6 @@ cat .specify/features/NNN-feature-name/tasks.md
 
 ---
 
-**Version**: 3.3.1
+**Version**: 3.3.2
 **Last Updated**: 2025-11-18
 **See Also**: [minor.md](minor.md), [micro.md](micro.md), [epic.md](epic.md)

@@ -588,6 +588,6 @@ Micro에서도 breaking changes는 금지:
 
 ---
 
-**Version**: 3.3.1
+**Version**: 3.3.2
 **Last Updated**: 2025-11-18
 **See Also**: [major.md](major.md), [minor.md](minor.md), [epic.md](epic.md)

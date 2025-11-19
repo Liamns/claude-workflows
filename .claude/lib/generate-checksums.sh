@@ -49,6 +49,7 @@ EXCLUDE_DIRS=(
     ".claude/commands/_backup"
     ".claude/command/.backup"
     ".claude/agents/_deprecated"
+    ".claude/deprecated"
     ".claude/__tests__"
     ".claude/lib/__tests__"
     ".claude/architectures/__tests__"
@@ -70,12 +71,15 @@ EXCLUDE_FILES=(
     "*.log"
     "*.tmp"
     "*.bak"
+    "*.backup"
     "*.swp"
     "*.swo"
     "*~"
     "*.local.json"
     ".DS_Store"
     "Thumbs.db"
+    ".claude/.version"
+    ".claude/.checksums.json.backup"
 )
 
 # ════════════════════════════════════════════════════════════════════════════

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Claude Code Workflows Installer
-# Version: 3.3.1 - Architecture Templates & Documentation Enhancement
+# Version: 3.3.2 - Architecture Templates & Documentation Enhancement
 
 set -e
 

@@ -53,3 +53,33 @@ agents:
 skills:
   - "bug-fix-pattern"
   - "reusability-enforcer"
+
+# ============================================================================
+# USER PROMPTS (AskUserQuestion)
+# ============================================================================
+
+prompts:
+  bug_analysis:
+    - question: "버그를 어떻게 설명하시겠습니까?"
+      header: "버그 설명"
+      multiSelect: false
+      options:
+        - label: "재현 단계 포함"
+          description: "버그 재현 방법을 단계별로 설명합니다"
+        - label: "에러 메시지 기반"
+          description: "에러 메시지와 스택 트레이스를 제공합니다"
+        - label: "기대/실제 동작 비교"
+          description: "기대했던 동작과 실제 동작을 비교합니다"
+
+    - question: "버그의 영향 범위는 어느 정도입니까?"
+      header: "영향 범위"
+      multiSelect: false
+      options:
+        - label: "특정 기능만"
+          description: "하나의 특정 기능에만 영향"
+        - label: "모듈 전체"
+          description: "전체 모듈에 영향"
+        - label: "여러 모듈"
+          description: "여러 모듈에 걸쳐 영향"
+        - label: "전체 시스템"
+          description: "시스템 전체에 영향"

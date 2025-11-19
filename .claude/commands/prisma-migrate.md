@@ -6,6 +6,20 @@ usage: "/prisma-migrate"
 
 # Prisma Migration Command
 
+**Claude를 위한 필수 지시사항:**
+
+이 명령어가 실행될 때 반드시 다음 단계를 **순서대로** 따라야 합니다:
+
+1. 사전 조건 확인 (Prisma 스키마 변경사항 - git diff schema.prisma)
+2. .claude/lib/prisma-migrate.sh 스크립트 실행
+3. 결과를 파싱하고 표시
+4. 마이그레이션 히스토리와 비교
+5. AskUserQuestion을 사용하여 다음 단계 권장사항 제공
+
+**절대로 사전 조건 확인 단계를 건너뛰지 마세요.**
+
+---
+
 ## Overview
 
 지능형 감지와 네이밍을 통해 Prisma 스키마 마이그레이션(migration)을 자동화합니다.

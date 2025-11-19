@@ -1,5 +1,19 @@
 # /pr - Pull Request 자동 생성
 
+**Claude를 위한 필수 지시사항:**
+
+이 명령어가 실행될 때 반드시 다음 단계를 **순서대로** 따라야 합니다:
+
+1. git log와 git diff [base]...HEAD를 사용하여 초기 분석 수행
+2. 브랜치 변경사항 전체를 분석하여 영향 범위 파악
+3. PR 제목과 설명 생성 (Summary, Changes, Test Plan)
+4. AskUserQuestion을 사용하여 PR 생성 전 사용자 확인 받기
+5. 확인 후 gh pr create 실행
+
+**절대로 브랜치 분석 단계를 건너뛰지 마세요.**
+
+---
+
 ## Overview
 
 커밋(commit) 히스토리와 코드 변경사항을 기반으로 지능형 설명과 함께 Pull Request를 자동으로 생성합니다.

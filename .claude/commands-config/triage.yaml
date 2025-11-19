@@ -288,3 +288,40 @@ output:
     next_steps:
       enabled: true
       auto_generate_command: true  # 다음 실행할 명령어 자동 생성
+
+# ============================================================================
+# NEXT COMMANDS (다음 단계 추천)
+# ============================================================================
+
+next_commands:
+  enabled: true
+  auto_prompt: true
+
+  recommendations:
+    - command: "/epic"
+      trigger: "on_success"
+      condition: "grep -q 'workflow_type.*epic' .claude/cache/triage-result.json"
+      priority: 1
+      auto_execute: false
+      description: "Epic 워크플로우를 시작합니다 (복잡도 15+)"
+
+    - command: "/major"
+      trigger: "on_success"
+      condition: "grep -q 'workflow_type.*major' .claude/cache/triage-result.json"
+      priority: 1
+      auto_execute: false
+      description: "Major 워크플로우를 시작합니다 (복잡도 8-14)"
+
+    - command: "/minor"
+      trigger: "on_success"
+      condition: "grep -q 'workflow_type.*minor' .claude/cache/triage-result.json"
+      priority: 1
+      auto_execute: false
+      description: "Minor 워크플로우를 시작합니다 (복잡도 3-7)"
+
+    - command: "/micro"
+      trigger: "on_success"
+      condition: "grep -q 'workflow_type.*micro' .claude/cache/triage-result.json"
+      priority: 1
+      auto_execute: false
+      description: "Micro 워크플로우를 시작합니다 (복잡도 0-2)"

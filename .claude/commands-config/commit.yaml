@@ -77,3 +77,19 @@ footer:
     🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
     Co-Authored-By: Claude <noreply@anthropic.com>
+
+# ============================================================================
+# NEXT COMMANDS (다음 단계 추천)
+# ============================================================================
+
+next_commands:
+  enabled: true
+  auto_prompt: true
+
+  recommendations:
+    - command: "/pr"
+      trigger: "on_success"
+      condition: "git rev-parse --abbrev-ref HEAD | grep -qvE '^(main|master|develop)$'"
+      priority: 1
+      auto_execute: false
+      description: "Pull Request를 생성합니다"

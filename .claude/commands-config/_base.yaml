@@ -41,6 +41,11 @@ defaults:
     log_file: ".claude/logs/command-execution.log"
     show_timestamps: true
 
+  # 다음 명령어 추천 설정
+  next_commands:
+    enabled: true        # 명령어 완료 후 다음 단계 추천
+    auto_prompt: true    # 자동으로 추천 옵션 표시
+
 # ============================================================================
 # SHARED UTILITIES (모든 명령어에서 사용 가능한 유틸리티)
 # ============================================================================

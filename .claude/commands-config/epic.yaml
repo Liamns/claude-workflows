@@ -38,6 +38,17 @@ notion:
   track_milestones: true
 
 # ============================================================================
+# AGENTS & SKILLS
+# ============================================================================
+
+agents:
+  - "architect-unified"
+  - "api-designer"
+
+skills:
+  - "reusability-enforcer"
+
+# ============================================================================
 # WORKFLOW SETTINGS
 # ============================================================================
 
@@ -57,13 +68,27 @@ workflow:
     auto_track: true
 
 # ============================================================================
-# PROMPTS
+# USER PROMPTS (AskUserQuestion)
 # ============================================================================
 
 prompts:
   epic_planning:
-    questions:
-      - "Epic의 최종 목표는 무엇인가요?"
-      - "예상 소요 시간은 얼마나 되나요?"
-      - "몇 개의 major 작업으로 나눌 수 있나요?"
-      - "주요 이해관계자는 누구인가요?"
+    - question: "프로젝트 규모는 어느 정도입니까?"
+      header: "프로젝트 규모"
+      multiSelect: false
+      options:
+        - label: "소규모 (1-2개월)"
+          description: "2-3개 major 작업"
+        - label: "중규모 (3-6개월)"
+          description: "4-8개 major 작업"
+        - label: "대규모 (6개월 이상)"
+          description: "9개 이상 major 작업"
+
+    - question: "Notion 연동을 사용하시겠습니까?"
+      header: "Notion 연동"
+      multiSelect: false
+      options:
+        - label: "사용"
+          description: "Notion에 Epic 페이지 자동 생성 및 진행상황 추적"
+        - label: "사용 안 함"
+          description: "로컬 파일로만 관리"

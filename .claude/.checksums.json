@@ -1,8 +1,8 @@
 {
   "version": "3.3.1",
-  "generatedAt": "2025-11-19T00:28:46Z",
+  "generatedAt": "2025-11-19T00:42:07Z",
   "files": {
-    ".claude/.checksums.json": "c16dfd37e54843ca664beea33d272e21d96c1fb8073e546c546effdecaa3690d",
+    ".claude/.checksums.json": "73b5cac4078558b311080eea2c2049b0b63fba9e92ee616a99dabe34a2f77112",
     ".claude/.version": "ef2a79c2f7dc37800a73fd9930b307824ce20af920cbc7159323456418e77e6b",
     ".claude/agents/api-designer.md": "8d34ac2f5c3c7d9e25ffe46463b8efa3073a1f023f6226ef2f2d184b1a64c1b5",
     ".claude/agents/architect-unified.md": "509dd35487a5054f559f7ec6536f33a6015f09bfdcc113916718970d2c43f77f",
@@ -97,7 +97,7 @@
     ".claude/commands/commit.md": "6defd42d434ad3f646a531c8fd85956c8531d73d2ce7ff6c6e4b8158072757a8",
     ".claude/commands/dashboard.md": "7b2c56814dc0513e096df239a9ae139dda41485a0253177e1225fe3f15ecad3a",
     ".claude/commands/db-sync.md": "818e525f02fce63963aa3f6ac1d6e68c4d78f5910d63559d33a5eeccca2f4ce0",
-    ".claude/commands/epic.md": "47dd7bf4df5c95e4ab36ae9902d902604c59a8c7abae3c92c8fb45d2ac91aa50",
+    ".claude/commands/epic.md": "46983eca42e14f7dc673de809691976765ee5841a934e6a87e3afd4511340938",
     ".claude/commands/examples/major-document-templates.md": "90bc7e7c43af13015a8217228ed4886914bcc287d8f971ba3e0bfe6a28d1c6ff",
     ".claude/commands/examples/major-examples.md": "e40ebc283c73aeb92b3d231e3d348c5526b113369fbc5b3922f897e9f058ebca",
     ".claude/commands/examples/major-troubleshooting.md": "d7bd6ad75910fb8c55dd4215904491971b3cd5469238a5944c21eba43daf9599",
@@ -108,7 +108,7 @@
     ".claude/commands/examples/minor-troubleshooting.md": "bd3d474d080149317255b66e4436b9162dc7a3b3cb781212eb9b41c2c1a7a790",
     ".claude/commands/major.md": "e527e719741b2f6eb4597bc1a47e8479238ac33fd576303502df69ed87b3730c",
     ".claude/commands/micro.md": "33e2917128853e6889ef9c0b8976a7da8046ec5499823ea2dc51bc4de43363e0",
-    ".claude/commands/minor.md": "ad810a77535d0cb31a2942fe2fb8cda6a2d49e87e2b06b888fc23001ca7d4f56",
+    ".claude/commands/minor.md": "98b3adacd23485ec26636ad73adc847df25a18a50a6360ba419e4bfbd675d5ef",
     ".claude/commands/pr-review.md": "fb0ae41d6e38cd6798c1b977f899516bf4083fca60c43f98bc9b1a60d87882bf",
     ".claude/commands/pr.md": "8ae53a7a1eaecf6addaaa8d5008b90b0404137cf184773a5f9fba1608857e0c1",
     ".claude/commands/prisma-migrate.md": "c494d5f9b44b7d6fee47e69bf41ad17ba3ab43fdfe23c3fdfe092d4a09b62202",

@@ -2,7 +2,7 @@
 
 ## Overview
 
-Streamlined workflow for bug fixes, refactoring, and incremental improvements with 75% token savings through focused analysis and minimal overhead.
+버그 수정, 리팩토링, 점진적 개선을 위한 간소화된 워크플로우(workflow)로, 집중된 분석과 최소한의 오버헤드를 통해 75%의 토큰 절감을 달성합니다.
 
 ## Output Language
 
@@ -34,20 +34,20 @@ Streamlined workflow for bug fixes, refactoring, and incremental improvements wi
 ...
 ```
 
-This command:
-1. **Analyzes Issue**: Identifies root cause and affected components
-2. **Searches Reusable Patterns**: Finds similar fixes and existing utilities
-3. **Generates Solution**: Creates minimal, focused implementation plan
-4. **Validates Quality**: Ensures related tests pass and no regressions
-5. **Maintains Consistency**: Verifies coding standards and architecture compliance
+이 커맨드는 다음을 수행합니다:
+1. **이슈 분석**: 근본 원인과 영향받는 컴포넌트 식별
+2. **재사용 가능 패턴 검색**: 유사한 수정사항과 기존 유틸리티 찾기
+3. **솔루션 생성**: 최소한의 집중된 구현 계획 작성
+4. **품질 검증**: 관련 테스트 통과 및 회귀 방지 확인
+5. **일관성 유지**: 코딩 표준 및 아키텍처(architecture) 준수 검증
 
-**Key Features:**
-- 75% token savings through smart-cache and focused scope
-- Automatic reusability pattern detection
-- Minimal quality gates (related tests only)
-- Fast turnaround (< 1 day implementation)
-- No breaking changes allowed
-- Constitution compliance validation
+**주요 기능:**
+- Smart-cache와 집중된 범위를 통한 75% 토큰 절감
+- 자동 재사용성(reusability) 패턴 감지
+- 최소한의 품질 게이트(quality gate) (관련 테스트만)
+- 빠른 처리 시간 (< 1일 구현)
+- Breaking change 금지
+- Constitution 준수 검증
 
 ## Usage
 
@@ -55,14 +55,14 @@ This command:
 /minor
 ```
 
-The command will:
-- Gather issue description interactively
-- **Ask if you want to create a new branch** (optional)
-- **Ask for merge target branch** (e.g., main, develop)
-- Analyze root cause
-- Search for reusable solutions
-- Generate fix-analysis.md with implementation plan
-- Validate against project rules
+이 커맨드는 다음을 수행합니다:
+- 대화형으로 이슈 설명 수집
+- **새 브랜치 생성 여부 물어봄** (선택)
+- **병합 대상 브랜치 물어봄** (예: main, develop)
+- 근본 원인 분석
+- 재사용 가능한 솔루션 검색
+- 구현 계획이 포함된 fix-analysis.md 생성
+- 프로젝트 규칙에 대한 검증
 
 ### Branch Strategy
 
@@ -72,10 +72,10 @@ The command will:
 
 ### Prerequisites
 
-- Git repository initialized
-- Architecture configured (run `/start` first)
-- Constitution file: `.specify/memory/constitution.md`
-- Quality gates: `.claude/workflow-gates.json`
+- Git 저장소 초기화
+- 아키텍처(architecture) 설정 완료 (먼저 `/start` 실행)
+- Constitution 파일: `.specify/memory/constitution.md`
+- 품질 게이트(quality gate): `.claude/workflow-gates.json`
 
 ## 사용 시나리오
 
@@ -137,67 +137,67 @@ The command will:
 
 ### Architecture
 
-The Minor workflow uses 4 unified agents:
-- **architect-unified**: Root cause analysis
-- **reusability-enforcer**: Pattern detection (auto-runs)
-- **implementer-unified**: Solution generation
-- **reviewer-unified**: Constitution validation
+Minor 워크플로우(workflow)는 4개의 통합 에이전트(agent)를 사용합니다:
+- **architect-unified**: 근본 원인 분석
+- **reusability-enforcer**: 패턴 감지 (자동 실행)
+- **implementer-unified**: 솔루션 생성
+- **reviewer-unified**: Constitution 검증
 
 ### Dependencies
 
-**Required:**
-- Unified agents (architect, reusability-enforcer, implementer, reviewer)
-- Constitution file: `.specify/memory/constitution.md`
-- Quality gates: `.claude/workflow-gates.json`
+**필수:**
+- 통합 에이전트(unified agent) (architect, reusability-enforcer, implementer, reviewer)
+- Constitution 파일: `.specify/memory/constitution.md`
+- 품질 게이트(quality gate): `.claude/workflow-gates.json`
 
-**Optional:**
-- Git repository for diff analysis
-- Test suite for validation
+**선택:**
+- Diff 분석을 위한 Git 저장소
+- 검증을 위한 테스트 스위트
 
 ### Workflow Steps
 
-**Step 1: Issue Gathering (2-3 min)**
-- Collect issue description
-- Identify symptoms and error messages
-- Determine affected components
-- Output: Issue summary
+**단계 1: 이슈 수집 (2-3분)**
+- 이슈 설명 수집
+- 증상 및 에러 메시지 식별
+- 영향받는 컴포넌트 확인
+- 출력: 이슈 요약
 
-**Step 2: Root Cause Analysis (3-5 min)**
-- Analyze code to find source of issue
-- Identify files and lines affected
-- Determine scope of change
-- Output: Root cause identified
+**단계 2: 근본 원인 분석 (3-5분)**
+- 코드 분석하여 이슈 원인 찾기
+- 영향받는 파일 및 라인 식별
+- 변경 범위 결정
+- 출력: 근본 원인 식별됨
 
-**Step 3: Reusability Search (automatic)**
-- Search for similar fixes in codebase
-- Find existing utilities that can be reused
-- Identify patterns to follow
-- Output: Reusability recommendations
+**단계 3: 재사용성(Reusability) 검색 (자동)**
+- 코드베이스에서 유사한 수정사항 검색
+- 재사용 가능한 기존 유틸리티 찾기
+- 따를 패턴 식별
+- 출력: 재사용성(reusability) 권장사항
 
-**Step 4: Solution Generation (5-7 min)**
-- Create minimal fix strategy
-- List files to modify
-- Identify related tests
-- Output: fix-analysis.md
+**단계 4: 솔루션 생성 (5-7분)**
+- 최소한의 수정 전략 작성
+- 수정할 파일 목록 작성
+- 관련 테스트 식별
+- 출력: fix-analysis.md
 
-**Step 5: Validation (automatic)**
-- Check constitution compliance
-- Verify no breaking changes
-- Ensure minimal scope
-- Output: Validation report
+**단계 5: 검증 (자동)**
+- Constitution 준수 확인
+- Breaking change 없음 검증
+- 최소 범위 보장
+- 출력: 검증 보고서
 
 ### Token Optimization
 
-**Smart-Cache System:**
-- File caching: 75% hit rate
-- Test caching: 80% hit rate
-- Analysis caching: 70% hit rate
-- Total savings: 75% on average
+**Smart-Cache 시스템:**
+- 파일 캐싱: 75% 적중률
+- 테스트 캐싱: 80% 적중률
+- 분석 캐싱: 70% 적중률
+- 총 절감: 평균 75%
 
-**Minimal Scope:**
-- Focus on affected files only: -20,000 tokens
-- Skip unnecessary documentation: -15,000 tokens
-- Targeted testing: -10,000 tokens
+**최소 범위:**
+- 영향받는 파일만 집중: -20,000 토큰
+- 불필요한 문서화 생략: -15,000 토큰
+- 타겟 테스팅: -10,000 토큰
 
 ## 실행 순서
 

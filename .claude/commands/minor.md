@@ -1,5 +1,20 @@
 # /minor - Minor 워크플로 (Incremental Updates)
 
+**Claude를 위한 필수 지시사항:**
+
+이 명령어가 실행될 때 반드시 다음 단계를 **순서대로** 따라야 합니다:
+
+1. **아직 코드를 작성하지 마세요**
+2. 대화 맥락에서 이슈 설명을 수집하세요
+3. 영향받는 파일을 읽어 근본 원인을 분석하세요
+4. reusability-enforcer skill을 사용하여 재사용 가능한 패턴을 검색하세요
+5. **.specify/fixes/NNN-issue-name/fix-analysis.md 문서를 생성하세요**
+6. 구현하기 전에 사용자 승인을 기다리세요
+
+**절대로 fix-analysis.md 문서 생성 단계를 건너뛰지 마세요.**
+
+---
+
 ## Overview
 
 버그 수정, 리팩토링, 점진적 개선을 위한 간소화된 워크플로우(workflow)로, 집중된 분석과 최소한의 오버헤드를 통해 75%의 토큰 절감을 달성합니다.
@@ -70,12 +85,65 @@
 - **Branch Name**: `NNN-issue-name` (예: `042-login-null-pointer`)
 - **Merge Target**: 실행 시 물어봄 (main, develop 등)
 
+### Branch State 처리
+
+`branch-state-handler.sh` 실행 시:
+
+1. **변경사항 감지 시 중단**
+   - 스크립트가 uncommitted changes를 감지하면 자동으로 중단됩니다
+
+2. **AskUserQuestion으로 5가지 옵션 제공**
+   - 커밋 후 계속 (Commit and continue)
+   - 변경사항과 함께 이동 (Move with changes)
+   - Stash 후 계속 (Stash and continue)
+   - 변경사항 삭제 - ⚠️ 복구 불가 (Discard and continue)
+   - 취소 (Cancel)
+
+3. **사용자 선택을 환경 변수로 전달**
+   ```bash
+   BRANCH_ACTION="commit"  # 또는 move_with_changes, stash, discard, cancel
+   ```
+
+4. **스크립트 재실행하여 선택 처리**
+   - 선택된 동작이 자동으로 수행됩니다
+
 ### Prerequisites
 
 - Git 저장소 초기화
 - 아키텍처(architecture) 설정 완료 (먼저 `/start` 실행)
 - Constitution 파일: `.specify/memory/constitution.md`
 - 품질 게이트(quality gate): `.claude/workflow-gates.json`
+
+### 흐름 중단 시 대처
+
+명령어 실행 중 수정이 필요한 경우:
+
+1. **자유롭게 수정 요청**
+   - "이 부분을 먼저 수정해줘"
+   - "다시 설명해줄래?"
+   - "파일 X를 수정하고 올게"
+
+2. **수정 완료 후 복귀**
+   - 수정 완료 후 "계속" 또는 "진행" 입력
+   - 저장된 컨텍스트에서 자동으로 재개
+
+3. **컨텍스트 복귀 옵션**
+   - **계속하기**: 중단된 위치에서 재개
+   - **새로 시작**: 기존 진행 상황 삭제하고 처음부터
+
+**예시 시나리오:**
+```
+사용자: /minor "로그인 버그 수정"
+Claude: [근본 원인 분석 중...]
+
+사용자: "잠깐, 에러 로그를 먼저 확인할게"
+Claude: [작업 컨텍스트 저장]
+
+[사용자가 로그 확인 완료]
+
+사용자: "계속"
+Claude: [분석부터 재개]
+```
 
 ## 사용 시나리오
 
@@ -258,7 +326,7 @@ Minor 워크플로우(workflow)는 4개의 통합 에이전트(agent)를 사용�
 - Constitution Compliance: 아키텍처 준수
 - Recommendations: 추가 권장사항
 
-**상세 템플릿**: [minor-document-templates.md](examples/minor-document-templates.md) 참고
+**상세 템플릿**: [minor-document-templates.md](../docs/command-examples/minor-document-templates.md) 참고
 
 ## Quality Gates (workflow-gates.json 기준)
 
@@ -395,9 +463,9 @@ fix-analysis.md의 재사용 권장사항 따르기:
 ## 사용 예시
 
 자세한 시나리오와 출력 예시는 별도 문서 참고:
-- **사용 예시**: [minor-examples.md](examples/minor-examples.md)
-- **문서 템플릿**: [minor-document-templates.md](examples/minor-document-templates.md)
-- **문제 해결**: [minor-troubleshooting.md](examples/minor-troubleshooting.md)
+- **사용 예시**: [minor-examples.md](../docs/command-examples/minor-examples.md)
+- **문서 템플릿**: [minor-document-templates.md](../docs/command-examples/minor-document-templates.md)
+- **문제 해결**: [minor-troubleshooting.md](../docs/command-examples/minor-troubleshooting.md)
 
 ## 빠른 참조
 

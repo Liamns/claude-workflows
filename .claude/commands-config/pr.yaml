@@ -36,33 +36,31 @@ templates:
 # ============================================================================
 
 prompts:
-  base_branch:
-    mode: "interactive"
-    header: "🎯 Select base branch for PR"
-    default: "main"
+  base_branch_selection:
+    - question: "어느 브랜치로 PR을 생성하시겠습니까?"
+      header: "Base 브랜치"
+      multiSelect: false
+      options:
+        - label: "main"
+          description: "프로덕션 배포용 브랜치"
+        - label: "develop"
+          description: "개발 통합 브랜치"
+        - label: "기타"
+          description: "다른 브랜치 지정"
 
-    options:
-      - value: "main"
-        label: "main (Production)"
-        description: "프로덕션 배포용 브랜치"
+    - question: "PR을 Draft로 생성하시겠습니까?"
+      header: "PR 상태"
+      multiSelect: false
+      options:
+        - label: "일반 PR"
+          description: "바로 리뷰 요청 가능한 PR"
+        - label: "Draft PR"
+          description: "작업 중인 PR (리뷰 요청 전)"
 
-      - value: "develop"
-        label: "develop (Development)"
-        description: "개발 통합 브랜치"
-
-    # 자동 감지 규칙
-    auto_detect_rules:
-      - branch_pattern: "^feature/.*"
-        base_branch: "develop"
-        confidence: "high"
-
-      - branch_pattern: "^hotfix/.*"
-        base_branch: "main"
-        confidence: "high"
-
-      - branch_pattern: "^fix/.*"
-        base_branch: "develop"
-        confidence: "medium"
+  # 자동 감지 규칙 (참고용, 동적으로 처리)
+  # feature/* → develop (high confidence)
+  # hotfix/* → main (high confidence)
+  # fix/* → develop (medium confidence)
 
 # ============================================================================
 # PR AUTO-FILL SETTINGS
@@ -120,3 +118,19 @@ flags:
   - name: "--auto-assign"
     description: "리뷰어 자동 할당"
     example: "/pr --auto-assign"
+
+# ============================================================================
+# NEXT COMMANDS (다음 단계 추천)
+# ============================================================================
+
+next_commands:
+  enabled: true
+  auto_prompt: true
+
+  recommendations:
+    - command: "/dashboard"
+      trigger: "on_success"
+      condition: ""  # 항상 추천
+      priority: 1
+      auto_execute: false
+      description: "프로젝트 대시보드를 확인합니다"

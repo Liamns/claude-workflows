@@ -1,5 +1,19 @@
 # /micro - Micro 워크플로 (Quick Fix)
 
+**Claude를 위한 필수 지시사항:**
+
+이 명령어가 실행될 때 반드시 다음 단계를 **순서대로** 따라야 합니다:
+
+1. **변경사항이 정말 micro 수준인지 확인하세요**
+2. 대화 맥락에서 간단한 수정 내용을 수집하세요
+3. 범위 검증: 30분 이내 완료 가능한지 확인하세요
+4. 범위가 크면 즉시 /minor 또는 /major 사용을 권장하세요
+5. 확인 후 바로 변경을 수행하세요 (문서 생성 없음)
+
+**절대로 범위 검증 단계를 건너뛰지 마세요.**
+
+---
+
 ## Overview
 
 최소한의 오버헤드와 직접 실행을 통해 85%의 토큰 절감을 달성하는 간단한 변경을 위한 초고속 워크플로우(workflow)입니다.
@@ -64,6 +78,37 @@
 - Git 저장소 (권장)
 - 아키텍처(architecture) 설정 (선택)
 - 품질 게이트(quality gate) 적용 안 함
+
+### 흐름 중단 시 대처
+
+명령어 실행 중 수정이 필요한 경우:
+
+1. **자유롭게 수정 요청**
+   - "이 부분을 먼저 수정해줘"
+   - "다시 설명해줄래?"
+   - "파일 X를 수정하고 올게"
+
+2. **수정 완료 후 복귀**
+   - 수정 완료 후 "계속" 또는 "진행" 입력
+   - 저장된 컨텍스트에서 자동으로 재개
+
+3. **컨텍스트 복귀 옵션**
+   - **계속하기**: 중단된 위치에서 재개
+   - **새로 시작**: 기존 진행 상황 삭제하고 처음부터
+
+**예시 시나리오:**
+```
+사용자: /micro "README 타이포 수정"
+Claude: [변경 파일 확인 중...]
+
+사용자: "잠깐, 다른 타이포도 있는지 확인할게"
+Claude: [작업 컨텍스트 저장]
+
+[사용자가 확인 완료]
+
+사용자: "계속"
+Claude: [확인부터 재개]
+```
 
 ## Implementation
 
@@ -488,8 +533,8 @@ Micro에서도 breaking changes는 금지:
 ## 사용 예시
 
 자세한 시나리오와 실전 예시는 별도 문서 참고:
-- **사용 예시**: [micro-examples.md](examples/micro-examples.md)
-- **문제 해결**: [micro-troubleshooting.md](examples/micro-troubleshooting.md)
+- **사용 예시**: [micro-examples.md](../docs/command-examples/micro-examples.md)
+- **문제 해결**: [micro-troubleshooting.md](../docs/command-examples/micro-troubleshooting.md)
 
 관련 문서:
 - [major.md](major.md) - 복잡한 기능(feature) 개발
@@ -543,6 +588,6 @@ Micro에서도 breaking changes는 금지:
 
 ---
 
-**Version**: 3.3.1
+**Version**: 3.3.2
 **Last Updated**: 2025-11-18
 **See Also**: [major.md](major.md), [minor.md](minor.md), [epic.md](epic.md)

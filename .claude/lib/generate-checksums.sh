@@ -35,7 +35,7 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.."; pwd)"
 if [ -f "$PROJECT_ROOT/.claude/.version" ]; then
     VERSION=$(cat "$PROJECT_ROOT/.claude/.version" | tr -d '[:space:]')
 else
-    VERSION="3.3.1"  # fallback
+    VERSION="3.3.2"  # fallback
 fi
 
 # 기본 출력 파일 (설정하지 않으면 stdout)

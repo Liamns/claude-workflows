@@ -20,8 +20,8 @@ if [ -f "$SCRIPT_DIR/.claude/.version" ]; then
     TARGET_VERSION="$VERSION_FROM_FILE"
 else
     # Fallback to hardcoded version
-    INSTALLER_VERSION="3.3.1"
-    TARGET_VERSION="3.3.1"
+    INSTALLER_VERSION="3.3.2"
+    TARGET_VERSION="3.3.2"
 fi
 
 # Repository Configuration

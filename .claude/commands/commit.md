@@ -1,5 +1,19 @@
 # 🚀 Smart Commit Command
 
+**Claude를 위한 필수 지시사항:**
+
+이 명령어가 실행될 때 반드시 다음 단계를 **순서대로** 따라야 합니다:
+
+1. git status와 git diff를 사용하여 초기 분석 수행
+2. 커밋 히스토리를 분석하여 커밋 메시지 패턴 파악
+3. Conventional Commits 형식으로 커밋 메시지 생성
+4. AskUserQuestion을 사용하여 커밋 전 사용자 확인 받기
+5. 확인 후 커밋 실행
+
+**절대로 변경사항 분석 단계를 건너뛰지 마세요.**
+
+---
+
 ## Overview
 
 스테이징된 변경사항을 분석하여 Conventional Commits 형식을 따르는 의미 있는 커밋(commit) 메시지를 자동으로 생성합니다.
@@ -315,5 +329,5 @@ bash .claude/hooks/install-hooks.sh
 
 ---
 
-**Version**: 3.3.1
+**Version**: 3.3.2
 **Last Updated**: 2025-11-18

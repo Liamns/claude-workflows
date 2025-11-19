@@ -1,6 +1,6 @@
 # 🤖 Claude Workflows
 
-[![Version](https://img.shields.io/badge/version-3.3.1-blue.svg)](https://github.com/Liamns/claude-workflows)
+[![Version](https://img.shields.io/badge/version-3.3.2-blue.svg)](https://github.com/Liamns/claude-workflows)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-purple.svg)](https://claude.ai/code)
 [![Validation](https://img.shields.io/badge/validation-automated-success.svg)](https://github.com/Liamns/claude-workflows)
@@ -10,6 +10,33 @@
 **📖 새로운 Claude 세션?** → [프로젝트 컨텍스트 문서](.claude/docs/PROJECT-CONTEXT.md) (5분이면 전체 파악)
 
 ## 🆕 최신 기능
+
+### v3.3.2 - Slash Command UX Improvement
+
+**🎯 실행 흐름 강제화**
+- **CRITICAL INSTRUCTIONS**: 13개 모든 슬래시 커맨드에 실행 순서 가이드 추가
+- **타입 시스템**: Workflow/Utility/Hybrid 명령어 자동 분류
+- **명령어 추천**: 완료 후 다음 단계 자동 추천 시스템
+
+**🛠️ 새로운 유틸리티 도구**
+- **AskUserQuestion 어댑터**: YAML/Shell 메뉴를 AskUserQuestion JSON으로 자동 변환
+- **컨텍스트 관리자**: 명령어 실행 상태 관리 및 Lock 메커니즘
+- **명령어 추천 시스템**: YAML 기반 조건부 다음 단계 추천
+- **타입 검증**: 명령어 타입별 필수 요소 자동 검증
+
+**📚 문서 구조 개선**
+- **명령어 예제 재구성**: .claude/docs/command-examples/ 디렉토리로 분리
+- **타입 분석 문서**: command-type-analysis.md 추가 (345줄)
+- **링크 검증**: 자동화된 문서 링크 무결성 체크
+
+**🔒 보안 강화**
+- **eval 보안**: command-recommender.sh의 조건 검사 보안 강화
+- **안전한 조건만 허용**: test/[ 명령어만 실행, 위험한 명령어 차단
+
+**🧹 코드 정리**
+- **12,765줄 삭제**: 사용하지 않는 테스트 파일 및 deprecated 모듈 제거
+- **코드베이스 40% 감소**: 유지보수성 및 성능 향상
+- **체계적 관리**: .claude/deprecated/ 디렉토리로 이전
 
 ### v3.3.1 - Architecture Templates & Database Tools
 
@@ -32,47 +59,7 @@
 - **자동화 도구**: 생성/검증/마이그레이션 스크립트
 - **Git 통합**: Pre-commit hook 품질 관리
 
-### v3.1.0 - 품질 자동화
-
-- **아키텍처 검증**: FSD/Clean/Hexagonal/DDD 자동 검증
-- **한글 문서화**: 계획 문서 한글 비율 자동 체크
-- **Git 상태 관리**: 브랜치 생성 시 자동 처리 (5가지 옵션)
-- **체크섬 강화**: SHA256 기반 파일 무결성 검증
-
-### v3.0.0 - Epic Workflow
-
-- **대규모 관리**: 복잡도 10+ 작업을 3-5개 Feature로 분해
-- **진행 추적**: progress.md/roadmap.md 자동 업데이트
-- **의존성 검증**: DAG 기반 순환 의존성 방지
-
-### v2.8.0 - 스마트 리뷰
-
-- **코드베이스 분석**: 전체 프로젝트 기반 PR 리뷰
-- **재사용 탐지**: 기존 모듈/패턴 자동 제안
-- **중복 감지**: 80% 이상 유사 코드 경고
-
 **📚 상세 문서**: [Feature 001 Summary](.claude/docs/FEATURE-001-SUMMARY.md) | [Command-Resource Guide](.claude/docs/COMMAND-RESOURCE-GUIDE.md)
-
-### 핵심 개선사항
-
-- **🔒 SHA256 체크섬 기반 파일 무결성 검증** - 설치 시 자동 파일 검증 및 복구
-  - 100개 핵심 파일의 SHA256 체크섬 자동 검증
-  - 불일치 파일 자동 재다운로드
-  - 복구 실패 시 안전한 롤백
-  - .gitignore 자동 관리 (백업/캐시 제외)
-- **✅ 강화된 Validation 시스템** - 4가지 마이그레이션 시나리오 완전 검증
-  - v1.0 → v2.6 마이그레이션
-  - v2.4/v2.5 → v2.6 업그레이드
-  - 신규 설치 검증
-  - 롤백 시나리오 자동 테스트
-- **🔄 자동 롤백 기능** - 마이그레이션 실패 시 이전 상태로 안전하게 복구
-- **📋 Pre-commit Hook** - .claude/ 변경사항 자동 검증 및 커밋 차단
-- **🔍 통합 Validation** - install.sh에 validation 자동 실행 통합
-
-### 기존 기능 (v2.5)
-
-- **📊 실시간 메트릭스 대시보드** - 토큰 사용량, 성능, 품질 지표 모니터링
-- **🎯 자동 워크플로우 선택** - /triage로 Major/Minor/Micro 자동 분류
 
 ## 🚀 Quick Start
 

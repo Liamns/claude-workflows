@@ -28,6 +28,10 @@ readonly INSTALLER_GITIGNORE_PATTERNS=(
     # Specify 디렉토리 전체
     ".specify/"
 
+    # Archived/deprecated files
+    ".claude/deprecated/"
+    "*.backup"
+
     # Log files
     "*.log"
 

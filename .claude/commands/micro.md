@@ -2,7 +2,7 @@
 
 ## Overview
 
-Ultra-fast workflow for trivial changes with 85% token savings through minimal overhead and direct execution.
+최소한의 오버헤드와 직접 실행을 통해 85%의 토큰 절감을 달성하는 간단한 변경을 위한 초고속 워크플로우(workflow)입니다.
 
 ## Output Language
 
@@ -32,20 +32,20 @@ Ultra-fast workflow for trivial changes with 85% token savings through minimal o
 다음 단계: /commit으로 커밋 생성
 ```
 
-This command:
-1. **Identifies Change**: Quick analysis of trivial modification needed
-2. **Validates Scope**: Ensures change is truly micro-level (< 30 min)
-3. **Executes Directly**: Makes change without extensive planning
-4. **Skips Tests**: No test requirements for cosmetic changes
-5. **Quick Verification**: Manual verification only
+이 커맨드는 다음을 수행합니다:
+1. **변경 식별**: 필요한 간단한 수정 사항의 빠른 분석
+2. **범위 검증**: 변경이 실제로 마이크로 수준인지 확인 (< 30분)
+3. **직접 실행**: 광범위한 계획 없이 변경 수행
+4. **테스트 생략**: 코스메틱 변경의 경우 테스트 불필요
+5. **빠른 검증**: 수동 검증만 수행
 
-**Key Features:**
-- 85% token savings (minimal agent usage)
-- No planning documents generated
-- No test requirements
-- Sub-30 minute execution
-- Perfect for typos, logs, comments, config changes
-- Auto-upgrades to /minor if scope too large
+**주요 기능:**
+- 85% 토큰 절감 (최소한의 에이전트 사용)
+- 계획 문서 생성 안 함
+- 테스트 요구사항 없음
+- 30분 이내 실행
+- 오타, 로그, 주석, 설정 변경에 완벽
+- 범위가 너무 크면 자동으로 /minor로 전환
 
 ## Usage
 
@@ -53,76 +53,76 @@ This command:
 /micro
 ```
 
-The command will:
-- Ask for brief description of change
-- Validate it's micro-level scope
-- Make the change directly
-- Skip documentation and tests
+이 커맨드는 다음을 수행합니다:
+- 변경 사항에 대한 간단한 설명 요청
+- 마이크로 수준 범위인지 검증
+- 변경 사항을 직접 적용
+- 문서화 및 테스트 생략
 
 ### Prerequisites
 
-- Git repository (recommended)
-- Architecture configured (optional)
-- No quality gates enforced
+- Git 저장소 (권장)
+- 아키텍처(architecture) 설정 (선택)
+- 품질 게이트(quality gate) 적용 안 함
 
 ## Implementation
 
 ### Architecture
 
-The Micro workflow uses minimal agent involvement:
-- **smart-cache**: File reading only (cached)
-- **No planning agents**: Direct execution
-- **No quality gates**: Trust developer judgment
+Micro 워크플로우(workflow)는 최소한의 에이전트(agent) 개입을 사용합니다:
+- **smart-cache**: 파일 읽기만 (캐시됨)
+- **계획 에이전트 없음**: 직접 실행
+- **품질 게이트 없음**: 개발자 판단 신뢰
 
 ### Dependencies
 
-**Required:**
-- Basic file system access
-- Smart-cache (for file reading)
+**필수:**
+- 기본 파일 시스템 접근
+- Smart-cache (파일 읽기용)
 
-**Optional:**
-- Git (for commit)
-- None of the quality gates or validation agents
+**선택:**
+- Git (커밋용)
+- 품질 게이트(quality gate) 또는 검증 에이전트(agent) 불필요
 
 ### Workflow Steps
 
-**Step 1: Change Description (30 seconds)**
-- Get brief description of change
-- Identify affected file(s)
-- Output: Change summary
+**단계 1: 변경 설명 (30초)**
+- 변경에 대한 간단한 설명 받기
+- 영향받는 파일 식별
+- 출력: 변경 요약
 
-**Step 2: Scope Validation (30 seconds)**
-- Check complexity score (must be ≤ 3/15)
-- Verify single/few files
-- Ensure cosmetic or trivial change
-- Output: Validation decision
+**단계 2: 범위 검증 (30초)**
+- 복잡도(complexity) 점수 확인 (≤ 3/15여야 함)
+- 단일/소수 파일 확인
+- 코스메틱 또는 간단한 변경 확인
+- 출력: 검증 결정
 
-**Step 3: Auto-Upgrade Check**
-- If complexity > 3: Upgrade to /minor
-- If tests needed: Upgrade to /minor
-- If logic change: Upgrade to /minor
-- Output: Workflow recommendation
+**단계 3: 자동 업그레이드 확인**
+- 복잡도 > 3인 경우: /minor로 업그레이드
+- 테스트 필요한 경우: /minor로 업그레이드
+- 로직 변경인 경우: /minor로 업그레이드
+- 출력: 워크플로우(workflow) 권장사항
 
-**Step 4: Execution (1-5 min)**
-- Read affected files
-- Make changes directly
-- No documentation generated
-- Output: Modified files
+**단계 4: 실행 (1-5분)**
+- 영향받는 파일 읽기
+- 변경 사항 직접 적용
+- 문서 생성 안 함
+- 출력: 수정된 파일
 
-**Step 5: Quick Verify**
-- Manual verification only
-- No automated tests
-- No quality gates
-- Output: Change summary
+**단계 5: 빠른 검증**
+- 수동 검증만
+- 자동화된 테스트 없음
+- 품질 게이트(quality gate) 없음
+- 출력: 변경 요약
 
 ### Token Optimization
 
-**Extreme Minimalism:**
-- No planning phase: -30,000 tokens
-- No documentation: -10,000 tokens
-- No test generation: -15,000 tokens
-- Cached file reads: -5,000 tokens
-- **Total savings: 85%**
+**극도의 최소화:**
+- 계획 단계 없음: -30,000 토큰
+- 문서화 없음: -10,000 토큰
+- 테스트 생성 없음: -15,000 토큰
+- 캐시된 파일 읽기: -5,000 토큰
+- **총 절감: 85%**
 
 ## 실행 순서
 
@@ -490,6 +490,11 @@ Micro에서도 breaking changes는 금지:
 자세한 시나리오와 실전 예시는 별도 문서 참고:
 - **사용 예시**: [micro-examples.md](examples/micro-examples.md)
 - **문제 해결**: [micro-troubleshooting.md](examples/micro-troubleshooting.md)
+
+관련 문서:
+- [major.md](major.md) - 복잡한 기능(feature) 개발
+- [minor.md](minor.md) - 중간 규모 변경
+- [epic.md](epic.md) - 대규모 프로젝트
 
 ## 빠른 참조
 

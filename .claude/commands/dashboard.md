@@ -2,7 +2,7 @@
 
 ## Overview
 
-Real-time monitoring dashboard for Claude Workflows performance metrics, token usage, and quality indicators.
+Claude 워크플로우(Workflow) 성능 메트릭(metric), 토큰(token) 사용량, 품질 지표를 위한 실시간 모니터링 대시보드입니다.
 
 ## Output Language
 
@@ -41,18 +41,18 @@ Minor    ██████░░░░  3개 작업   12,300 토큰
 Micro    ████░░░░░░  2개 작업    8,240 토큰
 ```
 
-This command provides:
-1. **Token Usage**: Track token consumption by workflow and agent
-2. **Performance Metrics**: Monitor execution times and throughput
-3. **Quality Indicators**: View test coverage, code quality scores
-4. **Session Statistics**: Current session and historical data
+이 커맨드는 다음을 제공합니다:
+1. **토큰 사용량**: 워크플로우(workflow)와 에이전트(agent)별 토큰 소비 추적
+2. **성능 메트릭**: 실행 시간과 처리량 모니터링
+3. **품질 지표**: 테스트 커버리지, 코드 품질 점수 확인
+4. **세션 통계**: 현재 세션 및 히스토리 데이터
 
-**Key Features:**
-- Real-time metric updates
-- Workflow-specific breakdowns
-- Agent performance comparison
-- Token efficiency tracking
-- Visual progress indicators
+**주요 기능:**
+- 실시간 메트릭 업데이트
+- 워크플로우(workflow)별 상세 분석
+- 에이전트(agent) 성능 비교
+- 토큰 효율성 추적
+- 시각적 진행 표시기
 
 ## Usage
 
@@ -60,19 +60,19 @@ This command provides:
 /dashboard
 ```
 
-The command will display:
-- Current session metrics
-- Today's statistics
-- Top consuming workflows/agents
-- Quality gate pass rates
+이 커맨드는 다음을 표시합니다:
+- 현재 세션 메트릭
+- 오늘의 통계
+- 토큰을 가장 많이 소비하는 워크플로우(workflow)/에이전트(agent)
+- 품질 게이트(quality gate) 통과율
 
 ### Options
 
-| Option | Description | Default |
+| 옵션 | 설명 | 기본값 |
 |--------|-------------|---------|
-| `--full` | Show detailed breakdown | `false` |
-| `--history` | Show last N days | `7` |
-| `--export` | Export to JSON file | `false` |
+| `--full` | 상세 분석 표시 | `false` |
+| `--history` | 최근 N일 표시 | `7` |
+| `--export` | JSON 파일로 내보내기 | `false` |
 
 ## Examples
 
@@ -132,11 +132,11 @@ Performance Gain:    5.2x
 /dashboard --full
 ```
 
-**Shows additional info:**
-- Per-file analysis
-- Detailed agent breakdowns
-- Cache statistics
-- Historical trends
+**추가 정보 표시:**
+- 파일별 분석
+- 에이전트(agent) 상세 분석
+- 캐시(cache) 통계
+- 히스토리 추세
 
 ### Example 3: Export Metrics
 
@@ -144,72 +144,72 @@ Performance Gain:    5.2x
 /dashboard --export metrics.json
 ```
 
-**Creates:** `.claude/cache/metrics/metrics-20251118.json`
+**생성됨:** `.claude/cache/metrics/metrics-20251118.json`
 
 ## Implementation
 
 ### Architecture
 
-The dashboard aggregates data from:
-- **Cache System**: `.claude/cache/metrics/`
-- **Git Statistics**: Recent commit activity
-- **Session Tracking**: Current workflow state
-- **Quality Gates**: workflow-gates.json validation results
+대시보드는 다음에서 데이터를 수집합니다:
+- **캐시 시스템(Cache System)**: `.claude/cache/metrics/`
+- **Git 통계**: 최근 커밋 활동
+- **세션 추적**: 현재 워크플로우(workflow) 상태
+- **품질 게이트(Quality Gates)**: workflow-gates.json 검증 결과
 
 ### Dependencies
 
-**Required:**
-- Metrics collection system (auto-enabled)
-- Cache directory: `.claude/cache/metrics/`
+**필수:**
+- 메트릭 수집 시스템 (자동 활성화)
+- 캐시 디렉토리: `.claude/cache/metrics/`
 
-**Optional:**
-- Git repository for commit stats
-- Quality gate configuration
+**선택:**
+- 커밋 통계를 위한 Git 저장소
+- 품질 게이트(quality gate) 설정
 
 ### Workflow Steps
 
-1. **Data Collection**
-   - Read current session metrics
-   - Aggregate historical data
-   - Calculate derived metrics
+1. **데이터 수집**
+   - 현재 세션 메트릭 읽기
+   - 히스토리 데이터 집계
+   - 파생 메트릭 계산
 
-2. **Analysis**
-   - Compute averages and trends
-   - Identify top consumers
-   - Calculate efficiency scores
+2. **분석**
+   - 평균 및 추세 계산
+   - 최다 소비자 식별
+   - 효율성 점수 계산
 
-3. **Presentation**
-   - Format data with visual indicators
-   - Apply color coding for status
-   - Generate summary statistics
+3. **표시**
+   - 시각적 표시기로 데이터 포맷
+   - 상태별 색상 코딩 적용
+   - 요약 통계 생성
 
 ### Related Resources
 
-- **Cache Files**:
-  - `current-session.json`: Active session data
-  - `stats.json`: Historical aggregates
-  - `summary.json`: Daily/weekly summaries
-- **Configuration**: `.claude/config/cache-config.yaml`
+- **캐시 파일(Cache Files)**:
+  - `current-session.json`: 활성 세션 데이터
+  - `stats.json`: 히스토리 집계
+  - `summary.json`: 일간/주간 요약
+- **설정(Configuration)**: `.claude/config/cache-config.yaml`
 
 ### Metric Types
 
-**Token Metrics:**
-- Total tokens used
-- Per-workflow breakdown
-- Per-agent consumption
-- Cache savings
+**토큰 메트릭:**
+- 총 사용 토큰
+- 워크플로우(workflow)별 분석
+- 에이전트(agent)별 소비량
+- 캐시 절감량
 
-**Performance Metrics:**
-- Task completion time
-- Agent execution time
-- Workflow overhead
-- Cache hit/miss rates
+**성능 메트릭:**
+- 작업(task) 완료 시간
+- 에이전트(agent) 실행 시간
+- 워크플로우(workflow) 오버헤드
+- 캐시(cache) 적중/실패율
 
-**Quality Metrics:**
-- Test coverage percentage
-- Code quality score
-- Architecture compliance
-- Documentation completeness
+**품질 메트릭:**
+- 테스트 커버리지 비율
+- 코드 품질 점수
+- 아키텍처(architecture) 준수도
+- 문서화 완성도
 
 ## 옵션
 

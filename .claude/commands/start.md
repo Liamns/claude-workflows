@@ -2,7 +2,7 @@
 
 ## Overview
 
-Initialize Claude Workflows in your project with automatic architecture detection and setup.
+자동 아키텍처(architecture) 감지 및 설정과 함께 프로젝트에 Claude 워크플로우(Workflow)를 초기화합니다.
 
 ## Output Language
 
@@ -39,19 +39,19 @@ Initialize Claude Workflows in your project with automatic architecture detectio
 - .specify/config/architecture.json 생성
 ```
 
-This command:
-1. **Detects Architecture**: Analyzes existing codebase structure
-2. **Configures Templates**: Sets up architecture-specific templates
-3. **Creates Constitution**: Generates project-specific rules and guidelines
-4. **Initializes Agents**: Configures unified agents for your architecture
-5. **Verifies Setup**: Ensures all components are properly configured
+이 커맨드는 다음을 수행합니다:
+1. **아키텍처 감지**: 기존 코드베이스 구조 분석
+2. **템플릿 설정**: 아키텍처별 템플릿 구성
+3. **Constitution 생성**: 프로젝트별 규칙 및 가이드라인 생성
+4. **에이전트 초기화**: 아키텍처에 맞는 통합 에이전트(agent) 구성
+5. **설정 검증**: 모든 구성요소의 올바른 설정 확인
 
-**Key Features:**
-- 32 architecture templates (Backend, Frontend, Fullstack, Mobile)
-- Auto-detection of existing patterns
-- Multi-architecture support for fullstack projects
-- Constitutional constraints generation
-- Quality gates configuration
+**주요 기능:**
+- 32개 아키텍처 템플릿 (Backend, Frontend, Fullstack, Mobile)
+- 기존 패턴 자동 감지
+- 풀스택 프로젝트를 위한 다중 아키텍처 지원
+- Constitutional 제약조건 생성
+- 품질 게이트(quality gate) 설정
 
 ## Usage
 
@@ -59,14 +59,14 @@ This command:
 /start
 ```
 
-The command will:
-- Analyze your project structure
-- Detect or prompt for architecture selection
-- Generate configuration files
-- Set up quality gates
-- Verify installation
+이 커맨드는 다음을 수행합니다:
+- 프로젝트 구조 분석
+- 아키텍처 감지 또는 선택 프롬프트 표시
+- 설정 파일 생성
+- 품질 게이트 설정
+- 설치 검증
 
-### Supported Architectures
+### 지원되는 아키텍처
 
 **Backend (5)**:
 - Clean Architecture
@@ -241,57 +241,57 @@ Creating unified constitution...
 
 ## Implementation
 
-### Architecture
+### 아키텍처(Architecture)
 
-The command uses:
-- **architect-unified**: Architecture detection and validation
-- **File system analysis**: Pattern matching for structure detection
-- **Template engine**: Architecture-specific file generation
+이 커맨드는 다음을 사용합니다:
+- **architect-unified**: 아키텍처 감지 및 검증
+- **파일 시스템 분석**: 구조 감지를 위한 패턴 매칭
+- **템플릿 엔진**: 아키텍처별 파일 생성
 
-### Dependencies
+### 의존성(Dependencies)
 
-**Required:**
-- architect-unified agent
-- Architecture templates in `.claude/architectures/`
-- File system access
+**필수:**
+- architect-unified 에이전트(agent)
+- `.claude/architectures/`의 아키텍처 템플릿
+- 파일 시스템 접근
 
-**Optional:**
-- Git repository (for version tracking)
-- Existing configuration files
+**선택:**
+- Git 저장소 (버전 추적용)
+- 기존 설정 파일
 
-### Workflow Steps
+### 워크플로우 단계
 
-1. **Project Analysis**
-   - Scan directory structure
-   - Detect package manager (npm, yarn, pnpm)
-   - Identify framework (React, Vue, Angular, etc.)
-   - Analyze existing patterns
+1. **프로젝트 분석**
+   - 디렉토리 구조 스캔
+   - 패키지 매니저 감지 (npm, yarn, pnpm)
+   - 프레임워크 식별 (React, Vue, Angular 등)
+   - 기존 패턴 분석
 
-2. **Architecture Detection**
-   - Match patterns to known architectures
-   - Calculate confidence scores
-   - Handle ambiguous cases
-   - Support multi-architecture projects
+2. **아키텍처 감지**
+   - 알려진 아키텍처와 패턴 매칭
+   - 신뢰도 점수 계산
+   - 모호한 경우 처리
+   - 다중 아키텍처 프로젝트 지원
 
-3. **Configuration Generation**
-   - Create constitution.md (project rules)
-   - Generate architecture.json (structure config)
-   - Set up workflow-gates.json (quality gates)
-   - Initialize agent configurations
+3. **설정 생성**
+   - constitution.md 생성 (프로젝트 규칙)
+   - architecture.json 생성 (구조 설정)
+   - workflow-gates.json 설정 (품질 게이트)
+   - 에이전트 설정 초기화
 
-4. **Verification**
-   - Validate configuration files
-   - Check template availability
-   - Ensure agent compatibility
-   - Test quality gate definitions
+4. **검증**
+   - 설정 파일 유효성 검사
+   - 템플릿 가용성 확인
+   - 에이전트 호환성 확인
+   - 품질 게이트 정의 테스트
 
-### Related Resources
+### 관련 리소스
 
-- **Templates**: `.claude/architectures/*/`
+- **템플릿**: `.claude/architectures/*/`
 - **Constitution**: `.specify/memory/constitution.md`
-- **Config**: `.specify/config/architecture.json`
-- **Gates**: `.claude/workflow-gates.json`
-- **Agents**: architect-unified, reviewer-unified
+- **설정**: `.specify/config/architecture.json`
+- **게이트**: `.claude/workflow-gates.json`
+- **에이전트**: architect-unified, reviewer-unified
 
 ## 실행 순서
 

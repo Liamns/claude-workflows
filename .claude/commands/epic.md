@@ -56,11 +56,20 @@ This command provides:
 ```
 
 The command will:
-- Create `.specify/specs/<epic-id>/` directory
+- Create `.specify/epics/<epic-id>/` directory
+- **Create Epic branch** (`NNN-epic-name`)
+- **Ask for merge target branch** (main, develop 등)
 - Generate epic.md with decomposition
 - Create progress.md for tracking
 - Generate roadmap.md with timeline
 - Set up dependency graph
+
+### Branch Strategy
+
+- **Branch Creation**: 자동 생성
+- **Branch Name**: `NNN-epic-name` (예: `009-ecommerce-platform`)
+- **Merge Target**: 실행 시 물어봄 (main, develop 등)
+- **Features**: 모든 하위 features는 동일한 Epic 브랜치에서 작업
 
 ### Prerequisites
 
@@ -78,7 +87,7 @@ The command will:
 
 **Generated Structure:**
 ```
-.specify/specs/011-microservices-migration/
+.specify/epics/011-microservices-migration/
 ├── epic.md                 # Epic definition
 ├── progress.md             # Progress tracking
 ├── roadmap.md              # Timeline and dependencies
@@ -221,7 +230,7 @@ Epic workflow uses:
 
 - **Agents**: architect-unified, all unified agents
 - **Commands**: /major (for feature implementation)
-- **Files**: .specify/specs/<epic-id>/
+- **Files**: .specify/epics/<epic-id>/
 
 ## Epic vs Major
 
@@ -244,11 +253,13 @@ Epic workflow uses:
 ### Relationship
 
 ```
-Epic: Microservices Migration
+Epic: Microservices Migration (.specify/epics/011-microservices-migration/)
 ├── Feature 1: API Gateway → /major "API Gateway"
 ├── Feature 2: Auth Service → /major "Auth Service"
 ├── Feature 3: User Service → /major "User Service"
 └── Feature 4: Deployment → /major "Deployment Pipeline"
+
+All features work in the same Epic branch: 011-microservices-migration
 ```
 
 ## Progress Tracking
@@ -366,7 +377,7 @@ Progress is automatically updated when:
 /major "Feature 002"  # Depends on 001
 
 # Check progress anytime
-cat .specify/specs/<epic-id>/progress.md
+cat .specify/epics/<epic-id>/progress.md
 
 # Update roadmap as needed
 # Edit roadmap.md manually or regenerate

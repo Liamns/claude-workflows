@@ -57,10 +57,18 @@ This command:
 
 The command will:
 - Gather issue description interactively
+- **Ask if you want to create a new branch** (optional)
+- **Ask for merge target branch** (e.g., main, develop)
 - Analyze root cause
 - Search for reusable solutions
 - Generate fix-analysis.md with implementation plan
 - Validate against project rules
+
+### Branch Strategy
+
+- **Branch Creation**: 실행 시 생성 여부 물어봄
+- **Branch Name**: `NNN-issue-name` (예: `042-login-null-pointer`)
+- **Merge Target**: 실행 시 물어봄 (main, develop 등)
 
 ### Prerequisites
 
@@ -233,12 +241,15 @@ The Minor workflow uses 4 unified agents:
 
 ### fix-analysis.md
 
-**생성 위치**: `.specify/fixes/<issue-name>/fix-analysis.md`
+**생성 위치**: `.specify/fixes/<NNN-issue-name>/fix-analysis.md`
+
+**번호 체계**: 순차 번호 (001, 002, 003, ...) 자동 부여
 
 **포함 내용:**
 - Issue: 문제 요약, 심각도, 복잡도, 예상 시간
 - Root Cause: 원인 분석, 파일/라인 식별
 - Solution: 권장 접근법, 재사용 컴포넌트
+- **Tasks**: 체크박스로 수행 항목 추적 (진행도 관리)
 - Files to Change: 수정할 파일 목록
 - Related Tests: 관련 테스트, 추가할 테스트
 - Verification Steps: 검증 단계
@@ -318,7 +329,7 @@ The Minor workflow uses 4 unified agents:
 # → fix-analysis.md 생성
 
 # 3. 문서 리뷰
-cat .claude/docs/fixes/login-null-pointer/fix-analysis.md
+cat .specify/fixes/042-login-null-pointer/fix-analysis.md
 
 # 4. 구현
 # ... 코드 수정 ...
@@ -400,7 +411,7 @@ fix-analysis.md의 재사용 권장사항 따르기:
 /triage "버그 설명"
 
 # 문서 확인
-cat .claude/docs/fixes/<issue-name>/fix-analysis.md
+cat .specify/fixes/<NNN-issue-name>/fix-analysis.md
 
 # 관련 테스트 실행
 npm test <ComponentName>
@@ -408,7 +419,7 @@ npm test <ComponentName>
 
 ### 생성되는 파일
 
-- ✅ fix-analysis.md (`.claude/docs/fixes/<issue-name>/`)
+- ✅ fix-analysis.md (`.specify/fixes/<NNN-issue-name>/`)
 
 ### 일반적인 에러 해결
 

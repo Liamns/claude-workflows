@@ -14,6 +14,41 @@
 
 ---
 
+## 📋 다음 단계 추천 시 필수 규칙
+
+### 다음 워크플로우 추천 시 AskUserQuestion 사용
+
+복잡도 분석 완료 후, **사용자에게 워크플로우 선택을 요청할 때** 반드시 AskUserQuestion 도구를 사용하세요.
+
+**❌ 잘못된 예시:**
+```
+"복잡도 분석 결과 Major 워크플로우를 추천합니다. 실행하시겠습니까?"
+```
+
+**✅ 올바른 예시:**
+```
+"복잡도 분석 결과 Major 워크플로우를 추천합니다."
+
+[AskUserQuestion 호출]
+- question: "어떤 워크플로우를 실행하시겠습니까?"
+- header: "워크플로우"
+- options: ["Major 워크플로우", "Minor 워크플로우", "직접 선택"]
+```
+
+### 사용자 선택 후 자동 실행
+
+**사용자가 워크플로우를 선택하면 즉시 해당 명령어를 실행하세요:**
+
+```javascript
+{"0": "Major 워크플로우"}  → SlashCommand("/major")
+{"0": "Minor"}              → SlashCommand("/minor")
+{"0": "Epic"}               → SlashCommand("/epic")
+{"0": "Micro"}              → SlashCommand("/micro")
+{"0": "직접 선택"}          → 실행 안 함, 안내만
+```
+
+---
+
 ## Overview
 
 AI 기반 워크플로우(workflow) 선택기로, 작업(task)을 자동으로 분석하여 최적의 워크플로우(Major/Minor/Micro)를 추천합니다.

@@ -15,6 +15,31 @@
 
 ---
 
+## 📋 다음 단계 추천 시 필수 규칙
+
+### Epic 계획 완료 후 첫 기능 시작 제안 시 AskUserQuestion 사용
+
+Epic 계획 완료 후, **첫 번째 Major 기능을 시작할지** 물어볼 때 반드시 AskUserQuestion 도구를 사용하세요.
+
+**✅ 올바른 예시:**
+```
+"Epic 계획이 완료되었습니다. 3개의 Major 기능으로 분해되었습니다."
+
+[AskUserQuestion 호출]
+- question: "첫 번째 기능을 시작하시겠습니까?"
+- header: "다음 단계"
+- options: ["예, /major 실행", "나중에"]
+```
+
+### 사용자 선택 후 자동 실행
+
+```javascript
+{"0": "예, /major 실행"}  → SlashCommand("/major")
+{"0": "나중에"}            → 실행 안 함
+```
+
+---
+
 ## Overview
 
 복잡한 다중 기능(feature) 이니셔티브를 Feature와 Task로 분해하고 의존성(dependency) 추적 및 진행 상황 관리를 제공합니다.

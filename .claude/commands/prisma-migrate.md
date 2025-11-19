@@ -20,6 +20,31 @@ usage: "/prisma-migrate"
 
 ---
 
+## 📋 다음 단계 추천 시 필수 규칙
+
+### 마이그레이션 완료 후 DB 동기화 제안 시 AskUserQuestion 사용
+
+Prisma 마이그레이션 완료 후, **DB 동기화가 필요한 경우** AskUserQuestion 도구를 사용하세요.
+
+**✅ 올바른 예시:**
+```
+"마이그레이션이 완료되었습니다."
+
+[AskUserQuestion 호출]
+- question: "개발 DB를 동기화하시겠습니까?"
+- header: "다음 단계"
+- options: ["예, /db-sync 실행", "나중에"]
+```
+
+### 사용자 선택 후 자동 실행
+
+```javascript
+{"0": "예, /db-sync 실행"}  → SlashCommand("/db-sync")
+{"0": "나중에"}             → 실행 안 함
+```
+
+---
+
 ## Overview
 
 지능형 감지와 네이밍을 통해 Prisma 스키마 마이그레이션(migration)을 자동화합니다.

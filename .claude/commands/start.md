@@ -14,6 +14,31 @@
 
 ---
 
+## 📋 다음 단계 추천 시 필수 규칙
+
+### 초기화 완료 후 첫 작업 트리아지 제안 시 AskUserQuestion 사용
+
+프로젝트 초기화 완료 후, **첫 작업을 시작할지** 물어볼 때 AskUserQuestion 도구를 사용할 수 있습니다.
+
+**✅ 올바른 예시:**
+```
+"프로젝트 초기화가 완료되었습니다."
+
+[AskUserQuestion 호출 - 선택 사항]
+- question: "첫 작업을 트리아지하시겠습니까?"
+- header: "다음 단계"
+- options: ["예, /triage 실행", "나중에"]
+```
+
+### 사용자 선택 후 자동 실행
+
+```javascript
+{"0": "예, /triage 실행"}  → SlashCommand("/triage")
+{"0": "나중에"}            → 실행 안 함
+```
+
+---
+
 ## Overview
 
 자동 아키텍처(architecture) 감지 및 설정과 함께 프로젝트에 Claude 워크플로우(Workflow)를 초기화합니다.

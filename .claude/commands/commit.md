@@ -14,6 +14,41 @@
 
 ---
 
+## 📋 다음 단계 추천 시 필수 규칙
+
+### 커밋 완료 후 PR 생성 제안 시 AskUserQuestion 사용
+
+커밋 완료 후, **현재 브랜치가 feature 브랜치인 경우** (main/master/develop가 아닌 경우) PR 생성 여부를 물어볼 때 반드시 AskUserQuestion 도구를 사용하세요.
+
+**❌ 잘못된 예시:**
+```
+"커밋이 완료되었습니다. PR을 생성하시겠습니까?"
+```
+
+**✅ 올바른 예시:**
+```
+"커밋이 완료되었습니다."
+
+[AskUserQuestion 호출]
+- question: "Pull Request를 생성하시겠습니까?"
+- header: "다음 단계"
+- options: ["예, /pr 실행", "나중에 수동으로"]
+```
+
+### 사용자 선택 후 자동 실행
+
+**사용자가 "예" 또는 "실행"을 선택하면 즉시 /pr을 실행하세요:**
+
+```javascript
+{"0": "예, /pr 실행"}  → SlashCommand("/pr")
+{"0": "PR 생성"}       → SlashCommand("/pr")
+{"0": "나중에"}        → 실행 안 함, 안내만
+```
+
+**조건**: 현재 브랜치가 main, master, develop가 **아닐 때만** PR 생성 제안
+
+---
+
 ## Overview
 
 스테이징된 변경사항을 분석하여 Conventional Commits 형식을 따르는 의미 있는 커밋(commit) 메시지를 자동으로 생성합니다.

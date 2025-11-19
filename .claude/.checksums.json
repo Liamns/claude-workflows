@@ -1,8 +1,8 @@
 {
   "version": "3.3.2",
-  "generatedAt": "2025-11-19T05:56:25Z",
+  "generatedAt": "2025-11-19T06:02:15Z",
   "files": {
-    ".claude/.checksums.json": "d654e7167af5fb47769232829c690d3dad678268be61500f378e54cfb9a0437d",
+    ".claude/.checksums.json": "576da4ac6ca150b6636e868e89cc94a110783d143260cf14c161d02175300051",
     ".claude/.checksums.json.backup": "adc1d27d2f0d3273bde79a46e5224ab4eebf60638905af234adfcea0d3f03f50",
     ".claude/.version": "abba5fcd6d1275d62d78e09d88276dcf264d2137f85323ab50eadddcc31aeea9",
     ".claude/agents/api-designer.md": "8d34ac2f5c3c7d9e25ffe46463b8efa3073a1f023f6226ef2f2d184b1a64c1b5",
@@ -248,7 +248,7 @@
     ".claude/lib/git-stats-helper.sh": "e511e6ea75b9fc22a9752a8ecbc5563429c0be33a407715640d537bff3f03a61",
     ".claude/lib/git-status-checker.sh": "4aaea24b5ab4fa4065250366535820ff0cbb78c8287f4bd762c9fe0d2dfe3709",
     ".claude/lib/git/detect-feature-id.sh": "4458890314d204a4845c4b79e84f59a462ec4d4f01d6d7013643a1f342c516db",
-    ".claude/lib/gitignore-manager.sh": "918a205f0fd9e9b8ef03424511b48944c0cae224b3163dd604b1c92dc8dfc781",
+    ".claude/lib/gitignore-manager.sh": "a381fb42b9f6c201783ebb3f7d373fc9765ffc3dda4e0cd8d68c8503d8954fb5",
     ".claude/lib/install-git-hooks.sh": "489e0b71b6108637c81ef74ee9e834306e9aae251761bd6242da1a2970b2f1de",
     ".claude/lib/korean-doc-validator.ts": "13a4278bce50051e25a29438d29dd4e9ab3cf8c4089a87d4ae0781c92b3810dd",
     ".claude/lib/metrics-collector.sh": "445f081eb83eb7bef46d908d40d8e9e3fb81a50cb27ab670af820c1e581db236",

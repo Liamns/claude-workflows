@@ -109,6 +109,18 @@ git_stats_all() {
 EOF
 }
 
+# Get list of files changed in a specific commit
+# Arguments:
+#   $1 - Commit hash (default: HEAD)
+# Output:
+#   List of file paths (one per line)
+# Returns:
+#   0 on success
+git_commit_files() {
+    local commit_hash="${1:-HEAD}"
+    git diff-tree --no-commit-id --name-only -r "$commit_hash" 2>/dev/null
+}
+
 # Export functions for use in other scripts
 if [ "${BASH_SOURCE[0]}" != "${0}" ]; then
     export -f git_stats_today
@@ -119,4 +131,5 @@ if [ "${BASH_SOURCE[0]}" != "${0}" ]; then
     export -f git_stats_repo
     export -f git_stats_diff
     export -f git_stats_all
+    export -f git_commit_files
 fi

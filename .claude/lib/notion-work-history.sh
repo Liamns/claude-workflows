@@ -207,6 +207,74 @@ print(summary)
 }
 
 #━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# Work Type Extraction Functions
+#━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# Extract work type from commit message
+# Arguments:
+#   $1 - Commit message
+# Output:
+#   Work type in Korean (기능 추가, 버그 수정 등)
+# Returns:
+#   0 on success
+# Example:
+#   extract_work_type "feat: Add user login feature"  # Returns: "기능 추가"
+extract_work_type() {
+    local commit_msg="$1"
+
+    if [[ -z "$commit_msg" ]]; then
+        log_error "Commit message cannot be empty" >&2
+        return 1
+    fi
+
+    log_info "Extracting work type from commit message" >&2
+
+    # Parse first line
+    local work_type
+    work_type=$(echo "$commit_msg" | python3 -c "
+import sys
+import re
+
+commit_msg = sys.stdin.read()
+first_line = commit_msg.split('\n')[0].strip()
+
+# Conventional commit type to Korean mapping
+type_mapping = {
+    'feat': '기능 추가',
+    'fix': '버그 수정',
+    'docs': '문서',
+    'style': '스타일',
+    'refactor': '리팩토링',
+    'test': '테스트',
+    'chore': '기타',
+    'perf': '성능',
+    'ci': 'CI/CD',
+    'build': '빌드',
+    'revert': '되돌리기'
+}
+
+# Extract conventional commit type
+match = re.match(r'^([a-z]+)(\([^)]+\))?:\s*', first_line)
+if match:
+    commit_type = match.group(1)
+    korean_type = type_mapping.get(commit_type, '기타')
+    print(korean_type)
+else:
+    # No conventional commit format
+    print('기타')
+")
+
+    if [[ -z "$work_type" ]]; then
+        log_error "Failed to extract work type" >&2
+        return 1
+    fi
+
+    log_success "Work type: ${work_type}" >&2
+    echo "$work_type"
+    return 0
+}
+
+#━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # Formatting Functions
 #━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -234,6 +302,63 @@ format_work_history_entry() {
 
     # Format: - [summary] : [start_date] - [commit_date]
     echo "- ${summary} : ${start_date} - ${commit_date}"
+    return 0
+}
+
+#━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# Worklog Table Formatting Functions
+#━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# Format worklog table entry
+# Arguments:
+#   $1 - Date/Time (YYYY-MM-DD HH:mm)
+#   $2 - Commit hash (short)
+#   $3 - Work type (Korean)
+#   $4 - Summary
+#   $5 - Files changed count
+#   $6 - Insertions count
+#   $7 - Deletions count
+#   $8 - File list (newline separated)
+# Output:
+#   Markdown table row
+# Returns:
+#   0 on success
+# Example:
+#   format_worklog_table_entry "2025-11-20 14:30" "abc123d" "기능 추가" "로그인 API" 3 120 15 "src/api/auth.ts\nsrc/types/user.ts"
+format_worklog_table_entry() {
+    local date_time="$1"
+    local commit_hash="$2"
+    local work_type="$3"
+    local summary="$4"
+    local files_count="$5"
+    local insertions="$6"
+    local deletions="$7"
+    local file_list="$8"
+
+    # Validate required arguments
+    if [[ -z "$date_time" ]] || [[ -z "$commit_hash" ]] || [[ -z "$work_type" ]] || [[ -z "$summary" ]]; then
+        log_error "Required arguments missing: date_time, commit_hash, work_type, summary" >&2
+        return 1
+    fi
+
+    # Format change amount
+    local changes="+${insertions:-0}/-${deletions:-0}"
+
+    # Format file list with <br> tags
+    local file_list_formatted=""
+    if [[ -n "$file_list" ]]; then
+        # Split by newline and format with <br>
+        file_list_formatted=$(echo "$file_list" | grep -v '^$' | head -50 | sed 's/$/<br>/' | tr -d '\n' | sed 's/<br>$//')
+
+        # Truncate long file lists
+        local file_count=$(echo "$file_list" | grep -v '^$' | wc -l | tr -d ' ')
+        if [[ $file_count -gt 50 ]]; then
+            file_list_formatted="${file_list_formatted}<br>외 $((file_count - 50))개"
+        fi
+    fi
+
+    # Return table row
+    echo "| $date_time | $commit_hash | $work_type | $summary | ${files_count:-0} | $changes | $file_list_formatted |"
     return 0
 }
 
@@ -382,5 +507,7 @@ print(json.dumps(props, ensure_ascii=False))
 # Export functions
 export -f get_notion_start_date
 export -f extract_work_summary
+export -f extract_work_type
 export -f format_work_history_entry
+export -f format_worklog_table_entry
 export -f add_work_history_on_commit

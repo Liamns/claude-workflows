@@ -52,6 +52,31 @@ COMMIT_MSG=$(git log -1 --format=%B "$COMMIT_HASH" 2>/dev/null)
 COMMIT_DATE=$(TZ='Asia/Seoul' git log -1 --format=%cd --date=format:'%Y-%m-%d' "$COMMIT_HASH" 2>/dev/null)
 COMMIT_AUTHOR=$(git log -1 --format=%an "$COMMIT_HASH" 2>/dev/null)
 
+# Get commit time (KST)
+COMMIT_TIME=$(TZ='Asia/Seoul' git log -1 --format=%cd --date=format:'%H:%M' "$COMMIT_HASH" 2>/dev/null)
+
+# Get changed files
+FILE_LIST=$(git diff-tree --no-commit-id --name-only -r "$COMMIT_HASH" 2>/dev/null | tr '\n' '|')
+
+# Get diff stats
+STATS=$(git diff --stat HEAD~1..HEAD 2>/dev/null || echo "")
+FILES_CHANGED=$(echo "$STATS" | tail -1 | awk '{print $1}' 2>/dev/null || echo "0")
+INSERTIONS=$(echo "$STATS" | tail -1 | grep -oE '[0-9]+ insertion' | awk '{print $1}' 2>/dev/null || echo "0")
+DELETIONS=$(echo "$STATS" | tail -1 | grep -oE '[0-9]+ deletion' | awk '{print $1}' 2>/dev/null || echo "0")
+
+# Ensure numeric variables have default values
+FILES_CHANGED="${FILES_CHANGED:-0}"
+INSERTIONS="${INSERTIONS:-0}"
+DELETIONS="${DELETIONS:-0}"
+
+# Extract work type
+if [[ -f "${WORK_HISTORY_LIB}" ]]; then
+    source "${WORK_HISTORY_LIB}"
+    WORK_TYPE=$(extract_work_type "$COMMIT_MSG" 2>/dev/null || echo "기타")
+else
+    WORK_TYPE="기타"
+fi
+
 # Create pending commits file if not exists
 PENDING_FILE="${REPO_ROOT}/.claude/cache/pending-commits.json"
 mkdir -p "$(dirname "$PENDING_FILE")"
@@ -80,7 +105,13 @@ new_commit = {
     'commit_hash': '$COMMIT_HASH',
     'commit_msg': '''$COMMIT_MSG''',
     'commit_date': '$COMMIT_DATE',
+    'commit_time': '$COMMIT_TIME',
     'commit_author': '$COMMIT_AUTHOR',
+    'files_changed': int('$FILES_CHANGED' or 0),
+    'insertions': int('$INSERTIONS' or 0),
+    'deletions': int('$DELETIONS' or 0),
+    'file_list': '$FILE_LIST'.split('|') if '$FILE_LIST' else [],
+    'work_type': '$WORK_TYPE',
     'context': '$CONTEXT' if '$CONTEXT' else None
 }
 

@@ -16,12 +16,12 @@ init_active_tasks() {
 }
 
 # 작업 추가
-# Usage: add_active_task "page_id" "title" "priority" "status" "channel" "feature_group"
+# Usage: add_active_task "page_id" "title" "priority" "task_status" "channel" "feature_group"
 add_active_task() {
   local page_id="$1"
   local title="$2"
   local priority="$3"
-  local status="$4"
+  local task_status="$4"
   local channel="$5"
   local feature_group="$6"
 
@@ -41,7 +41,7 @@ add_active_task() {
   "page_id": "$page_id",
   "title": "$title",
   "priority": "$priority",
-  "status": "$status",
+  "status": "$task_status",
   "channel": "$channel",
   "feature_group": "$feature_group",
   "started_at": "$today",
@@ -57,9 +57,9 @@ EOF
   else
     # 기존 작업 업데이트
     jq --arg id "$page_id" \
-       --arg status "$status" \
+       --arg task_status "$task_status" \
        --arg now "$now" \
-       '(.[] | select(.page_id == $id) | .status) = $status |
+       '(.[] | select(.page_id == $id) | .status) = $task_status |
         (.[] | select(.page_id == $id) | .last_active) = $now' \
        "$ACTIVE_TASKS_FILE" > "${ACTIVE_TASKS_FILE}.tmp"
     mv "${ACTIVE_TASKS_FILE}.tmp" "$ACTIVE_TASKS_FILE"
@@ -173,11 +173,11 @@ count_active_tasks() {
 # 상태별 작업 개수
 # Usage: count_tasks_by_status "대기"
 count_tasks_by_status() {
-  local status="$1"
+  local task_status="$1"
 
   init_active_tasks
 
-  jq --arg status "$status" '[.[] | select(.status == $status)] | length' "$ACTIVE_TASKS_FILE"
+  jq --arg task_status "$task_status" '[.[] | select(.status == $task_status)] | length' "$ACTIVE_TASKS_FILE"
 }
 
 # 우선순위별 작업 개수

@@ -29,8 +29,12 @@ cat .claude/cache/pending-commits.json | python3 -c "import json, sys; print(f'{
 1. `.claude/cache/pending-commits.json` 파일을 읽어서 page_id별로 그룹화
 2. 각 page_id에 대해:
    - Notion MCP를 사용하여 parent 페이지 fetch
-   - "📑 작업로그" 제목의 서브페이지 검색
-   - 없으면 새 서브페이지 생성 (테이블 템플릿 포함)
+   - "작업로그" 제목의 서브페이지 검색 (📑 이모지 제외)
+   - 없으면 새 서브페이지 생성:
+     * 타이틀: "작업로그" (이모지 제외)
+     * 아이콘: 📑 이모지 설정
+     * 초기 컨텐츠: 테이블 템플릿 포함
+     * 생성 후 parent 페이지에서 서브페이지 바로 위에 구분선(---) 추가
    - 있으면 기존 서브페이지 ID 사용
 3. 각 커밋을 테이블 행으로 변환:
    - `format_worklog_table_entry()` 함수 사용
@@ -57,12 +61,13 @@ cat .claude/cache/pending-commits.json | python3 -c "import json, sys; print(f'{
 
 ## What it does
 
-이 명령어는 pending 큐에 쌓인 커밋들을 Notion의 "📑 작업로그" 서브페이지로 동기화합니다:
+이 명령어는 pending 큐에 쌓인 커밋들을 Notion의 "작업로그" 서브페이지(📑 아이콘)로 동기화합니다:
 
 1. `.claude/cache/pending-commits.json` 읽기
 2. page_id별로 커밋 그룹화
-3. 각 페이지의 "📑 작업로그" 서브페이지 생성 또는 검색
-4. 커밋 정보를 Markdown 테이블 형식으로 변환
+3. 각 페이지의 "작업로그" 서브페이지 생성 또는 검색
+   - 새 페이지 생성 시: 타이틀 "작업로그", 아이콘 📑, 위에 구분선 추가
+4. 커밋 정보를 HTML 테이블 형식으로 변환
 5. 테이블에 새 행 추가
 6. Pending 큐 초기화
 

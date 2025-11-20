@@ -26,6 +26,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Automatic deadline field update (PR creation date)
     - Status update to "테스트완료" (Test Complete)
     - Graceful error handling (PR success not blocked by Notion failures)
+  - **`/notion-add` command**: Add new feature specifications to Notion
+    - Similarity search to prevent duplicate features
+    - Interactive information collection with AskUserQuestion
+    - Dynamic feature group extraction from actual data
+    - Template-based page creation with structured content
+    - Channel-specific data source mapping (화주, 어드민)
+    - Priority selection (P0-P3) and purpose input
   - **Korean Commit Type Mapping**: Automatic translation
     - `feat` → 기능 추가, `fix` → 버그 수정
     - `docs` → 문서 업데이트, `test` → 테스트

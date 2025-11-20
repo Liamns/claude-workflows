@@ -1,6 +1,6 @@
 # 🤖 Claude Workflows
 
-[![Version](https://img.shields.io/badge/version-3.4.0-blue.svg)](https://github.com/Liamns/claude-workflows)
+[![Version](https://img.shields.io/badge/version-3.4.1-blue.svg)](https://github.com/Liamns/claude-workflows)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-purple.svg)](https://claude.ai/code)
 [![Validation](https://img.shields.io/badge/validation-automated-success.svg)](https://github.com/Liamns/claude-workflows)
@@ -11,7 +11,7 @@
 
 ## 🆕 최신 기능
 
-### v3.4.0 - Notion Workflow Integration
+### v3.4.1 - Notion Workflow Integration
 
 **📝 Notion 통합 워크플로우**
 - **/notion-start**: Notion 데이터베이스에서 작업할 기능 선택 및 자동 세팅
@@ -83,14 +83,6 @@
 - **안전 보장**: 자동 백업, 롤백, 데이터 검증
 - **지능형 네이밍**: Git diff 분석 기반 마이그레이션 이름 자동 생성
 - **멀티 플랫폼**: macOS (Intel/ARM), Linux 자동 감지
-
-### v3.2.0 - Command Template System
-
-- **문서 표준화**: 템플릿 기반 커맨드 시스템 (11/11 완료)
-- **자동화 도구**: 생성/검증/마이그레이션 스크립트
-- **Git 통합**: Pre-commit hook 품질 관리
-
-**📚 상세 문서**: [Feature 001 Summary](.claude/docs/FEATURE-001-SUMMARY.md) | [Command-Resource Guide](.claude/docs/COMMAND-RESOURCE-GUIDE.md)
 
 ## 🚀 Quick Start
 
@@ -192,7 +184,7 @@ bash .claude/lib/generate-checksums.sh -o .claude/.checksums.json --verbose
 /pr                # PR 자동 생성
 /dashboard         # 📊 실시간 메트릭스 대시보드
 
-# 📝 Notion Integration (v3.4.0)
+# 📝 Notion Integration (v3.4.1)
 /notion-start      # Notion 작업 시작
 /notion-add        # 새로운 기능정의서 추가
 /notion-list       # 활성 작업 목록 조회

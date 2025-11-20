@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.1] - 2025-11-20
+
+### Changed
+- **Notion Worklog Page Enhancement**
+  - Updated worklog subpage creation to include 📑 emoji in title
+  - Maintained divider above worklog subpage for visual separation
+  - Updated `/notion-sync-commits` command documentation
+  - Note: Emoji in title approach due to Notion MCP API limitations (icon property not programmable)
+
 ## [3.4.0] - 2025-11-20
 
 ### Added

@@ -16,6 +16,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Template parsing from Notion pages
     - Automatic page property updates (start date, status, assignee)
     - Session management for active tasks
+    - **Active tasks integration**: Automatically adds started tasks to active-tasks.json
+  - **Batch Task Management System (Phase 4-9)**: Manage multiple Notion tasks simultaneously
+    - **`/notion-list` command**: View all active tasks sorted by priority
+      - Display current active task with ★ marker
+      - Show metadata: channel, feature group, status, dates
+      - Statistics view with --summary option
+      - Next action suggestions based on task state
+    - **`/notion-switch` command**: Switch between active tasks interactively
+      - AskUserQuestion-based task selection (up to 4 tasks)
+      - Direct switching by feature name (partial match)
+      - Automatic current-notion-page.txt update
+      - Last activity timestamp tracking
+    - **`/notion-recommend` command**: Priority-based next-task recommendation
+      - Intelligent scoring algorithm (Priority: P0=100, P1=75, P2=50, P3=25)
+      - Status-based scoring (대기=30, 개발중=20, 테스트중=10)
+      - Contextual recommendation reasons
+      - Multiple action options (start workflow, switch only, choose different, later)
+    - **Active Tasks Library** (`notion-active-tasks.sh`):
+      - JSON-based task registry (`.claude/cache/active-tasks.json`)
+      - Priority-sorted task listing
+      - Task state management (add, remove, update)
+      - Current task tracking
+      - Recommendation algorithm with feature grouping
   - **Automatic Work History Recording**: Git commit tracking to Notion
     - Post-commit hook integration
     - Pending commits queue system (async processing)
@@ -52,6 +75,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - `notion-work-history.sh`: Commit history tracking
     - `notion-utils.sh`: MCP tool wrappers
     - `notion-date-utils.sh`: KST timezone handling
+    - `notion-active-tasks.sh`: Multi-task management system
 
 ### Changed
 - **Git Hooks Enhancement**

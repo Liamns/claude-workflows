@@ -19,6 +19,11 @@
   - 유사 기능 검색으로 중복 방지
   - 채널별 동적 기능 그룹 추출 (화주, 어드민)
   - 대화형 정보 수집 및 템플릿 자동 생성
+- **일괄 작업 관리 (Phase 4-9)**: 여러 Notion 작업 동시 추적
+  - **/notion-list**: 우선순위별 작업 목록 표시 (★ 현재 작업 표시)
+  - **/notion-switch**: 작업 간 전환 (AskUserQuestion 기반)
+  - **/notion-recommend**: 우선순위 기반 다음 작업 자동 추천
+  - `.claude/cache/active-tasks.json`: 모든 활성 작업 추적
 - **작업내역 자동 기록**: Git 커밋 시 Notion 페이지에 자동으로 작업내역 추가
 - **PR 마감일 자동 기록**: PR 생성 시 Notion 페이지에 마감일 및 상태 업데이트
 - **한글 변환**: Conventional commit type 자동 한글 변환 (feat→기능 추가, fix→버그 수정 등)
@@ -186,6 +191,13 @@ bash .claude/lib/generate-checksums.sh -o .claude/.checksums.json --verbose
 /commit            # 스마트 커밋
 /pr                # PR 자동 생성
 /dashboard         # 📊 실시간 메트릭스 대시보드
+
+# 📝 Notion Integration (v3.4.0)
+/notion-start      # Notion 작업 시작
+/notion-add        # 새로운 기능정의서 추가
+/notion-list       # 활성 작업 목록 조회
+/notion-switch     # 작업 전환
+/notion-recommend  # 다음 작업 추천
 
 # 🗄️ Database Tools (v3.3.1)
 /db-sync           # Production → Development DB 동기화

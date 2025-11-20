@@ -13,7 +13,7 @@
 5. **업데이트 확인 (AskUserQuestion)**: Notion 페이지를 업데이트할지 사용자에게 확인 요청
 6. **Notion 업데이트**: 사용자가 확인한 경우에만 시작일, 담당자, 진행현황을 "개발중"으로 업데이트
 7. **/triage 자동 호출**: 파싱된 템플릿 내용을 기반으로 /triage 워크플로우 실행
-8. **세션 정보 저장**: 현재 작업 중인 Notion 페이지 정보 캐시에 저장
+8. **세션 정보 및 active-tasks 저장**: 현재 작업 중인 Notion 페이지 정보를 캐시에 저장하고 active-tasks.json에 추가
 
 **절대 금지 사항:**
 - ❌ Notion 검색 단계를 건너뛰지 마세요
@@ -417,6 +417,19 @@ cat > "${cache_dir}/current-workflow-context.json" <<EOF
 EOF
 
 echo "✅ 세션 정보 저장 완료"
+
+# 3. active-tasks.json에 추가
+source .claude/lib/notion-active-tasks.sh
+
+add_active_task \
+  "$page_id" \
+  "$(echo "$template_data" | jq -r '.metadata.title')" \
+  "$(echo "$template_data" | jq -r '.metadata.priority')" \
+  "개발중" \
+  "$(echo "$template_data" | jq -r '.metadata.channel')" \
+  "$(echo "$template_data" | jq -r '.metadata.group')"
+
+echo "✅ active-tasks 목록에 추가 완료"
 echo "   - Page ID: $page_id"
 echo "   - Context: ${cache_dir}/current-workflow-context.json"
 ```

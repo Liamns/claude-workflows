@@ -7,6 +7,54 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.0] - 2025-11-20
+
+### Added
+- **Notion Workflow Integration** - Complete integration with Notion for project management
+  - **`/notion-start` command**: Interactive Notion database search and task setup
+    - AskUserQuestion integration for feature selection
+    - Template parsing from Notion pages
+    - Automatic page property updates (start date, status, assignee)
+    - Session management for active tasks
+  - **Automatic Work History Recording**: Git commit tracking to Notion
+    - Post-commit hook integration
+    - Pending commits queue system (async processing)
+    - Korean translation for conventional commit types
+    - MCP tool limitation workaround (bash → queue → Claude)
+  - **Korean Commit Type Mapping**: Automatic translation
+    - `feat` → 기능 추가, `fix` → 버그 수정
+    - `docs` → 문서 업데이트, `test` → 테스트
+    - `refactor` → 리팩토링, `chore` → 기타 작업
+    - `style` → 스타일 변경, `perf` → 성능 개선
+    - `ci` → CI/CD, `build` → 빌드, `revert` → 되돌리기
+  - **Configuration System** (`.claude/config/notion.json`)
+    - Database and data source mappings
+    - Column name mappings (Korean support)
+    - Status and priority value definitions
+    - Flexible customization per project
+  - **Library Components**:
+    - `notion-config.sh`: Configuration loader and cache
+    - `notion-search.sh`: Interactive database search
+    - `notion-parser.sh`: Template parsing from pages
+    - `notion-update.sh`: Page property updates
+    - `notion-work-history.sh`: Commit history tracking
+    - `notion-utils.sh`: MCP tool wrappers
+    - `notion-date-utils.sh`: KST timezone handling
+
+### Changed
+- **Git Hooks Enhancement**
+  - Updated `post-commit` hook for Notion integration
+  - Added pending commits queue at `.claude/cache/pending-commits.json`
+  - Session tracking via `.claude/cache/current-notion-page.txt`
+
+### Technical Details
+- **Async Work History Architecture**: Git hook → JSON queue → Claude processing
+- **Benefits**:
+  - Commits never fail due to Notion API issues
+  - Batch processing support for multiple commits
+  - MCP tool limitations bypassed
+  - Improved reliability and performance
+
 ## [3.3.1] - 2025-01-18
 
 ### Added

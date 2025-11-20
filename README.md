@@ -1,6 +1,6 @@
 # 🤖 Claude Workflows
 
-[![Version](https://img.shields.io/badge/version-3.3.2-blue.svg)](https://github.com/Liamns/claude-workflows)
+[![Version](https://img.shields.io/badge/version-3.4.0-blue.svg)](https://github.com/Liamns/claude-workflows)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-purple.svg)](https://claude.ai/code)
 [![Validation](https://img.shields.io/badge/validation-automated-success.svg)](https://github.com/Liamns/claude-workflows)
@@ -10,6 +10,27 @@
 **📖 새로운 Claude 세션?** → [프로젝트 컨텍스트 문서](.claude/docs/PROJECT-CONTEXT.md) (5분이면 전체 파악)
 
 ## 🆕 최신 기능
+
+### v3.4.0 - Notion Workflow Integration
+
+**📝 Notion 통합 워크플로우**
+- **/notion-start**: Notion 데이터베이스에서 작업할 기능 선택 및 자동 세팅
+- **작업내역 자동 기록**: Git 커밋 시 Notion 페이지에 자동으로 작업내역 추가
+- **한글 변환**: Conventional commit type 자동 한글 변환 (feat→기능 추가, fix→버그 수정 등)
+- **AskUserQuestion 통합**: 모든 사용자 선택 단계에서 인터랙티브 UI 제공
+
+**🔄 비동기 작업내역 시스템**
+- **Pending Commits Queue**: Git hook → JSON queue → Claude 처리
+- **MCP 제한사항 우회**: Bash에서 직접 MCP 호출 불가 문제 해결
+- **배치 처리**: 여러 커밋을 한 번에 Notion에 동기화
+- **실패 방지**: 커밋이 Notion API 실패로 중단되지 않음
+
+**⚙️ 설정 기반 시스템**
+- **notion.json**: 데이터베이스 설정, 컬럼 매핑, 상태값 정의
+- **자동 세션 관리**: 현재 작업 중인 Notion 페이지 추적
+- **유연한 컬럼 매핑**: 프로젝트별 Notion 구조에 맞게 커스터마이징
+
+**📚 상세 문서**: [Notion Integration Design](.claude/specs/notion-integration-design.md)
 
 ### v3.3.2 - Slash Command UX Improvement
 

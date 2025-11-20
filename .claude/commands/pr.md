@@ -9,6 +9,7 @@
 3. PR 제목과 설명 생성 (Summary, Changes, Test Plan)
 4. AskUserQuestion을 사용하여 PR 생성 전 사용자 확인 받기
 5. 확인 후 gh pr create 실행
+6. **PR 생성 성공 시 Notion 마감일 및 상태 업데이트** (선택적 - 현재 작업 페이지가 있는 경우만)
 
 **절대로 브랜치 분석 단계를 건너뛰지 마세요.**
 
@@ -356,14 +357,64 @@ git add .
 gh pr ready  # 리뷰 준비 완료로 표시
 ```
 
+## Notion 통합
+
+### Step 6: PR 생성 후 Notion 마감일 및 상태 업데이트
+
+**목적**: PR 생성 시 자동으로 Notion 페이지의 마감일과 진행현황을 업데이트
+
+**실행 조건**:
+- `.claude/cache/current-notion-page.txt` 파일이 존재하고 유효한 페이지 ID가 있는 경우에만 실행
+- 파일이 없거나 비어있으면 이 단계를 건너뜀
+
+**업데이트 내용**:
+```python
+# 1. 현재 작업 페이지 ID 확인
+page_id = read_file('.claude/cache/current-notion-page.txt').strip()
+
+# 2. PR 생성 날짜 (KST)
+pr_date = datetime.now(tz=timezone('Asia/Seoul')).strftime('%Y-%m-%d')
+
+# 3. Notion 페이지 업데이트
+mcp__notion-company__notion-update-page({
+  "data": {
+    "page_id": page_id,
+    "command": "update_properties",
+    "properties": {
+      "date:마감일:start": pr_date,
+      "date:마감일:is_datetime": 0,
+      "\b진행현황": "테스트완료"
+    }
+  }
+})
+```
+
+**에러 처리**:
+- Notion 업데이트 실패 시 경고 메시지만 출력하고 계속 진행
+- PR 생성은 성공했으므로 Notion 업데이트 실패가 전체 프로세스를 중단하지 않음
+
+**출력 메시지 예시**:
+```
+✅ Pull Request Created!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+URL: https://github.com/user/repo/pull/42
+
+📝 Notion 업데이트 완료:
+  - 마감일: 2025-11-20
+  - 진행현황: 테스트완료
+```
+
+---
+
 ## 관련 커맨드
 
 - `/commit` - PR 전 커밋 생성
 - `/review` - PR 생성 전 코드 리뷰
 - `/pr-review <number>` - 기존 PR 리뷰
 - `/major`, `/minor`, `/micro` - PR 생성 포함
+- `/notion-start` - Notion 작업 페이지 선택 및 시작
 
 ---
 
-**Version**: 3.3.2
-**Last Updated**: 2025-11-18
+**Version**: 3.4.0
+**Last Updated**: 2025-11-20

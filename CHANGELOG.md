@@ -21,6 +21,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Pending commits queue system (async processing)
     - Korean translation for conventional commit types
     - MCP tool limitation workaround (bash → queue → Claude)
+  - **PR Deadline Recording**: Automatic deadline tracking on PR creation
+    - `/pr` command integration with Notion
+    - Automatic deadline field update (PR creation date)
+    - Status update to "테스트완료" (Test Complete)
+    - Graceful error handling (PR success not blocked by Notion failures)
   - **Korean Commit Type Mapping**: Automatic translation
     - `feat` → 기능 추가, `fix` → 버그 수정
     - `docs` → 문서 업데이트, `test` → 테스트

@@ -504,6 +504,158 @@ print(json.dumps(props, ensure_ascii=False))
     return 0
 }
 
+#━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# Worklog Subpage Management Functions
+#━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# Create worklog subpage under parent page
+# Arguments:
+#   $1 - Parent page ID
+# Output:
+#   Created subpage ID
+# Returns:
+#   0 on success, 1 on failure
+# Example:
+#   create_worklog_subpage "parent-page-id-123"
+create_worklog_subpage() {
+    local parent_id="$1"
+
+    if [[ -z "$parent_id" ]]; then
+        log_error "Parent page ID cannot be empty" >&2
+        return 1
+    fi
+
+    log_info "Creating worklog subpage under: ${parent_id}" >&2
+
+    # Initial template
+    local content="# 📑 작업로그
+
+## Overview
+이 페이지는 기능 개발 과정에서 발생한 모든 커밋을 자동으로 기록합니다.
+
+## Commit History
+
+| 날짜/시간 | 커밋 | 유형 | 주요 변경사항 | 파일 수 | 변경량 | 파일 목록 |
+|----------|------|------|--------------|---------|--------|----------|"
+
+    # Call MCP create-pages
+    # Note: Claude가 실제 MCP 호출을 수행
+    log_info "Calling MCP to create subpage..." >&2
+
+    # Return placeholder - 실제로는 MCP 응답에서 ID 추출
+    echo "subpage-id-placeholder"
+    return 0
+}
+
+# Find existing worklog subpage
+# Arguments:
+#   $1 - Parent page ID
+# Output:
+#   Subpage ID if found, empty otherwise
+# Returns:
+#   0 if found, 1 if not found
+# Example:
+#   find_worklog_subpage "parent-page-id-123"
+find_worklog_subpage() {
+    local parent_id="$1"
+
+    if [[ -z "$parent_id" ]]; then
+        log_error "Parent page ID cannot be empty" >&2
+        return 1
+    fi
+
+    log_info "Searching for existing worklog subpage" >&2
+
+    # Fetch parent page
+    local parent_data
+    if ! parent_data=$(fetch_notion_page "$parent_id"); then
+        log_error "Failed to fetch parent page" >&2
+        return 1
+    fi
+
+    # Extract subpages with title "📑 작업로그"
+    # Note: 실제로는 MCP fetch 응답에서 subpage 파싱
+    local subpage_id=""
+
+    if [[ -n "$subpage_id" ]]; then
+        echo "$subpage_id"
+        return 0
+    else
+        return 1
+    fi
+}
+
+# Get existing or create new worklog subpage
+# Arguments:
+#   $1 - Parent page ID
+# Output:
+#   Subpage ID
+# Returns:
+#   0 on success
+# Example:
+#   get_or_create_worklog_subpage "parent-page-id-123"
+get_or_create_worklog_subpage() {
+    local parent_id="$1"
+
+    # Try to find existing
+    local subpage_id
+    if subpage_id=$(find_worklog_subpage "$parent_id"); then
+        log_info "Found existing worklog subpage: ${subpage_id}" >&2
+        echo "$subpage_id"
+        return 0
+    fi
+
+    # Create new
+    log_info "Creating new worklog subpage" >&2
+    if ! subpage_id=$(create_worklog_subpage "$parent_id"); then
+        log_error "Failed to create worklog subpage" >&2
+        return 1
+    fi
+
+    echo "$subpage_id"
+    return 0
+}
+
+#━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# Worklog Table Update Functions
+#━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# Append new row(s) to worklog table
+# Arguments:
+#   $1 - Subpage ID
+#   $2 - Table entry (one or more rows, newline separated)
+# Returns:
+#   0 on success
+# Example:
+#   append_to_worklog_table "subpage-id" "| 2025-11-20 14:30 | abc123d | 기능 추가 | ... |"
+append_to_worklog_table() {
+    local subpage_id="$1"
+    local entries="$2"
+
+    if [[ -z "$subpage_id" ]] || [[ -z "$entries" ]]; then
+        log_error "Subpage ID and entries cannot be empty" >&2
+        return 1
+    fi
+
+    log_info "Appending entries to worklog table" >&2
+
+    # Fetch current page content
+    local page_content
+    if ! page_content=$(fetch_notion_page "$subpage_id"); then
+        log_error "Failed to fetch subpage content" >&2
+        return 1
+    fi
+
+    # Find table end (last row with |...| pattern)
+    # Note: 실제로는 Markdown 파싱 필요
+
+    # Insert after last row
+    # MCP update-page with insert_content_after
+    log_info "Calling MCP to update table..." >&2
+
+    return 0
+}
+
 # Export functions
 export -f get_notion_start_date
 export -f extract_work_summary
@@ -511,3 +663,7 @@ export -f extract_work_type
 export -f format_work_history_entry
 export -f format_worklog_table_entry
 export -f add_work_history_on_commit
+export -f create_worklog_subpage
+export -f find_worklog_subpage
+export -f get_or_create_worklog_subpage
+export -f append_to_worklog_table

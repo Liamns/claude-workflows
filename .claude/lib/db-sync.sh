@@ -362,28 +362,24 @@ initialize_target_db() {
     echo ""
 
     log_warning "This will DESTROY all data in target DB!"
-    log_info "Stopping postgres_dev container..."
-    docker-compose stop postgres_dev || log_warning "Container may not be running"
 
-    log_info "Removing postgres/user directory..."
-    rm -rf postgres/user
+    # Option 1: Just drop and recreate the database (safer, preserves PostgreSQL configuration)
+    log_info "Dropping and recreating target database..."
 
-    log_info "Creating fresh postgres/user directory..."
-    mkdir -p postgres/user
+    # Setup .pgpass for target DB
+    setup_pgpass "$TARGET_DB_HOST" "$TARGET_DB_PORT" "postgres" "$TARGET_DB_USER" "$TARGET_DB_PASS"
 
-    log_info "Starting postgres_dev container..."
-    docker-compose up -d postgres_dev
+    # Drop database (ignore errors if it doesn't exist)
+    psql -h "$TARGET_DB_HOST" -p "$TARGET_DB_PORT" -U "$TARGET_DB_USER" -d "postgres" \
+        -c "DROP DATABASE IF EXISTS \"$TARGET_DB_NAME\";" 2>&1 | grep -v "does not exist" || true
 
-    log_info "Waiting for database to be ready (8 seconds)..."
-    sleep 8
-
-    # Verify DB is ready
-    if docker logs baechaking-api-postgres_dev-1 2>&1 | grep -q "ready to accept connections"; then
+    # Create fresh database
+    if psql -h "$TARGET_DB_HOST" -p "$TARGET_DB_PORT" -U "$TARGET_DB_USER" -d "postgres" \
+        -c "CREATE DATABASE \"$TARGET_DB_NAME\";"; then
         log_success "Target DB initialized and ready"
         return 0
     else
-        log_error "Target DB may not be ready"
-        log_warning "Check docker logs: docker logs baechaking-api-postgres_dev-1"
+        log_error "Failed to create target database"
         return 1
     fi
 }

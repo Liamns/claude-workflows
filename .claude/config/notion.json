@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0",
+  "workspace": {
+    "name": "화주 프로젝트",
+    "description": "화주 앱 및 어드민 WEB 기능 명세 관리"
+  },
+  "database": {
+    "id": "2ac47c086985805185c3e48f0b7ce853",
+    "name": "기능 명세서",
+    "data_sources": {
+      "app": {
+        "name": "화주 앱",
+        "url": "collection://2ac47c08-6985-811b-a177-000b9ea43547",
+        "description": "프로젝트 스펙"
+      },
+      "admin": {
+        "name": "어드민 WEB",
+        "url": "collection://35d8c49c-a343-4bb4-a62a-8a418b8abca5",
+        "description": "어드민 기능"
+      }
+    }
+  },
+  "columns": {
+    "title": {
+      "notion_name": "기능 설명",
+      "type": "title",
+      "description": "기능명 (PK)"
+    },
+    "status": {
+      "notion_name": "진행현황",
+      "type": "status",
+      "description": "작업 진행 상태"
+    },
+    "priority": {
+      "notion_name": "우선순위",
+      "type": "select",
+      "description": "기능 우선순위"
+    },
+    "group": {
+      "notion_name": "기능 그룹",
+      "type": "select",
+      "description": "도메인 분류"
+    },
+    "assignee": {
+      "notion_name": "담당자",
+      "type": "person",
+      "description": "작업자"
+    },
+    "start_date": {
+      "notion_name": "시작일",
+      "type": "date",
+      "description": "작업 시작일 (KST)"
+    },
+    "deadline": {
+      "notion_name": "마감일",
+      "type": "date",
+      "description": "작업 완료일 (PR 생성 시)"
+    },
+    "work_history": {
+      "notion_name": "작업내역",
+      "type": "rich_text",
+      "description": "커밋 단위 작업 기록"
+    }
+  },
+  "status_values": {
+    "waiting": "대기",
+    "researching": "리서치중",
+    "developing": "개발중",
+    "completed": "작업완료",
+    "deployed": "배포완료"
+  },
+  "priority_values": {
+    "p0": "P0",
+    "p1": "P1",
+    "p2": "P2",
+    "p3": "P3"
+  },
+  "cache": {
+    "current_page_file": ".claude/cache/current-notion-page.txt",
+    "session_dir": ".claude/cache/notion-sessions"
+  }
+}

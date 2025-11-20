@@ -1,0 +1,101 @@
+#!/bin/bash
+# post-commit hook
+# Automatically record work history to Notion after each commit
+# This hook runs after a successful commit
+
+set -e
+
+# Color definitions
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+# Get repository root
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo ".")"
+SESSION_FILE="${REPO_ROOT}/.claude/cache/current-notion-page.txt"
+CONTEXT_FILE="${REPO_ROOT}/.claude/cache/current-workflow-context.json"
+
+# Source work history library
+WORK_HISTORY_LIB="${REPO_ROOT}/.claude/lib/notion-work-history.sh"
+
+# Check if session file exists
+if [[ ! -f "$SESSION_FILE" ]]; then
+    echo -e "${BLUE}ℹ️  No active Notion session - work history recording skipped${NC}"
+    exit 0
+fi
+
+# Read page ID from session file
+PAGE_ID=$(cat "$SESSION_FILE" 2>/dev/null | tr -d '[:space:]')
+if [[ -z "$PAGE_ID" ]]; then
+    echo -e "${YELLOW}⚠️  Session file is empty - work history recording skipped${NC}"
+    exit 0
+fi
+
+# Get current commit hash
+COMMIT_HASH=$(git rev-parse HEAD 2>/dev/null)
+if [[ -z "$COMMIT_HASH" ]]; then
+    echo -e "${RED}❌ Failed to get commit hash${NC}" >&2
+    # Don't fail the commit
+    exit 0
+fi
+
+# Load workflow context if exists
+CONTEXT=""
+if [[ -f "$CONTEXT_FILE" ]]; then
+    CONTEXT=$(cat "$CONTEXT_FILE" 2>/dev/null || echo "")
+fi
+
+# Get commit message and date
+COMMIT_MSG=$(git log -1 --format=%B "$COMMIT_HASH" 2>/dev/null)
+COMMIT_DATE=$(TZ='Asia/Seoul' git log -1 --format=%cd --date=format:'%Y-%m-%d' "$COMMIT_HASH" 2>/dev/null)
+COMMIT_AUTHOR=$(git log -1 --format=%an "$COMMIT_HASH" 2>/dev/null)
+
+# Create pending commits file if not exists
+PENDING_FILE="${REPO_ROOT}/.claude/cache/pending-commits.json"
+mkdir -p "$(dirname "$PENDING_FILE")"
+
+# Initialize pending commits array if file doesn't exist
+if [[ ! -f "$PENDING_FILE" ]]; then
+    echo "[]" > "$PENDING_FILE"
+fi
+
+# Add commit to pending list
+TEMP_FILE=$(mktemp)
+python3 -c "
+import json
+import sys
+
+# Read existing pending commits
+try:
+    with open('$PENDING_FILE', 'r') as f:
+        pending = json.load(f)
+except:
+    pending = []
+
+# Add new commit
+new_commit = {
+    'page_id': '$PAGE_ID',
+    'commit_hash': '$COMMIT_HASH',
+    'commit_msg': '''$COMMIT_MSG''',
+    'commit_date': '$COMMIT_DATE',
+    'commit_author': '$COMMIT_AUTHOR',
+    'context': '$CONTEXT' if '$CONTEXT' else None
+}
+
+pending.append(new_commit)
+
+# Write back
+with open('$TEMP_FILE', 'w') as f:
+    json.dump(pending, f, ensure_ascii=False, indent=2)
+
+print(f'Added commit {new_commit[\"commit_hash\"][:7]} to pending list')
+" && mv "$TEMP_FILE" "$PENDING_FILE"
+
+echo -e "${BLUE}📝 Commit queued for Notion sync${NC}"
+echo -e "${GREEN}✅ 작업내역은 다음 Claude 실행 시 Notion에 자동 기록됩니다${NC}"
+echo -e "${BLUE}💡 수동 동기화: Notion 페이지를 fetch하면 자동으로 처리됩니다${NC}"
+
+# Always exit successfully to preserve the commit
+exit 0

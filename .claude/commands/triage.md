@@ -1,16 +1,25 @@
 # 🎯 Triage - 스마트 워크플로우 선택기
 
-**Claude를 위한 필수 지시사항:**
+⚠️ **CRITICAL: 이 지시사항을 절대 건너뛰지 마세요**
 
-이 명령어가 실행될 때 반드시 다음 단계를 **순서대로** 따라야 합니다:
+**Claude를 위한 필수 실행 순서 (예외 없음):**
+
+아래 단계를 **정확히 이 순서대로** 따라야 합니다.
+**아래 예시(Examples)에서 AskUserQuestion이 보이지 않더라도,
+실제 실행 시에는 반드시 이 단계를 따라야 합니다:**
 
 1. 복잡도 분석을 사용하여 초기 분석 수행 (키워드 점수, 파일 개수, 소요 시간)
 2. 필요 시 AskUserQuestion을 사용하여 추가 정보 수집
 3. 복잡도 점수를 기반으로 워크플로우 추천
 4. 워크플로우 추천 (Epic/Major/Minor/Micro) 및 Plan Mode 가이드 생성
-5. 진행하기 전에 사용자 확인을 기다리세요
+5. **반드시 AskUserQuestion을 사용하여 사용자에게 워크플로우 선택을 요청**
+6. 사용자 선택 후에만 해당 워크플로우 실행
 
-**절대로 복잡도 분석 단계를 건너뛰지 마세요.**
+**절대 금지 사항:**
+- ❌ 복잡도 분석 단계를 건너뛰지 마세요
+- ❌ AskUserQuestion 없이 워크플로우를 자동 실행하지 마세요
+- ❌ 사용자 확인 없이 "Run: /major" 같은 명령어를 직접 실행하지 마세요
+- ❌ 예시(Examples)가 AskUserQuestion을 생략했더라도, 실제로는 필수입니다
 
 ---
 
@@ -106,6 +115,20 @@ AI 기반 워크플로우(workflow) 선택기로, 작업(task)을 자동으로 �
 
 ## Examples
 
+⚠️ **중요 - Claude는 반드시 읽으세요**:
+
+아래 예시는 **출력 형식**을 보여주기 위한 것입니다.
+실제 실행 시에는 반드시:
+
+1. ✅ 복잡도 분석 수행 (예시에 표시됨)
+2. ✅ **AskUserQuestion으로 사용자 선택 받기** (예시에는 간결성을 위해 생략됨)
+3. ✅ 선택 후 워크플로우 실행
+
+**예시에 AskUserQuestion 단계가 보이지 않는 것은 문서 간결성을 위한 생략이며,
+실제로는 필수입니다. 예시를 그대로 따라하지 말고, 위의 필수 지시사항을 따르세요.**
+
+---
+
 ### Example 1: Simple Fix (Micro)
 
 ```bash
@@ -131,7 +154,18 @@ Complexity Score: 2/15
 - Quality Level: Standard
 - No tests required
 
-🚀 Next Steps:
+📋 사용자 확인 필수 (AskUserQuestion):
+[AskUserQuestion 호출]
+- question: "어떤 워크플로우를 실행하시겠습니까?"
+- header: "워크플로우"
+- options:
+  - "Micro 워크플로우 (추천)"
+  - "Minor 워크플로우"
+  - "직접 선택"
+
+[사용자가 "Micro 워크플로우 (추천)" 선택]
+
+🚀 Next Steps (사용자 선택 후):
 1. Run: /micro "Fix typo in README"
 2. Make the change
 3. Run: /commit
@@ -165,7 +199,19 @@ Complexity Score: 6/15
 - Quality Level: High
 - Related tests must pass
 
-🚀 Next Steps:
+📋 사용자 확인 필수 (AskUserQuestion):
+[AskUserQuestion 호출]
+- question: "어떤 워크플로우를 실행하시겠습니까?"
+- header: "워크플로우"
+- options:
+  - "Minor 워크플로우 (추천)"
+  - "Major 워크플로우"
+  - "Micro 워크플로우"
+  - "직접 선택"
+
+[사용자가 "Minor 워크플로우 (추천)" 선택]
+
+🚀 Next Steps (사용자 선택 후):
 1. Run: /minor "Fix null pointer error in user login"
 2. Implement fix with minimal changes
 3. Update related tests
@@ -199,6 +245,17 @@ Complexity Score: 12/15
 - Token Savings: 60%
 - Quality Level: Highest
 - Full quality gates apply
+
+📋 사용자 확인 필수 (AskUserQuestion):
+[AskUserQuestion 호출]
+- question: "어떤 워크플로우를 실행하시겠습니까?"
+- header: "워크플로우"
+- options:
+  - "Major 워크플로우 (추천)"
+  - "Minor 워크플로우"
+  - "직접 선택"
+
+[사용자가 "Major 워크플로우 (추천)" 선택]
 
 💡 Plan Mode Recommended (Complexity 5+):
 For complex tasks, create a plan first for better results:

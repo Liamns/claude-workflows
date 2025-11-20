@@ -91,13 +91,13 @@ load_db_config() {
 # ============================================================================
 
 # Parse DATABASE_URL and extract components
-# Usage: parse_database_url "postgresql://user:pass@localhost:5433/dbname"
+# Usage: parse_database_url "postgresql://user:pass@localhost:5433/dbname?schema=public"
 # Sets: DB_USER, DB_PASS, DB_HOST, DB_PORT, DB_NAME (used by caller)
 parse_database_url() {
     local url="$1"
 
-    # Regex to parse: postgresql://user:pass@host:port/dbname
-    if [[ $url =~ ^postgresql://([^:]+):([^@]+)@([^:]+):([0-9]+)/(.+)$ ]]; then
+    # Regex to parse: postgresql://user:pass@host:port/dbname (with optional query params)
+    if [[ $url =~ ^postgresql://([^:]+):([^@]+)@([^:]+):([0-9]+)/([^?]+) ]]; then
         # shellcheck disable=SC2034  # Variables are used by caller script
         DB_USER="${BASH_REMATCH[1]}"
         # shellcheck disable=SC2034

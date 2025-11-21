@@ -23,6 +23,21 @@
 
 ---
 
+## 🔄 Compact 복원 가이드
+
+Compact 발생 후 워크플로우가 중단되었다면:
+
+```bash
+source .claude/lib/session-manager.sh && restore_from_compact
+```
+
+**Critical Rules (Compact 후에도 반드시 준수):**
+1. AskUserQuestion으로 워크플로우 선택 받기
+2. 사용자 확인 없이 /major, /minor 등 자동 실행 금지
+3. 연계된 워크플로우 진입 시에도 문서 생성 단계 필수
+
+---
+
 ## 📋 다음 단계 추천 시 필수 규칙
 
 ### 다음 워크플로우 추천 시 AskUserQuestion 사용

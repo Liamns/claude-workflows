@@ -15,6 +15,41 @@
 
 ---
 
+## 🔄 Compact 복원 가이드
+
+### Compact 후 복원이 필요한 경우
+
+토큰 제한으로 Compact이 발생하면 다음 명령어로 현재 상태를 확인하세요:
+
+```bash
+source .claude/lib/session-manager.sh && restore_from_compact
+```
+
+### 워크플로우 진행 중 상태 저장 (선택적)
+
+긴 워크플로우 진행 시, 각 Step 완료 후 상태를 저장할 수 있습니다:
+
+```bash
+# 최초 저장 시 (기존 세션이 없을 때만)
+source .claude/lib/session-manager.sh
+if ! has_workflow_session; then
+    init_workflow_session "major" "<feature-name>" "<number>"
+    add_critical_rule "no_skip_docs" "문서 생성 단계 필수" 1
+    add_critical_rule "user_confirm" "사용자 확인 없이 구현 금지" 2
+fi
+
+# Step 완료 시
+save_workflow_state <step_number> "<step_description>"
+```
+
+### Critical Rules (Compact 후에도 반드시 준수)
+
+1. **문서 생성 필수**: spec.md, plan.md, tasks.md 생성 후 구현
+2. **사용자 확인 필수**: AskUserQuestion으로 승인 받기
+3. **Document Gate 통과**: Step 5.5에서 필수 문서 검증
+
+---
+
 ## 📋 다음 단계 추천 시 필수 규칙
 
 ### 구현 완료 후 커밋 제안 시 AskUserQuestion 사용

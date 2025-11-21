@@ -58,6 +58,7 @@ EXCLUDE_DIRS=(
     ".claude/metrics"
     ".specify/specs"
     ".specify/features"
+    ".specify/fixes"
     ".specify/temp"
     ".specify/memory"
     ".git"

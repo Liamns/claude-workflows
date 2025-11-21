@@ -1,8 +1,8 @@
 {
   "version": "3.5.0",
-  "generatedAt": "2025-11-21T07:41:42Z",
+  "generatedAt": "2025-11-21T08:04:22Z",
   "files": {
-    ".claude/.checksums.json": "44618291c9b8803584374ada9e2af5ea5a6aac16d4d8b3f853d48b3542f43a00",
+    ".claude/.checksums.json": "98f982ac7735583f494f65283141ec8dc7d441225231c8a3d4ba9aa27b0ae4ea",
     ".claude/agents/api-designer.md": "8d34ac2f5c3c7d9e25ffe46463b8efa3073a1f023f6226ef2f2d184b1a64c1b5",
     ".claude/agents/architect-unified.md": "509dd35487a5054f559f7ec6536f33a6015f09bfdcc113916718970d2c43f77f",
     ".claude/agents/code-reviewer/lib/types.ts": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -151,7 +151,7 @@
     ".claude/lib/discover-commands.sh": "c2036d88d1f4d74aa7b54e539d985b55d2731305d005377247ae8cf423c2e0e5",
     ".claude/lib/extract-resource-mappings.sh": "4074c0fcd7ce230d5d0363bb1f4582a75eccef96c1c72b9c7f19ea214e091ad9",
     ".claude/lib/find-unused-files.sh": "1842c9c6a79c231596e5b40702bb83c95251af8a0bfbc40c2dbe4b51ecd70b11",
-    ".claude/lib/generate-checksums.sh": "3c8b2ae8ad3012efb80d6fcef307382161a18842473c65257b40f082d51956f5",
+    ".claude/lib/generate-checksums.sh": "4624b0fe51afd2900686091dac451d6721c20f574b712e38179910805d7bb9c2",
     ".claude/lib/git-operations.sh": "b29f65dfb3867ce5eec2b4b2603b226685ef90cd75b26f63f256e84c8b83dc00",
     ".claude/lib/git-stats-helper.sh": "d0a5f6f07480813efe8f24a3e55305c53c82183d6e0654808123443f43298153",
     ".claude/lib/git-status-checker.sh": "4aaea24b5ab4fa4065250366535820ff0cbb78c8287f4bd762c9fe0d2dfe3709",
@@ -248,7 +248,6 @@
     ".claude/templates/validation/report-template.md": "6c72a9d24f9f2866b139ce0593c76e18f07f6f81fbf90083f16b1978de83103c",
     ".claude/test/e2e-test-result.md": "390321acbda281f6e808feb18af978d3009703e2f0f0f31c2ee05df53b3c33be",
     ".claude/workflow-gates.json": "fa9b3ae55aef96641606b82b46317d014957f2c604dfae6420a8d88c52fa4698",
-    ".specify/fixes/001-notion-security-fixes/fix-analysis.md": "f51c034aabe44effc1023120165cb5e5846580b64461097bfa6a66bdc0d5d809",
     ".specify/scripts/bash/create-epic.sh": "12ee77f6caaab0db219e11337959166aa7b54eaed9bd3b6d74d1820663c57ab1",
     ".specify/scripts/bash/update-epic-progress.sh": "6ce84722fefef19e04cf799ca44d2c3332ac0b6adecfce4002d2a5b8057eef9e",
     ".specify/scripts/bash/validate-epic.sh": "e0b0ccd8e78805536e71617c5009354622d516b3ba0f8bde753f839ed0454c4d",

@@ -1,0 +1,277 @@
+# Tracker Command Configuration
+# 프로젝트 & 이슈 트래커
+
+extends: "_base.yaml"
+
+# ============================================================================
+# COMMAND INFO
+# ============================================================================
+
+command: "tracker"
+type: "hybrid"
+description: "프로젝트 및 이슈 추적 - 추가, 목록, 상태 업데이트, 담당자 배정"
+
+# ============================================================================
+# NOTION INTEGRATION
+# ============================================================================
+
+notion:
+  # Projects 데이터베이스
+  database_id: "2ad47c0869858041945cc55ee8474a2d"
+  database_name: "Projects"
+
+  # 데이터 소스
+  data_source:
+    id: "2ad47c08-6985-8016-b033-000bdcffaec7"
+    url: "collection://2ad47c08-6985-8016-b033-000bdcffaec7"
+
+  # 속성 매핑
+  property_mapping:
+    title: "Project name"
+    status: "Status"
+    priority: "Priority"
+    tag: "Tag"
+    assignee: "Assignee"
+    start_date: "Start date"
+    end_date: "End date"
+    team: "Team"
+    progress: "Progress"
+
+  # 상태 옵션
+  status_options:
+    - name: "Not started"
+      group: "to_do"
+      description: "시작 전"
+    - name: "In progress"
+      group: "in_progress"
+      description: "진행 중"
+    - name: "Done"
+      group: "complete"
+      description: "완료"
+
+  # 우선순위 옵션
+  priority_options:
+    - name: "High"
+      color: "red"
+      description: "긴급"
+    - name: "Medium"
+      color: "yellow"
+      description: "보통"
+    - name: "Low"
+      color: "green"
+      description: "낮음"
+
+  # 태그 옵션 (이슈 유형)
+  tag_options:
+    - name: "Issue"
+      color: "orange"
+      icon: "📌"
+      description: "일반 이슈"
+    - name: "Bug"
+      color: "purple"
+      icon: "🐛"
+      description: "버그"
+    - name: "Feature"
+      color: "red"
+      icon: "✨"
+      description: "새 기능"
+    - name: "Refatoring"
+      color: "default"
+      icon: "🔧"
+      description: "리팩토링"
+
+  # 뷰 설정
+  views:
+    by_status:
+      id: "2ad47c08-6985-80e2-8dbe-000c0076918e"
+      type: "board"
+      description: "상태별 칸반 보드"
+    all_projects:
+      id: "2ad47c08-6985-80c5-8631-000ceb2987bf"
+      type: "table"
+      description: "전체 프로젝트 테이블"
+    gantt:
+      id: "2ad47c08-6985-8077-9ca7-000c39871a05"
+      type: "timeline"
+      description: "간트 차트"
+    my_projects:
+      id: "2ad47c08-6985-8076-a0ce-000c2c7ffee7"
+      type: "table"
+      description: "내 프로젝트"
+
+# ============================================================================
+# ACTIONS
+# ============================================================================
+
+actions:
+  add:
+    description: "새 프로젝트/이슈 추가"
+    workflow:
+      - step: "collect_title"
+        description: "제목 입력"
+      - step: "select_tag"
+        description: "유형 선택 (AskUserQuestion)"
+      - step: "select_priority"
+        description: "우선순위 선택 (AskUserQuestion)"
+      - step: "create_page"
+        description: "Notion 페이지 생성"
+    default_values:
+      status: "Not started"
+      start_date: "today"  # KST 기준
+
+  list:
+    description: "프로젝트 목록 조회"
+    filters:
+      - status
+      - priority
+      - tag
+      - assignee
+    display_format: |
+      📋 프로젝트 목록
+
+      {projects}
+
+      총 {count}개
+
+  update:
+    description: "상태 업데이트"
+    requires:
+      - page_id
+      - status
+
+  assign:
+    description: "담당자 배정"
+    workflow:
+      - step: "get_users"
+        description: "Notion 사용자 목록 조회"
+      - step: "select_user"
+        description: "담당자 선택 (AskUserQuestion)"
+      - step: "update_assignee"
+        description: "담당자 업데이트"
+
+  close:
+    description: "완료 처리"
+    updates:
+      status: "Done"
+      end_date: "today"  # KST 기준
+
+# ============================================================================
+# PROMPTS (AskUserQuestion 설정)
+# ============================================================================
+
+prompts:
+  tag_selection:
+    question: "유형을 선택하세요"
+    header: "Tag"
+    multiSelect: false
+    options:
+      - label: "Issue"
+        description: "📌 일반 이슈"
+      - label: "Bug"
+        description: "🐛 버그 수정"
+      - label: "Feature"
+        description: "✨ 새 기능 추가"
+      - label: "Refatoring"
+        description: "🔧 코드 리팩토링"
+
+  priority_selection:
+    question: "우선순위를 선택하세요"
+    header: "Priority"
+    multiSelect: false
+    options:
+      - label: "High"
+        description: "긴급 - 즉시 처리"
+      - label: "Medium"
+        description: "보통 - 이번 주 내 처리"
+      - label: "Low"
+        description: "낮음 - 여유 있게 처리"
+
+  status_selection:
+    question: "상태를 선택하세요"
+    header: "Status"
+    multiSelect: false
+    options:
+      - label: "Not started"
+        description: "시작 전"
+      - label: "In progress"
+        description: "진행 중"
+      - label: "Done"
+        description: "완료"
+
+  assignee_selection:
+    question: "담당자를 선택하세요"
+    header: "Assignee"
+    multiSelect: false
+    # options는 동적으로 Notion 사용자 목록에서 로드
+
+  filter_selection:
+    question: "필터를 선택하세요"
+    header: "Filter"
+    multiSelect: true
+    options:
+      - label: "상태별"
+        description: "Status 기준 필터"
+      - label: "우선순위별"
+        description: "Priority 기준 필터"
+      - label: "유형별"
+        description: "Tag 기준 필터"
+
+# ============================================================================
+# DISPLAY ICONS
+# ============================================================================
+
+display:
+  tag_icons:
+    Issue: "📌"
+    Bug: "🐛"
+    Feature: "✨"
+    Refatoring: "🔧"
+
+  priority_icons:
+    High: "🔴"
+    Medium: "🟡"
+    Low: "🟢"
+
+  status_icons:
+    "Not started": "⬜"
+    "In progress": "🔵"
+    "Done": "✅"
+
+# ============================================================================
+# RATE LIMITING
+# ============================================================================
+
+rate_limiting:
+  enabled: true
+  requests_per_second: 3
+  delay_ms: 400
+
+# ============================================================================
+# SUPPORTING SCRIPTS
+# ============================================================================
+
+supporting_scripts:
+  - path: ".claude/lib/notion-utils.sh"
+    description: "Notion API 유틸리티"
+
+# ============================================================================
+# NEXT COMMANDS
+# ============================================================================
+
+next_commands:
+  enabled: true
+  auto_prompt: true
+
+  recommendations:
+    - command: "/tracker list"
+      trigger: "after_add"
+      priority: 2
+      auto_execute: false
+      description: "프로젝트 목록 확인"
+
+    - command: "/docu start"
+      trigger: "after_add"
+      condition: "tag == 'Feature'"
+      priority: 1
+      auto_execute: false
+      description: "기능 명세서 기반 작업 시작"

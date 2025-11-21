@@ -20,8 +20,8 @@ if [ -f "$SCRIPT_DIR/.claude/.version" ]; then
     TARGET_VERSION="$VERSION_FROM_FILE"
 else
     # Fallback to hardcoded version
-    INSTALLER_VERSION="3.3.2"
-    TARGET_VERSION="3.3.2"
+    INSTALLER_VERSION="3.5.0"
+    TARGET_VERSION="3.5.0"
 fi
 
 # Repository Configuration
@@ -101,7 +101,7 @@ health_check() {
     local agents_count=$(find "$TARGET_DIR/.claude/agents" -maxdepth 1 -type f -name '*.md' ! -path '*/_deprecated/*' 2>/dev/null | wc -l | tr -d ' ')
     local skills_count=$(find "$TARGET_DIR/.claude/skills" -maxdepth 1 -type d ! -name 'skills' 2>/dev/null | wc -l | tr -d ' ')
 
-    echo "  Commands: $commands_count (expected: 11)"
+    echo "  Commands: $commands_count (expected: 15)"
     echo "  Agents: $agents_count (expected: 6)"
     echo "  Skills: $skills_count (expected: 15)"
 
@@ -731,7 +731,7 @@ install_workflows() {
 
     # Copy slash commands (excluding deprecated and backup)
     if [ -d "$TEMP_DIR/.claude/commands" ]; then
-        print_info "Installing Slash Commands (10개)..."
+        print_info "Installing Slash Commands (15개)..."
         if [ "$DRY_RUN" = false ]; then
             # Backup existing pr.md if present (user might have customized it)
             if [ -f "$TARGET_DIR/.claude/commands/pr.md" ]; then
@@ -743,7 +743,7 @@ install_workflows() {
             # Copy files, excluding deprecated and backup directories
             find "$TEMP_DIR/.claude/commands" -maxdepth 1 -type f -name "*.md" -exec cp {} "$TARGET_DIR/.claude/commands/" \;
         fi
-        print_success "Slash Commands installed (start, triage, major, minor, micro, commit, pr, pr-review, review, dashboard)"
+        print_success "Slash Commands installed (15개: start, triage, major, minor, micro, commit, pr, pr-review, review, dashboard, docu, tracker, epic, db-sync, prisma-migrate)"
     else
         print_warning ".claude/commands/ directory not found in repository"
     fi
@@ -1081,7 +1081,7 @@ install_workflows() {
     echo -e "${GREEN}Installed Components (v$TARGET_VERSION):${NC}"
     echo ""
     echo "📁 $TARGET_DIR/.claude/"
-    echo "   ├── commands/        (10 Slash Commands)"
+    echo "   ├── commands/        (15 Slash Commands)"
     echo "   ├── templates/       (문서 템플릿)"
     echo "   ├── agents/          (6 Unified Agents - 통합 최적화)"
     echo "   ├── skills/          (15 Skills - 자동 활성화)"

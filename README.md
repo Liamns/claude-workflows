@@ -1,6 +1,6 @@
 # 🤖 Claude Workflows
 
-[![Version](https://img.shields.io/badge/version-3.4.1-blue.svg)](https://github.com/Liamns/claude-workflows)
+[![Version](https://img.shields.io/badge/version-3.5.0-blue.svg)](https://github.com/Liamns/claude-workflows)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-purple.svg)](https://claude.ai/code)
 [![Validation](https://img.shields.io/badge/validation-automated-success.svg)](https://github.com/Liamns/claude-workflows)
@@ -11,36 +11,34 @@
 
 ## 🆕 최신 기능
 
-### v3.4.1 - Notion Workflow Integration
+### v3.5.0 - 통합 명령어 시스템
 
-**📝 Notion 통합 워크플로우**
-- **/notion-start**: Notion 데이터베이스에서 작업할 기능 선택 및 자동 세팅
-- **/notion-add**: 새로운 기능정의서를 Notion에 추가
-  - 유사 기능 검색으로 중복 방지
-  - 채널별 동적 기능 그룹 추출 (화주, 어드민)
-  - 대화형 정보 수집 및 템플릿 자동 생성
-- **일괄 작업 관리 (Phase 4-9)**: 여러 Notion 작업 동시 추적
-  - **/notion-list**: 우선순위별 작업 목록 표시 (★ 현재 작업 표시)
-  - **/notion-switch**: 작업 간 전환 (AskUserQuestion 기반)
-  - **/notion-recommend**: 우선순위 기반 다음 작업 자동 추천
-  - `.claude/cache/active-tasks.json`: 모든 활성 작업 추적
-- **작업내역 자동 기록**: Git 커밋 시 Notion 페이지에 자동으로 작업내역 추가
-- **PR 마감일 자동 기록**: PR 생성 시 Notion 페이지에 마감일 및 상태 업데이트
-- **한글 변환**: Conventional commit type 자동 한글 변환 (feat→기능 추가, fix→버그 수정 등)
-- **AskUserQuestion 통합**: 모든 사용자 선택 단계에서 인터랙티브 UI 제공
+**📝 /docu - Notion 문서 통합 관리**
+- 기존 notion-* 명령어 6개를 단일 명령어로 통합
+- 10개 액션: `start`, `list`, `switch`, `recommend`, `update`, `log`, `sync`, `search`, `close`, `add`
+- 하이브리드 명령어 구조 (.md + .yaml)
 
-**🔄 비동기 작업내역 시스템**
-- **Pending Commits Queue**: Git hook → JSON queue → Claude 처리
-- **MCP 제한사항 우회**: Bash에서 직접 MCP 호출 불가 문제 해결
-- **배치 처리**: 여러 커밋을 한 번에 Notion에 동기화
-- **실패 방지**: 커밋이 Notion API 실패로 중단되지 않음
+**📌 /tracker - 프로젝트 & 이슈 트래커 (신규)**
+- Projects 데이터베이스 연동
+- 5개 액션: `add`, `list`, `update`, `assign`, `close`
+- Tag 기반 관리: Issue, Bug, Feature, Refactoring
 
-**⚙️ 설정 기반 시스템**
-- **notion.json**: 데이터베이스 설정, 컬럼 매핑, 상태값 정의
-- **자동 세션 관리**: 현재 작업 중인 Notion 페이지 추적
-- **유연한 컬럼 매핑**: 프로젝트별 Notion 구조에 맞게 커스터마이징
+**⚠️ Breaking Changes**
+```bash
+# 레거시 명령어 → 새 명령어
+/notion-start → /docu start
+/notion-list → /docu list
+/notion-switch → /docu switch
+/notion-recommend → /docu recommend
+/notion-add → /docu add
+/notion-sync-commits → /docu sync
+```
 
-**📚 상세 문서**: [Notion Integration Design](.claude/specs/notion-integration-design.md)
+**🔧 Phase 1-2 개선사항**
+- Session Manager: 워크플로우 세션 상태 관리
+- Document Gate 검증 로직 개선
+- /commit, /pr 명령어 안정성 강화
+- Notion 통합 보안 패치
 
 ### v3.3.2 - Slash Command UX Improvement
 
@@ -184,12 +182,12 @@ bash .claude/lib/generate-checksums.sh -o .claude/.checksums.json --verbose
 /pr                # PR 자동 생성
 /dashboard         # 📊 실시간 메트릭스 대시보드
 
-# 📝 Notion Integration (v3.4.1)
-/notion-start      # Notion 작업 시작
-/notion-add        # 새로운 기능정의서 추가
-/notion-list       # 활성 작업 목록 조회
-/notion-switch     # 작업 전환
-/notion-recommend  # 다음 작업 추천
+# 📝 Notion Integration (v3.5.0)
+/docu start        # Notion 기능 명세서 작업 시작
+/docu list         # 진행 중인 작업 목록
+/docu add          # 새 기능정의서 추가
+/tracker add       # 프로젝트/이슈 추가
+/tracker list      # 프로젝트 목록 조회
 
 # 🗄️ Database Tools (v3.3.1)
 /db-sync           # Production → Development DB 동기화
@@ -367,4 +365,4 @@ MIT License - 자유롭게 사용, 수정, 배포 가능
 
 ---
 
-**v3.3.1** | [GitHub](https://github.com/Liamns/claude-workflows) | Made with ❤️ for Claude Code
+**v3.5.0** | [GitHub](https://github.com/Liamns/claude-workflows) | Made with ❤️ for Claude Code

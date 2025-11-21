@@ -7,6 +7,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.5.0] - 2025-11-21
+
+### Added
+- **통합 명령어 시스템 (Phase 3)**
+  - **`/docu` 명령어**: Notion 기능 명세서 통합 관리
+    - 10개 액션: start, list, switch, recommend, update, log, sync, search, close, add
+    - 기존 notion-* 명령어 6개 통합 및 대체
+    - 하이브리드 명령어 구조 (.md + .yaml)
+  - **`/tracker` 명령어**: 프로젝트 & 이슈 트래커 (신규)
+    - 5개 액션: add, list, update, assign, close
+    - Projects 데이터베이스 연동 (`2ad47c08-6985-8016-b033-000bdcffaec7`)
+    - Tag 기반 이슈 관리 (Issue, Bug, Feature, Refactoring)
+
+- **Session Manager (Phase 2)**
+  - 워크플로우 세션 상태 관리 시스템
+  - `.claude/lib/session-manager.sh` 추가
+  - 세션 초기화, 상태 저장, 복구 기능
+
+- **Critical Fixes (Phase 1)**
+  - **FR6 Document Gate**: 문서 게이트 검증 로직 개선
+  - **FR1 /commit**: 커밋 명령어 안정성 강화
+  - **FR2 /pr**: PR 생성 워크플로우 개선
+  - **Security Patch**: Notion 통합 입력 검증 강화
+
+### Changed
+- **하이브리드 명령어 구조**
+  - `.md` 파일: 워크플로우 가이드라인
+  - `.yaml` 파일: 설정 (Notion 연동, 프롬프트, 액션)
+  - `config-loader.sh` 연동으로 YAML 자동 로드
+
+### Removed
+- **레거시 Notion 명령어 삭제** (Breaking Change)
+  - `/notion-start` → `/docu start`
+  - `/notion-list` → `/docu list`
+  - `/notion-switch` → `/docu switch`
+  - `/notion-recommend` → `/docu recommend`
+  - `/notion-add` → `/docu add`
+  - `/notion-sync-commits` → `/docu sync`
+
+### Migration Guide
+기존 notion-* 명령어 사용자는 다음과 같이 변경하세요:
+```bash
+# Before → After
+/notion-start → /docu start
+/notion-list → /docu list
+/notion-switch → /docu switch
+/notion-recommend → /docu recommend
+/notion-add → /docu add
+/notion-sync-commits → /docu sync
+```
+
 ## [3.4.1] - 2025-11-20
 
 ### Changed

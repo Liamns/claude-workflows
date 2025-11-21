@@ -420,9 +420,9 @@ URL: https://github.com/user/repo/pull/42
 - `/review` - PR 생성 전 코드 리뷰
 - `/pr-review <number>` - 기존 PR 리뷰
 - `/major`, `/minor`, `/micro` - PR 생성 포함
-- `/notion-start` - Notion 작업 페이지 선택 및 시작
+- `/docu start` - Notion 기능 명세서 작업 시작
 
 ---
 
-**Version**: 3.4.0
-**Last Updated**: 2025-11-20
+**Version**: 3.5.0
+**Last Updated**: 2025-11-21

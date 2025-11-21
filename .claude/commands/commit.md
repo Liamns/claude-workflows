@@ -7,10 +7,28 @@
 1. git status와 git diff를 사용하여 초기 분석 수행
 2. 커밋 히스토리를 분석하여 커밋 메시지 패턴 파악
 3. Conventional Commits 형식으로 커밋 메시지 생성
-4. AskUserQuestion을 사용하여 커밋 전 사용자 확인 받기
-5. 확인 후 커밋 실행
+4. **⚠️ 커밋 메시지 전문(全文) 출력** - 반드시 생성된 커밋 메시지 전체를 사용자에게 보여주세요:
+   ```
+   === 생성된 커밋 메시지 ===
+   <type>(<scope>): <subject>
 
-**절대로 변경사항 분석 단계를 건너뛰지 마세요.**
+   <body>
+
+   🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+   Co-Authored-By: Claude <noreply@anthropic.com>
+   ===========================
+   ```
+5. AskUserQuestion을 사용하여 커밋 전 사용자 확인 받기:
+   - question: "위 메시지로 커밋하시겠습니까?"
+   - header: "커밋 확인"
+   - options: ["예, 커밋 실행", "메시지 수정", "취소"]
+6. 사용자 선택 처리:
+   - "예, 커밋 실행" → 커밋 진행
+   - "메시지 수정" → 수정 요청을 받고 다시 4번으로
+   - "취소" → 커밋 중단
+
+**절대로 커밋 메시지를 보여주지 않고 확인을 요청하지 마세요.**
 
 ---
 

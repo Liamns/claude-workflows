@@ -45,8 +45,8 @@ validate_json_string() {
         return 1
     fi
 
-    # Validate using Python's json.tool
-    if ! echo "$json_str" | python3 -m json.tool &>/dev/null; then
+    # Validate using jq
+    if ! echo "$json_str" | jq . &>/dev/null; then
         log_error "Invalid JSON string format"
         return 1
     fi
@@ -132,23 +132,13 @@ search_notion_pages() {
     # Build search parameters
     local params="{\"query\": \"${query}\", \"query_type\": \"internal\"}"
 
-    # Add optional filters
+    # Add optional filters (using jq for safe JSON manipulation)
     if [[ -n "$data_source_url" ]]; then
-        params=$(echo "$params" | python3 -c "
-import sys, json
-data = json.load(sys.stdin)
-data['data_source_url'] = '${data_source_url}'
-print(json.dumps(data))
-")
+        params=$(echo "$params" | jq --arg url "$data_source_url" '. + {data_source_url: $url}')
     fi
 
     if [[ -n "$teamspace_id" ]]; then
-        params=$(echo "$params" | python3 -c "
-import sys, json
-data = json.load(sys.stdin)
-data['teamspace_id'] = '${teamspace_id}'
-print(json.dumps(data))
-")
+        params=$(echo "$params" | jq --arg id "$teamspace_id" '. + {teamspace_id: $id}')
     fi
 
     # Call MCP search
@@ -227,19 +217,12 @@ update_notion_properties() {
 
     log_info "Updating Notion page properties: ${page_id}"
 
-    # Build update parameters
+    # Build update parameters (using jq for safe JSON manipulation)
     local params
-    params=$(python3 -c "
-import json
-data = {
-    'data': {
-        'page_id': '${page_id}',
-        'command': 'update_properties',
-        'properties': json.loads('${properties}')
-    }
-}
-print(json.dumps(data))
-")
+    params=$(jq -n \
+        --arg page_id "$page_id" \
+        --argjson properties "$properties" \
+        '{data: {page_id: $page_id, command: "update_properties", properties: $properties}}')
 
     # Call MCP update
     local response
@@ -293,21 +276,24 @@ create_notion_page() {
         parent_value="$parent"
     fi
 
-    # Build create parameters
+    # Build create parameters (using jq for safe JSON manipulation)
     local params
-    params=$(python3 -c "
-import json
-parent = {'${parent_type}': '${parent_value}'}
-properties = json.loads('${properties}')
-page = {'properties': properties}
-if '${content}':
-    page['content'] = '''${content}'''
-data = {
-    'parent': parent,
-    'pages': [page]
-}
-print(json.dumps(data))
-")
+    local page_obj
+
+    # Build page object
+    page_obj=$(jq -n --argjson properties "$properties" '{properties: $properties}')
+
+    # Add content if provided
+    if [[ -n "$content" ]]; then
+        page_obj=$(echo "$page_obj" | jq --arg content "$content" '. + {content: $content}')
+    fi
+
+    # Build final params
+    params=$(jq -n \
+        --arg parent_type "$parent_type" \
+        --arg parent_value "$parent_value" \
+        --argjson page "$page_obj" \
+        '{parent: {($parent_type): $parent_value}, pages: [$page]}')
 
     # Call MCP create
     local response

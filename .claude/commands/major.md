@@ -339,6 +339,13 @@ Branch: 009-ecommerce-platform (모든 Feature가 이 브랜치에서 작업)
 - 재사용성 체크 포함
 - Output: tasks.md
 
+**Step 5.5: Document Gate 검증** (자동)
+- 필수 문서 존재 확인: spec.md, plan.md, tasks.md
+- 문서 최소 크기 검증 (100 bytes 이상)
+- 검증 방법: `source .claude/lib/workflow-gates.sh && validate_document_gate "major" "<번호>" "<이름>"`
+- ⚠️ **Gate 실패 시 구현 단계 진행 불가** - 누락된 문서 먼저 작성 필요
+- Output: Gate 통과 여부
+
 **Step 6: 검증** (자동)
 - Constitution 준수 확인
 - Quality gate 정의 검증

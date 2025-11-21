@@ -4,14 +4,22 @@
 
 이 명령어가 실행될 때 반드시 다음 단계를 **순서대로** 따라야 합니다:
 
-1. git log와 git diff [base]...HEAD를 사용하여 초기 분석 수행
-2. 브랜치 변경사항 전체를 분석하여 영향 범위 파악
-3. PR 제목과 설명 생성 (Summary, Changes, Test Plan)
-4. AskUserQuestion을 사용하여 PR 생성 전 사용자 확인 받기
-5. 확인 후 gh pr create 실행
-6. **PR 생성 성공 시 Notion 마감일 및 상태 업데이트** (선택적 - 현재 작업 페이지가 있는 경우만)
+1. **⚠️ Base 브랜치 선택 (필수 - 반드시 AskUserQuestion 사용)**
+   - Epic 브랜치 존재 여부 자동 탐지 (`git branch -a | grep -E "^[0-9]{3}-"`)
+   - AskUserQuestion으로 반드시 사용자에게 물어보기:
+     - question: "PR의 base 브랜치를 선택하세요"
+     - header: "Base 브랜치"
+     - options: ["main", "develop", "<탐지된 Epic 브랜치>", "직접 입력"]
+   - "직접 입력" 선택 시 추가 질문으로 브랜치명 받기
+   - **이 단계는 절대 생략하지 마세요** - 컨텍스트로 추론하지 말고 반드시 물어보세요
+2. git log와 git diff [선택된 base]...HEAD를 사용하여 초기 분석 수행
+3. 브랜치 변경사항 전체를 분석하여 영향 범위 파악
+4. PR 제목과 설명 생성 (Summary, Changes, Test Plan)
+5. AskUserQuestion을 사용하여 PR 생성 전 사용자 확인 받기
+6. 확인 후 gh pr create --base [선택된 브랜치] 실행
+7. **PR 생성 성공 시 Notion 마감일 및 상태 업데이트** (선택적 - 현재 작업 페이지가 있는 경우만)
 
-**절대로 브랜치 분석 단계를 건너뛰지 마세요.**
+**절대로 Base 브랜치 선택 없이 PR을 생성하지 마세요.**
 
 ---
 

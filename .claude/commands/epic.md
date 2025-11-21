@@ -8,10 +8,13 @@
 2. 대화 맥락에서 epic 비전과 범위를 수집하세요
 3. 기능으로 분해하세요 (3-10개 기능)
 4. 재사용 가능한 아키텍처 패턴을 검색하세요
-5. **.specify/epics/NNN-epic-name/epic-plan.md 문서를 생성하세요**
-6. 기능 계획으로 진행하기 전에 사용자 승인을 기다리세요
+5. **.specify/epics/NNN-epic-name/ 디렉토리에 epic.md, roadmap.md 문서를 생성하세요**
+6. **Document Gate 검증**: 필수 문서(epic.md, roadmap.md) 존재 및 최소 크기(100 bytes) 확인
+   - 검증: `source .claude/lib/workflow-gates.sh && validate_document_gate "epic" "<번호>" "<이름>"`
+   - ⚠️ **Gate 실패 시 진행 불가**
+7. 기능 계획으로 진행하기 전에 사용자 승인을 기다리세요
 
-**절대로 epic-plan.md 생성 단계를 건너뛰지 마세요.**
+**절대로 문서 생성 및 Document Gate 검증 단계를 건너뛰지 마세요.**
 
 ---
 

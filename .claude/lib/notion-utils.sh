@@ -26,6 +26,35 @@ source "${SCRIPT_DIR}/common.sh"
 readonly NOTION_MCP_SERVER="notion-company"
 
 #━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# Validation Functions
+#━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# Validate JSON string format
+# Arguments:
+#   $1 - JSON string to validate
+# Returns:
+#   0 if valid JSON, 1 otherwise
+# Note:
+#   Complements validate_json() in common.sh which validates JSON files.
+#   This function validates in-memory JSON strings.
+validate_json_string() {
+    local json_str="$1"
+
+    if [[ -z "$json_str" ]]; then
+        log_error "JSON string cannot be empty"
+        return 1
+    fi
+
+    # Validate using Python's json.tool
+    if ! echo "$json_str" | python3 -m json.tool &>/dev/null; then
+        log_error "Invalid JSON string format"
+        return 1
+    fi
+
+    return 0
+}
+
+#━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # Low-Level MCP Functions
 #━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -50,6 +79,12 @@ call_notion_mcp() {
         return 1
     fi
 
+    # Validate JSON parameters
+    if ! validate_json_string "$params"; then
+        log_error "Invalid JSON parameters for MCP call"
+        return 1
+    fi
+
     # Call MCP tool via Claude SDK
     # Note: This is a placeholder - actual implementation depends on Claude SDK
     local response
@@ -60,7 +95,7 @@ call_notion_mcp() {
     fi
 
     # Validate JSON response
-    if ! echo "$response" | python3 -m json.tool &>/dev/null; then
+    if ! validate_json_string "$response"; then
         log_error "Invalid JSON response from Notion MCP"
         return 1
     fi
@@ -287,6 +322,7 @@ print(json.dumps(data))
 }
 
 # Export functions
+export -f validate_json_string
 export -f call_notion_mcp
 export -f search_notion_pages
 export -f fetch_notion_page

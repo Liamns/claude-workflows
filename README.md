@@ -40,6 +40,19 @@
 - /commit, /pr 명령어 안정성 강화
 - Notion 통합 보안 패치
 
+**📚 한글 문서화 강제 (Feature 003)**
+- Major 워크플로우 문서 자동 한글 검증
+- 한글 비율 자동 계산 (60% 이상 권장)
+- 검증 결과 실시간 보고 (✅ Pass / ⚠️ Warning / ❌ Error)
+- 자동 재생성 옵션 (최대 3회)
+- 코드/경로/URL 자동 제외
+```typescript
+// 검증 결과 예시
+✅ spec.md - 한글 비율: 78% (양호)
+⚠️ plan.md - 한글 비율: 52% (낮음, 수정 권장)
+❌ tasks.md - 한글 비율: 35% (불충분, 재생성 필요)
+```
+
 ### v3.3.2 - Slash Command UX Improvement
 
 **🎯 실행 흐름 강제화**

@@ -7,7 +7,9 @@
 1. **아직 코드를 작성하지 마세요**
 2. 대화 맥락에서 epic 비전과 범위를 수집하세요
 3. 기능으로 분해하세요 (3-10개 기능)
-4. 재사용 가능한 아키텍처 패턴을 검색하세요
+4. **.claude/commands-config/epic.yaml에 정의된 skills를 실행하세요**
+   - 현재 등록된 skills: reusability-enforcer
+   - 각 skill을 순서대로 Skill 도구로 실행
 5. **.specify/epics/NNN-epic-name/ 디렉토리에 epic.md, roadmap.md 문서를 생성하세요**
 6. **Document Gate 검증**: 필수 문서(epic.md, roadmap.md) 존재 및 최소 크기(100 bytes) 확인
    - 검증: `source .claude/lib/workflow-gates.sh && validate_document_gate "epic" "<번호>" "<이름>"`

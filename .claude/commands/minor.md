@@ -7,7 +7,9 @@
 1. **아직 코드를 작성하지 마세요**
 2. 대화 맥락에서 이슈 설명을 수집하세요
 3. 영향받는 파일을 읽어 근본 원인을 분석하세요
-4. reusability-enforcer skill을 사용하여 재사용 가능한 패턴을 검색하세요
+4. **.claude/commands-config/minor.yaml에 정의된 skills를 실행하세요**
+   - 현재 등록된 skills: bug-fix-pattern, reusability-enforcer
+   - 각 skill을 순서대로 Skill 도구로 실행
 5. **.specify/fixes/NNN-issue-name/fix-analysis.md 문서를 생성하세요**
 6. 구현하기 전에 사용자 승인을 기다리세요
 

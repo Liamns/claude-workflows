@@ -410,29 +410,62 @@ Branch: 009-ecommerce-platform (모든 Feature가 이 브랜치에서 작업)
 - 재사용 기회 제안
 - Output: plan.md에 재사용 권장사항 포함
 
-**Step 4: 설계 & 계획** (10-15분)
+**Step 4: 설계 & 계획** (5-8분, 80% 토큰 절감)
 
-- 기술 명세 생성 (spec.md)
-- 구현 계획 작성 (plan.md)
+- **템플릿 기반 문서 생성 (Epic 006 Feature 003)**:
+  ```bash
+  # 자동 생성 스크립트 사용 (9,000-14,000 토큰 → 2,300 토큰)
+  bash .claude/lib/doc-generator/generate-spec.sh \
+    --epic-id <epic-id> \
+    --feature-id <feature-id> \
+    --feature-name "<feature-name>" \
+    --priority P1 \
+    --duration "7일" \
+    --status Draft
+
+  bash .claude/lib/doc-generator/generate-plan.sh \
+    --epic-id <epic-id> \
+    --feature-id <feature-id> \
+    --feature-name "<feature-name>"
+  ```
+- LLM은 생성된 템플릿의 플레이스홀더만 채움 (변수 치환)
 - 품질 게이트 및 수용 기준 정의
 - Constitution 검증
-- Output: 완전한 설계 문서
+- Output: 완전한 설계 문서 (spec.md, plan.md)
 
-**Step 5: 작업 분해** (5-10분)
+**Step 5: 작업 분해** (3-5분, 80% 토큰 절감)
 
-- 구현을 User Story로 분해
-- 순차적, 테스트 가능한 작업 생성
+- **템플릿 기반 문서 생성 (Epic 006 Feature 003)**:
+  ```bash
+  # 자동 생성 스크립트 사용
+  bash .claude/lib/doc-generator/generate-tasks.sh \
+    --epic-id <epic-id> \
+    --feature-id <feature-id> \
+    --feature-name "<feature-name>"
+  ```
+- LLM은 생성된 템플릿의 User Story별 작업만 채움
+- 순차적, 테스트 가능한 작업 정의
 - 검증 단계 추가
 - 재사용성 체크 포함
 - Output: tasks.md
 
-**Step 5.5: Document Gate 검증** (자동)
+**Step 5.5: Document Gate 검증** (자동, Feature 005)
 
-- 필수 문서 존재 확인: spec.md, plan.md, tasks.md
-- 문서 최소 크기 검증 (100 bytes 이상)
-- 검증 방법: `source .claude/lib/workflow-gates.sh && validate_document_gate "major" "<번호>" "<이름>"`
-- ⚠️ **Gate 실패 시 구현 단계 진행 불가** - 누락된 문서 먼저 작성 필요
-- Output: Gate 통과 여부
+- **문서 존재 확인**: spec.md, plan.md, tasks.md
+- **플레이스홀더 감지**: {placeholder}, TODO:, FIXME: 마커 검출 (코드 블록 제외)
+- **필수 섹션 검증**: 각 문서의 required sections 확인
+- 검증 방법:
+  ```bash
+  bash .claude/lib/document-gate/document-gate.sh \
+    .specify/features/<번호>-<이름>/
+  ```
+- ⚠️ **Gate 실패 시 구현 단계 진행 불가** - 검증 오류 해결 필요
+- Exit codes:
+  - 0: 통과 (구현 진행 가능)
+  - 1: 파일 누락 (파일 생성 필요)
+  - 2: 플레이스홀더 발견 (내용 완성 필요)
+  - 3: 필수 섹션 누락 (섹션 추가 필요)
+- Output: 검증 리포트 및 Gate 통과 여부
 
 **Step 5.6: 한글 비율 검증** (자동)
 

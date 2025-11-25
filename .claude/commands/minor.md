@@ -284,6 +284,10 @@ Minor 워크플로우(workflow)는 4개의 통합 에이전트(agent)를 사용�
 - 출력: fix-analysis.md
 
 **단계 5: 검증 (자동)**
+- **문서 완성도 검증**: fix-analysis.md가 완전히 작성되었는지 확인
+  - 모든 필수 섹션 존재 확인 (Issue, Root Cause, Solution, Tasks, etc.)
+  - {placeholder}, TODO:, FIXME: 마커가 남아있지 않은지 확인
+  - ⚠️ **미완성 문서는 구현 전 반드시 완성 필요**
 - Constitution 준수 확인
 - Breaking change 없음 검증
 - 최소 범위 보장

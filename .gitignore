@@ -68,3 +68,4 @@ todos.md
 # Archived unused files
 .claude/deprecated/
 *.backup
+.claude/cache/project-index.json

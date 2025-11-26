@@ -44,23 +44,38 @@ VERBOSE=false
 
 # 제외할 디렉토리 패턴
 EXCLUDE_DIRS=(
+    # 백업/캐시
     ".claude/.backup"
     ".claude/cache"
     ".claude/commands/_backup"
     ".claude/command/.backup"
     ".claude/agents/_deprecated"
     ".claude/deprecated"
+
+    # 테스트 디렉토리 (개발용, 설치 불필요)
     ".claude/__tests__"
     ".claude/lib/__tests__"
     ".claude/architectures/__tests__"
     ".claude/agents/code-reviewer/__tests__"
+    ".claude/lib/architecture/__tests__"
+    ".claude/lib/document-gate/__tests__"
+    ".claude/lib/reusability/__tests__"
+
+    # 런타임 디렉토리
     ".claude/hooks"
     ".claude/metrics"
+
+    # 프로젝트 고유 문서 (설치 불필요)
+    ".specify/epics"
     ".specify/specs"
     ".specify/features"
     ".specify/fixes"
     ".specify/temp"
     ".specify/memory"
+    ".claude/specs"
+    ".claude/test"
+
+    # IDE/시스템
     ".git"
     ".vscode"
     ".idea"
@@ -70,6 +85,7 @@ EXCLUDE_DIRS=(
 
 # 제외할 파일 패턴
 EXCLUDE_FILES=(
+    # 임시/백업 파일
     "*.log"
     "*.tmp"
     "*.bak"
@@ -78,10 +94,23 @@ EXCLUDE_FILES=(
     "*.swo"
     "*~"
     "*.local.json"
+
+    # Deprecated 파일
+    "*.deprecated"
+
+    # 디렉토리 유지용 빈 파일
+    ".gitkeep"
+
+    # 시스템 파일
     ".DS_Store"
     "Thumbs.db"
+
+    # 버전/체크섬 관리 파일
     ".claude/.version"
     ".claude/.checksums.json.backup"
+
+    # 빈 파일 (특정)
+    ".claude/agents/code-reviewer/lib/types.ts"
 )
 
 # ════════════════════════════════════════════════════════════════════════════

@@ -22,7 +22,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/common.sh"
 source "${SCRIPT_DIR}/notion-utils.sh"
 source "${SCRIPT_DIR}/notion-config.sh"
-source "${SCRIPT_DIR}/ask-user-question-adapter.sh"
+# ask-user-question-adapter.sh 제거됨 - Claude가 직접 AskUserQuestion 도구 사용
 
 # Maximum number of search results to return (AskUserQuestion limit: 4)
 readonly MAX_SEARCH_RESULTS=4
@@ -292,16 +292,22 @@ for item in data[:${MAX_SEARCH_RESULTS}]:
         return 1
     fi
 
-    # Convert to AskUserQuestion format using adapter
-    local question_json
-    if ! question_json=$(convert_shell_menu_to_askuserquestion \
-        "$question_text" \
-        "$header_text" \
-        "false" \
-        "${options_array[@]}"); then
-        log_error "Failed to convert to AskUserQuestion format" >&2
-        return 1
-    fi
+    # JSON 형식으로 직접 변환 (adapter 제거됨)
+    local options_json="["
+    local first=true
+    for opt in "${options_array[@]}"; do
+        local label="${opt%%|*}"
+        local desc="${opt#*|}"
+        if [[ "$first" == "true" ]]; then
+            first=false
+        else
+            options_json+=","
+        fi
+        options_json+="{\"label\":\"$label\",\"description\":\"$desc\"}"
+    done
+    options_json+="]"
+
+    local question_json="{\"question\":\"$question_text\",\"header\":\"$header_text\",\"multiSelect\":false,\"options\":$options_json}"
 
     log_success "Converted ${#options_array[@]} results to AskUserQuestion format" >&2
     echo "$question_json"

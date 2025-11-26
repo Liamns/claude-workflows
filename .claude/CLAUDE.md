@@ -78,24 +78,20 @@ AskUserQuestion 도구 호출:
 
 ---
 
-## 4. 워크플로우 규칙
+## 4. Compact 후 작업 연속성 규칙
 
-### 진입점
-새로운 작업은 **/triage로 시작**합니다.
-- 복잡도 분석 수행
-- 적절한 워크플로우 자동 추천
-- 직접 /plan-major, /implement 실행은 지양
+Compact(자동/수동) 발생 후에는 **반드시 compact된 history를 확인**합니다.
 
-### Epic 하위 작업
-Epic 하위 Feature는 **브랜치 생성 안 함**:
-- Epic 브랜치 내에서 작업
-- 디렉토리: `.specify/epics/{epic-id}/features/{feature-id}/`
-- /plan-major 실행 시 브랜치 생성 로직 확인
+### 확인 절차
+1. Compact 감지 시 즉시 history 요약 확인
+2. 진행 중이던 작업/단계 파악
+3. TodoWrite로 남은 작업 재구성
+4. 중단된 지점부터 이어서 진행
 
-### 독립 Feature
-독립 Feature는 **브랜치 생성**:
-- 디렉토리: `.specify/features/{feature-id}/`
-- 브랜치명: `{feature-id}-{feature-name}`
+### 금지 사항
+- History 확인 없이 새 작업 시작
+- 이전 컨텍스트 무시하고 처음부터 재시작
+- Compact 전 진행 중이던 작업 방치
 
 ---
 
@@ -132,6 +128,7 @@ PostHook이 있는 명령어는 다음을 준수합니다.
 | 문서 생성 후 | 사용자 확인 없이 다음 단계 |
 | Critical Rules 섹션 | 건너뛰기 |
 | PostHook 있는 명령어 | 미완성 문서로 종료 |
+| Compact 발생 후 | History 확인 없이 새 작업 시작 |
 
 ---
 

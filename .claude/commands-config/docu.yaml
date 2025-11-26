@@ -1,0 +1,187 @@
+# Docu Commands Configuration
+# 기능 명세서 기반 작업 관리 (docu-start, docu-list, docu-update, docu-close, docu-switch)
+
+extends: "_base.yaml"
+
+# ============================================================================
+# COMMAND INFO
+# ============================================================================
+
+command: "docu"
+type: "hybrid"
+description: "Notion 기능 명세서 데이터베이스 기반 작업 관리"
+
+# ============================================================================
+# NOTION INTEGRATION
+# ============================================================================
+
+notion:
+  # 데이터 소스 (채널별)
+  data_sources:
+    hwaju:
+      id: "2ac47c08-6985-811b-a177-000b9ea43547"
+      url: "collection://2ac47c08-6985-811b-a177-000b9ea43547"
+      name: "화주"
+      description: "화주 앱 기능 명세서 (프로젝트 스펙)"
+
+    admin:
+      id: "35d8c49c-a343-4bb4-a62a-8a418b8abca5"
+      url: "collection://35d8c49c-a343-4bb4-a62a-8a418b8abca5"
+      name: "어드민"
+      description: "어드민 WEB 기능정의서"
+
+  # 속성 매핑
+  property_mapping:
+    title: "기능명"
+    priority: "우선순위"
+    status: "진행현황"
+    channel: "채널"
+    feature_group: "기능그룹"
+    start_date: "시작일"
+    end_date: "완료일"
+    assignee: "담당자"
+
+  # 우선순위 옵션
+  priority_options:
+    - name: "P0"
+      color: "red"
+      description: "긴급 - 즉시 처리"
+    - name: "P1"
+      color: "orange"
+      description: "높음 - 이번 스프린트"
+    - name: "P2"
+      color: "yellow"
+      description: "보통 - 다음 스프린트"
+    - name: "P3"
+      color: "green"
+      description: "낮음 - 백로그"
+
+  # 진행현황 옵션
+  status_options:
+    - name: "대기"
+      group: "to_do"
+      description: "작업 대기 중"
+    - name: "개발중"
+      group: "in_progress"
+      description: "개발 진행 중"
+    - name: "완료"
+      group: "complete"
+      description: "개발 완료"
+    - name: "보류"
+      group: "on_hold"
+      description: "일시 보류"
+
+  # 채널 옵션
+  channel_options:
+    - name: "화주"
+      data_source: "hwaju"
+    - name: "어드민"
+      data_source: "admin"
+
+# ============================================================================
+# LOCAL CACHE
+# ============================================================================
+
+cache:
+  active_tasks_file: ".claude/cache/active-tasks.json"
+  max_active_tasks: 10
+  auto_cleanup: true
+
+# ============================================================================
+# PROMPTS (AskUserQuestion 설정)
+# ============================================================================
+
+prompts:
+  feature_selection:
+    question: "어떤 기능을 작업하시겠습니까?"
+    header: "Feature"
+    multiSelect: false
+    max_options: 4
+
+  channel_selection:
+    question: "어떤 채널의 기능입니까?"
+    header: "채널"
+    multiSelect: false
+    options:
+      - label: "화주"
+        description: "화주 앱 기능"
+      - label: "어드민"
+        description: "어드민 WEB 기능"
+
+  priority_selection:
+    question: "우선순위를 선택하세요"
+    header: "Priority"
+    multiSelect: false
+    options:
+      - label: "P0"
+        description: "긴급 - 즉시 처리"
+      - label: "P1"
+        description: "높음 - 이번 스프린트"
+      - label: "P2"
+        description: "보통 - 다음 스프린트"
+      - label: "P3"
+        description: "낮음 - 백로그"
+
+  notion_update_confirmation:
+    question: "Notion 페이지를 업데이트하시겠습니까?"
+    header: "Notion"
+    multiSelect: false
+    options:
+      - label: "업데이트"
+        description: "시작일, 진행현황을 '개발중'으로 변경"
+      - label: "스킵"
+        description: "Notion 업데이트 없이 진행"
+
+  next_action:
+    question: "다음 작업을 선택하세요"
+    header: "Next"
+    multiSelect: false
+    options:
+      - label: "/triage"
+        description: "작업 분류 및 워크플로우 선택"
+      - label: "/docu-list"
+        description: "활성 작업 목록 확인"
+      - label: "나중에"
+        description: "이 단계에서 종료"
+
+# ============================================================================
+# DISPLAY
+# ============================================================================
+
+display:
+  priority_icons:
+    P0: "🔴"
+    P1: "🟠"
+    P2: "🟡"
+    P3: "🟢"
+
+  status_icons:
+    "대기": "⬜"
+    "개발중": "🔵"
+    "완료": "✅"
+    "보류": "⏸️"
+
+  channel_icons:
+    "화주": "📦"
+    "어드민": "🖥️"
+
+# ============================================================================
+# SUPPORTING SCRIPTS
+# ============================================================================
+
+supporting_scripts:
+  - path: ".claude/lib/notion-utils.sh"
+    description: "Notion API 유틸리티"
+  - path: ".claude/lib/notion-active-tasks.sh"
+    description: "활성 작업 관리"
+  - path: ".claude/lib/notion-search.sh"
+    description: "Notion 검색 유틸리티"
+
+# ============================================================================
+# RATE LIMITING
+# ============================================================================
+
+rate_limiting:
+  enabled: true
+  requests_per_second: 3
+  delay_ms: 400

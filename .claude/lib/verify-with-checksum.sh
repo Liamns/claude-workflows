@@ -437,5 +437,136 @@ retry_failed_files() {
 }
 
 # ════════════════════════════════════════════════════════════════════════════
+# T023: 체크섬에 없는 파일 정리
+# ════════════════════════════════════════════════════════════════════════════
+
+# 체크섬 매니페스트에 없는 .claude/ 내부 파일을 찾아서 삭제합니다.
+# 레거시 파일 자동 정리에 사용됩니다.
+#
+# @param $1 dry_run (true: 실제 삭제 안함, false: 실제 삭제)
+# @return 0 성공, 1 실패
+#
+# @example
+#   cleanup_orphan_files true   # 삭제 대상 미리보기
+#   cleanup_orphan_files false  # 실제 삭제
+cleanup_orphan_files() {
+    local dry_run="${1:-true}"
+
+    echo ""
+    echo "════════════════════════════════════════════════════════════════"
+    echo "체크섬에 없는 파일 정리"
+    if [[ "$dry_run" == "true" ]]; then
+        echo "(미리보기 모드 - 실제 삭제하지 않음)"
+    fi
+    echo "════════════════════════════════════════════════════════════════"
+    echo ""
+
+    # 매니페스트 확인
+    if [[ ! -f "$CHECKSUM_MANIFEST" ]]; then
+        echo "오류: 체크섬 매니페스트를 찾을 수 없습니다: $CHECKSUM_MANIFEST" >&2
+        return 1
+    fi
+
+    # 매니페스트에서 파일 목록 추출
+    local manifest_files=()
+    local manifest_data
+    if ! manifest_data=$(parse_checksum_manifest "$CHECKSUM_MANIFEST"); then
+        echo "오류: 매니페스트 파싱 실패" >&2
+        return 1
+    fi
+
+    while IFS='=' read -r file_path _; do
+        manifest_files+=("$file_path")
+    done <<< "$manifest_data"
+
+    # .checksums.json 자체도 매니페스트 파일 목록에 추가
+    manifest_files+=(".claude/.checksums.json")
+
+    # 보존할 디렉토리/파일 패턴 (동적으로 생성되거나 사용자 설정)
+    local preserve_patterns=(
+        ".claude/cache/*"
+        ".claude/.backup/*"
+        ".claude/settings.local.json"
+        ".claude/.version"
+        ".claude/config/*.local.*"
+    )
+
+    # .claude/ 내의 모든 파일 찾기
+    local orphan_files=()
+    local orphan_count=0
+
+    while IFS= read -r -d '' file; do
+        local relative_path="${file#./}"
+
+        # 매니페스트에 있는지 확인
+        local in_manifest=false
+        for manifest_file in "${manifest_files[@]}"; do
+            if [[ "$relative_path" == "$manifest_file" ]]; then
+                in_manifest=true
+                break
+            fi
+        done
+
+        # 보존 패턴 확인
+        local should_preserve=false
+        if [[ "$in_manifest" == "false" ]]; then
+            for pattern in "${preserve_patterns[@]}"; do
+                if [[ "$relative_path" == $pattern ]]; then
+                    should_preserve=true
+                    break
+                fi
+            done
+        fi
+
+        # 삭제 대상인 경우
+        if [[ "$in_manifest" == "false" && "$should_preserve" == "false" ]]; then
+            orphan_files+=("$relative_path")
+            ((orphan_count++))
+        fi
+    done < <(find .claude -type f -print0 2>/dev/null)
+
+    # 결과 출력
+    if [[ $orphan_count -eq 0 ]]; then
+        echo "✅ 체크섬에 없는 파일 없음 (정리 완료)"
+        echo "════════════════════════════════════════════════════════════════"
+        return 0
+    fi
+
+    echo "발견된 체크섬에 없는 파일: ${orphan_count}개"
+    echo ""
+
+    for file in "${orphan_files[@]}"; do
+        if [[ "$dry_run" == "true" ]]; then
+            echo "  [삭제 예정] $file"
+        else
+            if rm -f "$file" 2>/dev/null; then
+                echo "  ✓ 삭제됨: $file"
+            else
+                echo "  ✗ 삭제 실패: $file"
+            fi
+        fi
+    done
+
+    # 빈 디렉토리 정리
+    if [[ "$dry_run" == "false" ]]; then
+        echo ""
+        echo "빈 디렉토리 정리 중..."
+        find .claude -type d -empty -delete 2>/dev/null || true
+    fi
+
+    echo ""
+    echo "────────────────────────────────────────────────────────────────"
+    if [[ "$dry_run" == "true" ]]; then
+        echo "⚠️  미리보기 완료. 실제 삭제하려면:"
+        echo "   cleanup_orphan_files false"
+    else
+        echo "✅ 정리 완료: ${orphan_count}개 파일 삭제됨"
+    fi
+    echo "════════════════════════════════════════════════════════════════"
+
+    return 0
+}
+
+# ════════════════════════════════════════════════════════════════════════════
 # END OF FILE
 # ════════════════════════════════════════════════════════════════════════════

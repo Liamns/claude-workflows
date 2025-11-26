@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.1.0] - 2025-11-26
+
+### Added
+- **채널 선택 옵션** (`--web`/`--admin`)
+  - `/docu-start`, `/docu-list`, `/docu-switch`, `/docu-update` 명령어에 데이터베이스 직접 선택 옵션 추가
+  - 옵션 미입력 시 AskUserQuestion으로 채널 선택 안내
+  - 화주 (hwaju) / 어드민 (admin) 데이터 소스 매핑
+
+- **작업 로그 자동 생성**
+  - `/docu-update` 실행 시 '작업 로그' 서브페이지 자동 확인/생성
+  - 표 구조: 커밋ID | 핵심작업내용 | 작업날짜
+  - Notion API 에러 시 재시도 로직 및 로컬 캐시 fallback
+
+- **`--today` 옵션** (Git 커밋 자동 분석)
+  - `/docu-update --today`: Git 커밋 분석 → 작업 로그 자동 업데이트
+  - `/tracker --today`: Git 커밋 분석 → 이슈 자동 생성
+  - 다중 작업자 감지 시 AskUserQuestion으로 선택
+  - 커밋 없음 시 날짜 범위 선택 UI 제공
+  - 기능 매칭 알고리즘 (Conventional Commit scope 기반)
+  - 중복 커밋 방지 로직
+
+### Changed
+- `.claude/commands-config/docu.yaml`: CLI 옵션 정의 추가
+- 모든 `/docu-*` 명령어 문서 업데이트
+
+### Compatibility
+- 기존 명령어 사용법 100% 호환
+- Breaking Changes 없음
+
 ## [4.0.0] - 2025-11-26
 
 ### Added

@@ -12,6 +12,28 @@ type: "hybrid"
 description: "Notion 기능 명세서 데이터베이스 기반 작업 관리"
 
 # ============================================================================
+# CLI OPTIONS
+# ============================================================================
+
+cli_options:
+  channel:
+    # --web: 화주 데이터베이스
+    web:
+      flag: "--web"
+      data_source: "hwaju"
+      description: "화주 앱 기능 명세서"
+    # --admin: 어드민 데이터베이스
+    admin:
+      flag: "--admin"
+      data_source: "admin"
+      description: "어드민 WEB 기능정의서"
+
+  today:
+    flag: "--today"
+    description: "오늘 Git 커밋 기반 작업 내역 자동 정리"
+    requires_git: true
+
+# ============================================================================
 # NOTION INTEGRATION
 # ============================================================================
 

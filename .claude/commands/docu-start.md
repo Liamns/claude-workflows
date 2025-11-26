@@ -34,16 +34,50 @@ ACTIVE_TASKS=".claude/cache/active-tasks.json"
 ## Usage
 
 ```bash
-/docu-start [keyword]        # 키워드로 검색 후 작업 시작
-/docu-start --add [name]     # 새 기능정의서 추가
-/docu-start --search [query] # 검색만 (작업 시작 안 함)
+/docu-start [keyword]              # 키워드로 검색 후 작업 시작 (채널 선택 필요)
+/docu-start --web [keyword]        # 화주 데이터베이스에서 검색
+/docu-start --admin [keyword]      # 어드민 데이터베이스에서 검색
+/docu-start --add [name]           # 새 기능정의서 추가
+/docu-start --search [query]       # 검색만 (작업 시작 안 함)
 ```
+
+### 채널 옵션
+
+| 옵션 | 데이터베이스 | 설명 |
+|------|-------------|------|
+| `--web` | hwaju | 화주 앱 기능 명세서 |
+| `--admin` | admin | 어드민 WEB 기능정의서 |
+| (없음) | - | AskUserQuestion으로 선택 |
 
 ## Workflow: 기본 모드
 
+### Step 0: 채널 선택 (옵션 미입력 시)
+
+`--web` 또는 `--admin` 옵션이 없으면 AskUserQuestion으로 채널 선택:
+
+```
+AskUserQuestion 도구 호출:
+- question: "어떤 채널에서 작업하시겠습니까?"
+- header: "채널"
+- options:
+  - label: "화주 (--web)"
+    description: "화주 앱 기능 명세서"
+  - label: "어드민 (--admin)"
+    description: "어드민 WEB 기능정의서"
+```
+
+선택에 따라 데이터 소스 결정:
+```bash
+# 화주 선택 시
+ds_id="2ac47c08-6985-811b-a177-000b9ea43547"
+
+# 어드민 선택 시
+ds_id="35d8c49c-a343-4bb4-a62a-8a418b8abca5"
+```
+
 ### Step 1: Notion 검색
 
-키워드로 기능 명세서 데이터베이스 검색:
+키워드로 기능 명세서 데이터베이스 검색 (선택된 채널에서):
 
 ```bash
 source .claude/lib/notion-utils.sh

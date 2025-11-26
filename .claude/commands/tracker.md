@@ -49,6 +49,7 @@ PROP_TAG="Tag"
 | `update` | 상태 업데이트 |
 | `assign` | 담당자 배정 |
 | `close` | 완료 처리 |
+| `--today` | 오늘 Git 커밋 기반 이슈 일괄 생성 |
 
 ---
 
@@ -235,6 +236,116 @@ PROP_TAG="Tag"
      --data '{"page_id": "'"$page_id"'", "command": "update_properties", "properties": {"Status": "Done", "date:End date:start": "'"$end_date"'"}}'
    ```
 3. **결과 출력**: 완료 메시지
+
+---
+
+## Action: --today
+
+**오늘 Git 커밋을 분석하여 이슈를 일괄 생성합니다.**
+
+```bash
+/tracker --today
+```
+
+### Workflow
+
+#### Step 1: 커밋 없음 확인
+
+```bash
+commit_count=$(git log --since="today 00:00" --oneline | wc -l)
+```
+
+**커밋이 0개인 경우:**
+```
+AskUserQuestion 도구 호출:
+- question: "오늘 커밋이 없습니다. 다른 날짜 범위를 선택하시겠습니까?"
+- header: "날짜"
+- options:
+  - label: "어제 커밋"
+    description: "--since='yesterday 00:00'"
+  - label: "이번 주"
+    description: "--since='1 week ago'"
+  - label: "취소"
+    description: "명령어 종료"
+```
+
+#### Step 2: 작업자 확인
+
+```bash
+git log --since="today 00:00" --format="%an" | sort -u
+```
+
+**작업자가 2명 이상인 경우:**
+```
+AskUserQuestion 도구 호출:
+- question: "오늘 여러 작업자의 커밋이 있습니다. 어떤 작업자의 내용을 정리하시겠습니까?"
+- header: "작업자"
+- options:
+  - label: "{작업자1}"
+    description: "{N}개 커밋"
+  - label: "{작업자2}"
+    description: "{M}개 커밋"
+  - label: "전체"
+    description: "모든 작업자 ({총합}개 커밋)"
+```
+
+#### Step 3: Git 커밋 수집
+
+```bash
+git log --since="today 00:00" --author="$author" --format="%h|%s|%ad" --date=short
+```
+
+#### Step 4: 커밋 타입별 Tag 매핑
+
+| 커밋 타입 | Tag |
+|----------|-----|
+| `fix:` | Bug |
+| `feat:` | Feature |
+| `refactor:` | Refatoring |
+| 기타 | Issue |
+
+#### Step 5: 이슈 일괄 생성
+
+각 커밋에 대해:
+
+```bash
+# KST 날짜
+start_date=$(TZ=Asia/Seoul date +%Y-%m-%d)
+
+# 커밋 메시지에서 타입 제거하여 제목 추출
+# 예: "feat(login): 버튼 추가" → "버튼 추가"
+title=$(echo "$commit_msg" | sed 's/^[^:]*: //')
+
+# Notion 페이지 생성
+mcp__notion-personal__notion-create-pages \
+  --parent '{"data_source_id": "2ad47c08-6985-8016-b033-000bdcffaec7"}' \
+  --pages '[{
+    "properties": {
+      "Project name": "'"$title"'",
+      "Status": "Not started",
+      "Priority": "Medium",
+      "Tag": "[\"'"$tag"'\"]",
+      "date:Start date:start": "'"$start_date"'"
+    }
+  }]'
+```
+
+#### Step 6: 결과 출력
+
+```
+✅ 오늘 이슈 일괄 생성 완료!
+
+📊 처리 결과
+- 분석된 커밋: {N}개
+- 생성된 이슈: {M}개
+
+📝 생성된 이슈:
+- 🐛 [Bug] 로그인 버튼 오류 수정
+- ✨ [Feature] 회원가입 UI 추가
+- 🔧 [Refatoring] API 클라이언트 정리
+
+💡 '/tracker list'로 전체 목록을 확인하세요.
+```
 
 ---
 

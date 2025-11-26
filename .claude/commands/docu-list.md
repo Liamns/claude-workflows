@@ -29,10 +29,20 @@ ACTIVE_TASKS=".claude/cache/active-tasks.json"
 ## Usage
 
 ```bash
-/docu-list              # 기본 목록
-/docu-list --recommend  # 다음 작업 추천 포함
-/docu-list --summary    # 요약 형식
+/docu-list                    # 기본 목록 (전체 채널)
+/docu-list --web              # 화주 채널만 표시
+/docu-list --admin            # 어드민 채널만 표시
+/docu-list --recommend        # 다음 작업 추천 포함
+/docu-list --summary          # 요약 형식
 ```
+
+### 채널 필터 옵션
+
+| 옵션 | 설명 |
+|------|------|
+| `--web` | 화주 채널 작업만 표시 |
+| `--admin` | 어드민 채널 작업만 표시 |
+| (없음) | 전체 채널 표시 |
 
 ---
 

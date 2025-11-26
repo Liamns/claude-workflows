@@ -1,6 +1,6 @@
 # 🤖 Claude Workflows
 
-[![Version](https://img.shields.io/badge/version-4.0.0-blue.svg)](https://github.com/Liamns/claude-workflows)
+[![Version](https://img.shields.io/badge/version-4.1.0-blue.svg)](https://github.com/Liamns/claude-workflows)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-purple.svg)](https://claude.ai/code)
 [![Validation](https://img.shields.io/badge/validation-automated-success.svg)](https://github.com/Liamns/claude-workflows)
@@ -10,6 +10,21 @@
 **📖 새로운 Claude 세션?** → [프로젝트 컨텍스트 문서](.claude/docs/PROJECT-CONTEXT.md) (5분이면 전체 파악)
 
 ## 🆕 최신 기능
+
+### v4.1.0 - /docu-* 명령어 시스템 업그레이드
+
+**🎯 채널 선택 옵션** (`--web`/`--admin`)
+- 모든 `/docu-*` 명령어에서 데이터베이스 직접 선택 가능
+- 옵션 미입력 시 AskUserQuestion으로 안내
+
+**📝 작업 로그 자동 생성**
+- `/docu-update` 실행 시 '작업 로그' 서브페이지 자동 생성
+- 커밋ID, 핵심작업내용, 작업날짜 표 구조
+
+**⚡ `--today` 옵션**
+- `/docu-update --today`: Git 커밋 분석 → 작업 로그 자동 업데이트
+- `/tracker --today`: Git 커밋 분석 → 이슈 자동 생성
+- 다중 작업자 감지 시 선택 UI 제공
 
 ### v4.0.0 - Legacy Cleanup & Streamlined Architecture
 
@@ -25,11 +40,6 @@
 - CLAUDE.md 프로젝트 레벨 규칙 통합
 - 문서 완성도 자동 검증
 
-**🎯 6개 도메인 전문 Skill 추가**
-- 에이전트별 Skill 참조 섹션 구조화
-- 문서 생성 도구 자동화
-- 도메인별 전문 가이드라인 적용
-
 ### v3.5.0 - 통합 명령어 시스템
 
 **📝 /docu - Notion 문서 통합 관리**
@@ -41,17 +51,6 @@
 - Projects 데이터베이스 연동
 - 5개 액션: `add`, `list`, `update`, `assign`, `close`
 - Tag 기반 관리: Issue, Bug, Feature, Refactoring
-
-### v3.3.2 - Slash Command UX Improvement
-
-**🎯 실행 흐름 강제화**
-- CRITICAL INSTRUCTIONS: 모든 슬래시 커맨드에 실행 순서 가이드 추가
-- 타입 시스템: Workflow/Utility/Hybrid 명령어 자동 분류
-- 명령어 추천: 완료 후 다음 단계 자동 추천 시스템
-
-**🧹 코드 정리**
-- 12,765줄 삭제: 사용하지 않는 테스트 파일 및 deprecated 모듈 제거
-- 코드베이스 40% 감소: 유지보수성 및 성능 향상
 
 ## 🚀 Quick Start
 
@@ -336,4 +335,4 @@ MIT License - 자유롭게 사용, 수정, 배포 가능
 
 ---
 
-**v4.0.0** | [GitHub](https://github.com/Liamns/claude-workflows) | Made with ❤️ for Claude Code
+**v4.1.0** | [GitHub](https://github.com/Liamns/claude-workflows) | Made with ❤️ for Claude Code

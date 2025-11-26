@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Claude Code Workflows Installer
-# Version: 4.0.0 - Legacy Cleanup & Streamlined Architecture
+# Version: 4.1.0 - /docu-* 명령어 시스템 업그레이드
 
 set -e
 
@@ -20,8 +20,8 @@ if [ -f "$SCRIPT_DIR/.claude/.version" ]; then
     TARGET_VERSION="$VERSION_FROM_FILE"
 else
     # Fallback to hardcoded version
-    INSTALLER_VERSION="4.0.0"
-    TARGET_VERSION="4.0.0"
+    INSTALLER_VERSION="4.1.0"
+    TARGET_VERSION="4.1.0"
 fi
 
 # Repository Configuration

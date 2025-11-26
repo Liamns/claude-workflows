@@ -30,9 +30,19 @@ CURRENT_PAGE=".claude/cache/current-notion-page.txt"
 ## Usage
 
 ```bash
-/docu-switch <N>          # N번 작업으로 전환
-/docu-switch --interactive # 목록에서 선택
+/docu-switch <N>              # N번 작업으로 전환
+/docu-switch --interactive    # 목록에서 선택
+/docu-switch --web            # 화주 채널 작업만 표시
+/docu-switch --admin          # 어드민 채널 작업만 표시
 ```
+
+### 채널 필터 옵션
+
+| 옵션 | 설명 |
+|------|------|
+| `--web` | 화주 채널 작업만 표시 |
+| `--admin` | 어드민 채널 작업만 표시 |
+| (없음) | 전체 채널 표시 |
 
 ---
 

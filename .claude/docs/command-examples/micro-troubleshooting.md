@@ -818,6 +818,6 @@ Micro → Major:
 
 ---
 
-**Version**: 3.3.2
+**Version**: 4.0.0
 **Last Updated**: 2025-11-18
 **See Also**: [micro.md](../micro.md), [micro-examples.md](micro-examples.md)

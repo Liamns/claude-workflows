@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft-07/schema#",
-  "version": "3.3.2",
+  "version": "4.0.0",
   "description": "워크플로우별 품질 게이트 설정",
   "note": "이 파일은 Workflow 명령어(epic, major, minor, micro)의 품질 게이트만 정의합니다. Utility 명령어 설정은 .claude/commands-config/*.yaml에 정의됩니다.",
   "workflows": {

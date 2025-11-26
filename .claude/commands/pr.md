@@ -432,5 +432,5 @@ URL: https://github.com/user/repo/pull/42
 
 ---
 
-**Version**: 3.5.0
+**Version**: 4.0.0
 **Last Updated**: 2025-11-21

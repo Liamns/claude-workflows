@@ -20,8 +20,8 @@ if [ -f "$SCRIPT_DIR/.claude/.version" ]; then
     TARGET_VERSION="$VERSION_FROM_FILE"
 else
     # Fallback to hardcoded version
-    INSTALLER_VERSION="3.5.0"
-    TARGET_VERSION="3.5.0"
+    INSTALLER_VERSION="4.0.0"
+    TARGET_VERSION="4.0.0"
 fi
 
 # Repository Configuration
@@ -1040,6 +1040,17 @@ install_workflows() {
                     verification_passed=true
                     print_success "All files recovered successfully!"
                     log_to_file "File recovery: SUCCESS"
+
+                    # Recovery 후에도 레거시 파일 정리 실행
+                    echo ""
+                    print_info "체크섬에 없는 레거시 파일 정리 중..."
+                    if cleanup_orphan_files false; then
+                        print_success "레거시 파일 정리 완료"
+                        log_to_file "Orphan files cleanup: COMPLETED (after recovery)"
+                    else
+                        print_warning "레거시 파일 정리 중 일부 오류 발생 (설치는 계속됨)"
+                        log_to_file "Orphan files cleanup: PARTIAL (after recovery)"
+                    fi
                 else
                     print_error "File recovery failed"
                     log_to_file "File recovery: FAILED"
@@ -1055,6 +1066,22 @@ install_workflows() {
             print_info "Running basic file verification..."
             if verify_installation; then
                 verification_passed=true
+
+                # 체크섬 시스템이 없어도 레거시 파일 정리 시도
+                # (새로 설치된 파일에 체크섬 시스템이 있으면 사용)
+                if [ -f "$TARGET_DIR/.claude/.checksums.json" ] && [ -f "$TARGET_DIR/.claude/lib/verify-with-checksum.sh" ]; then
+                    print_info "체크섬 기반 레거시 파일 정리 중..."
+                    pushd "$TARGET_DIR" > /dev/null
+                    source "$TARGET_DIR/.claude/lib/verify-with-checksum.sh"
+                    if cleanup_orphan_files false; then
+                        print_success "레거시 파일 정리 완료"
+                        log_to_file "Orphan files cleanup: COMPLETED (basic verification mode)"
+                    else
+                        print_warning "레거시 파일 정리 중 일부 오류 발생"
+                        log_to_file "Orphan files cleanup: PARTIAL (basic verification mode)"
+                    fi
+                    popd > /dev/null
+                fi
             fi
         fi
 

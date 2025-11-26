@@ -116,7 +116,7 @@ bash .claude/lib/generate-checksums.sh -o .claude/.checksums.json --verbose
 
 # 출력 예시
 # ✓ Checksum manifest generated: .claude/.checksums.json
-#   Version: 3.3.1
+#   Version: 4.0.0
 #   Files: 240
 #   Generated at: 2025-01-18T10:00:00Z
 ```
@@ -160,7 +160,7 @@ bash .claude/lib/generate-checksums.sh -o .claude/.checksums.json --verbose
 /tracker add       # 프로젝트/이슈 추가
 /tracker list      # 프로젝트 목록 조회
 
-# 🗄️ Database Tools (v3.3.1)
+# 🗄️ Database Tools (v4.0.0)
 /db-sync           # Production → Development DB 동기화
 /prisma-migrate    # Prisma 스키마 자동 마이그레이션
 ```

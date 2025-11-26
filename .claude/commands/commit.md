@@ -390,5 +390,5 @@ bash .claude/hooks/install-hooks.sh
 
 ---
 
-**Version**: 3.3.2
+**Version**: 4.0.0
 **Last Updated**: 2025-11-18

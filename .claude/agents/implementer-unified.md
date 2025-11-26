@@ -197,3 +197,14 @@ describe('Feature Integration', () => {
 - Major: 새 기능 구현 시
 - Minor: 버그 수정 시
 - Micro: 간단한 수정 시
+
+## 참조 Skill
+
+필요 시 아래 Skill 파일을 읽어서 전문 지식을 활용합니다:
+
+| Skill | 경로 | 활용 시점 |
+|-------|------|-----------|
+| react-optimization | `.claude/skills/react-optimization/SKILL.md` | React 컴포넌트 최적화, useMemo/useCallback 적용 |
+| typescript-strict | `.claude/skills/typescript-strict/SKILL.md` | 타입 에러 해결, 제네릭/타입 가드 구현 |
+| nestjs-patterns | `.claude/skills/nestjs-patterns/SKILL.md` | NestJS 백엔드 구현, DI 패턴 |
+| bug-fix-pattern | `.claude/skills/bug-fix-pattern/SKILL.md` | 일반적인 버그 패턴 수정 |

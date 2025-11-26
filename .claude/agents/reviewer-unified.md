@@ -227,3 +227,14 @@ if (code.match(/query.*\$\{.*\}/)) {
 - PR 생성 시 자동 실행
 - `/review` 명령어 실행 시
 - Major/Minor 워크플로우 완료 시
+
+## 참조 Skill
+
+필요 시 아래 Skill 파일을 읽어서 전문 지식을 활용합니다:
+
+| Skill | 경로 | 활용 시점 |
+|-------|------|-----------|
+| security-owasp-checker | `.claude/skills/security-owasp-checker/SKILL.md` | OWASP Top 10 보안 취약점 검사 |
+| performance-profiler | `.claude/skills/performance-profiler/SKILL.md` | 번들/로딩/런타임 성능 분석 |
+| react-optimization | `.claude/skills/react-optimization/SKILL.md` | React 렌더링 최적화 검토 |
+| typescript-strict | `.claude/skills/typescript-strict/SKILL.md` | 타입 안전성 검토 |

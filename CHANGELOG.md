@@ -7,6 +7,70 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.0] - 2025-11-26
+
+### Added
+- **Epic 007 - md+Hook+CLAUDE.md 3중 방어 구조**
+  - 명령어 md 파일 자체 규칙 강화 (Critical Rules 섹션)
+  - PostHook 검증 시스템 연동
+  - CLAUDE.md 프로젝트 레벨 규칙 통합
+  - 문서 완성도 자동 검증
+
+- **6개 도메인 전문 Skill 추가**
+  - 에이전트별 Skill 참조 섹션 구조화
+  - 문서 생성 도구 자동화
+  - 도메인별 전문 가이드라인 적용
+
+### Removed
+- **대규모 레거시 정리** (Breaking Change)
+  - deprecated 레거시 명령어 파일 제거
+  - `.claude/commands-config/*.yaml` 레거시 설정 파일 삭제
+    - commit.yaml, dashboard.yaml, db-sync.yaml 등 14개 파일
+  - `.claude/lib/` 사용하지 않는 Shell 스크립트 40+ 개 삭제
+    - ask-user-question-adapter.sh
+    - branch-info-collector.sh
+    - check-architecture-compliance.sh
+    - command-context-manager.sh
+    - command-recommender.sh
+    - command-runner.sh
+    - commit.sh
+    - create-new-command.sh
+    - dashboard-generator.sh
+    - discover-commands.sh
+    - extract-resource-mappings.sh
+    - find-unused-files.sh
+    - git-status-checker.sh
+    - gitignore-manager.sh
+    - install-git-hooks.sh
+    - metrics-collector.sh
+    - migrate-to-template.sh
+    - migrate-v1-to-v2.sh
+    - migrate-v2-to-v25.sh
+    - notion-sync-commits.sh
+    - pr.sh
+    - read-config.sh
+    - session-manager.sh
+    - sync-architecture-registry.sh
+    - update-checksums.sh
+    - update-command-registry.sh
+    - validate-all-commands.sh
+    - validate-command-template.sh
+    - validate-command-type.sh
+    - validate-crossref.sh
+    - validate-documentation.sh
+    - validate-migration.sh
+    - 그 외 다수
+  - `.claude/hooks/major-enforcer.sh` 제거
+  - `.claude/.backup/v1-v2-migration/*` 마이그레이션 백업 파일 정리
+
+### Changed
+- 코드베이스 경량화 및 유지보수성 향상
+- 필수 기능만 남기고 불필요한 레이어 제거
+
+### Migration Guide
+v3.5.0에서 v4.0.0으로 업그레이드 시 특별한 조치 필요 없음.
+제거된 파일들은 더 이상 사용되지 않는 레거시 코드입니다.
+
 ## [3.5.0] - 2025-11-21
 
 ### Added

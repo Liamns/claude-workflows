@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Claude Code Workflows Installer
-# Version: 3.3.2 - Architecture Templates & Documentation Enhancement
+# Version: 4.0.0 - Legacy Cleanup & Streamlined Architecture
 
 set -e
 
@@ -1020,6 +1020,17 @@ install_workflows() {
                 verification_passed=true
                 print_success "Checksum verification passed!"
                 log_to_file "Checksum verification: PASSED"
+
+                # 체크섬에 없는 레거시 파일 정리
+                echo ""
+                print_info "체크섬에 없는 레거시 파일 정리 중..."
+                if cleanup_orphan_files false; then
+                    print_success "레거시 파일 정리 완료"
+                    log_to_file "Orphan files cleanup: COMPLETED"
+                else
+                    print_warning "레거시 파일 정리 중 일부 오류 발생 (설치는 계속됨)"
+                    log_to_file "Orphan files cleanup: PARTIAL"
+                fi
             else
                 # Checksum verification failed - try to recover
                 print_warning "Some files failed checksum verification"

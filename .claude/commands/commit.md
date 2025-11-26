@@ -1,4 +1,12 @@
+---
+name: commit
+hooks:
+  pre: .claude/hooks/commit-pre.sh
+---
+
 # 🚀 Smart Commit Command
+
+> **참고**: 이 명령어는 `.claude/CLAUDE.md`의 규칙을 준수합니다.
 
 **Claude를 위한 필수 지시사항:**
 

@@ -378,3 +378,13 @@ async function handleSubmit(): Promise<ApiResponse<DispatchResponse>> {
 ✅ 프론트엔드 통합 준비 완료
 ✅ Mock 데이터 제공
 ```
+
+## 참조 Skill
+
+필요 시 아래 Skill 파일을 읽어서 전문 지식을 활용합니다:
+
+| Skill | 경로 | 활용 시점 |
+|-------|------|-----------|
+| nestjs-patterns | `.claude/skills/nestjs-patterns/SKILL.md` | NestJS 백엔드 API 구현 패턴 |
+| api-integration | `.claude/skills/api-integration/SKILL.md` | 기존 API 통합 패턴 분석 |
+| typescript-strict | `.claude/skills/typescript-strict/SKILL.md` | API 타입 정의, 제네릭 활용 |

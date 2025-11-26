@@ -1,5 +1,7 @@
 # /epic - Large Initiative Workflow
 
+> **참고**: 이 명령어는 `.claude/CLAUDE.md`의 규칙을 준수합니다.
+
 **Claude를 위한 필수 지시사항:**
 
 이 명령어가 실행될 때 반드시 다음 단계를 **순서대로** 따라야 합니다:
@@ -7,7 +9,9 @@
 1. **아직 코드를 작성하지 마세요**
 2. 대화 맥락에서 epic 비전과 범위를 수집하세요
 3. 기능으로 분해하세요 (3-10개 기능)
-4. 재사용 가능한 아키텍처 패턴을 검색하세요
+4. **.claude/commands-config/epic.yaml에 정의된 skills를 실행하세요**
+   - 현재 등록된 skills: reusability-enforcer
+   - 각 skill을 순서대로 Skill 도구로 실행
 5. **.specify/epics/NNN-epic-name/ 디렉토리에 epic.md, roadmap.md 문서를 생성하세요**
 6. **Document Gate 검증**: 필수 문서(epic.md, roadmap.md) 존재 및 최소 크기(100 bytes) 확인
    - 검증: `source .claude/lib/workflow-gates.sh && validate_document_gate "epic" "<번호>" "<이름>"`
@@ -37,8 +41,8 @@ Epic 계획 완료 후, **첫 번째 Major 기능을 시작할지** 물어볼 �
 ### 사용자 선택 후 자동 실행
 
 ```javascript
-{"0": "예, /major 실행"}  → SlashCommand("/major")
-{"0": "나중에"}            → 실행 안 함
+{"0": "예, /plan-major 실행"}  → SlashCommand("/plan-major")
+{"0": "나중에"}                 → 실행 안 함
 ```
 
 ---
@@ -381,7 +385,7 @@ Epic 워크플로우(workflow)는 다음을 사용합니다:
    - dependencies.json: Graph data
 
 5. **Feature Implementation**
-   - Use `/major` for each feature
+   - Use `/plan-major` for each feature
    - Update progress.md automatically
    - Track completion percentage
 
@@ -401,7 +405,7 @@ Epic 워크플로우(workflow)는 다음을 사용합니다:
 - Team collaboration needed
 - Requires architectural changes
 
-### When to Use /major
+### When to Use /plan-major
 
 - Complexity score 5-9
 - Single feature scope
@@ -413,10 +417,10 @@ Epic 워크플로우(workflow)는 다음을 사용합니다:
 
 ```
 Epic: Microservices Migration (.specify/epics/011-microservices-migration/)
-├── Feature 1: API Gateway → /major "API Gateway"
-├── Feature 2: Auth Service → /major "Auth Service"
-├── Feature 3: User Service → /major "User Service"
-└── Feature 4: Deployment → /major "Deployment Pipeline"
+├── Feature 1: API Gateway → /plan-major "API Gateway"
+├── Feature 2: Auth Service → /plan-major "Auth Service"
+├── Feature 3: User Service → /plan-major "User Service"
+└── Feature 4: Deployment → /plan-major "Deployment Pipeline"
 
 All features work in the same Epic branch: 011-microservices-migration
 ```
@@ -532,8 +536,8 @@ Progress is automatically updated when:
 /epic "initiative description"
 
 # Implement features in dependency order
-/major "Feature 001"  # No deps, start first
-/major "Feature 002"  # Depends on 001
+/plan-major "Feature 001"  # No deps, start first
+/plan-major "Feature 002"  # Depends on 001
 
 # Check progress anytime
 cat .specify/epics/<epic-id>/progress.md
@@ -551,7 +555,7 @@ cat .specify/epics/<epic-id>/progress.md
 
 ## Related Commands
 
-- `/major` - Implement individual features
+- `/plan-major` - Plan individual features
 - `/triage` - Determine if task is Epic-worthy
 - `/review` - Review feature implementations
 - `/pr` - Create PRs for completed features

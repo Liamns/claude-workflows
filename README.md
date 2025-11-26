@@ -1,6 +1,6 @@
 # 🤖 Claude Workflows
 
-[![Version](https://img.shields.io/badge/version-3.5.0-blue.svg)](https://github.com/Liamns/claude-workflows)
+[![Version](https://img.shields.io/badge/version-4.0.0-blue.svg)](https://github.com/Liamns/claude-workflows)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-purple.svg)](https://claude.ai/code)
 [![Validation](https://img.shields.io/badge/validation-automated-success.svg)](https://github.com/Liamns/claude-workflows)
@@ -11,6 +11,25 @@
 
 ## 🆕 최신 기능
 
+### v4.0.0 - Legacy Cleanup & Streamlined Architecture
+
+**🧹 대규모 레거시 정리**
+- deprecated 레거시 명령어 및 설정 파일 완전 제거
+- 사용하지 않는 Shell 스크립트 40+ 개 정리
+- commands-config/*.yaml 레거시 파일 삭제
+- 코드베이스 경량화 및 유지보수성 향상
+
+**🛡️ Epic 007 - md+Hook+CLAUDE.md 3중 방어 구조**
+- 명령어 md 파일 자체 규칙 강화
+- PostHook 검증 시스템 연동
+- CLAUDE.md 프로젝트 레벨 규칙 통합
+- 문서 완성도 자동 검증
+
+**🎯 6개 도메인 전문 Skill 추가**
+- 에이전트별 Skill 참조 섹션 구조화
+- 문서 생성 도구 자동화
+- 도메인별 전문 가이드라인 적용
+
 ### v3.5.0 - 통합 명령어 시스템
 
 **📝 /docu - Notion 문서 통합 관리**
@@ -18,69 +37,21 @@
 - 10개 액션: `start`, `list`, `switch`, `recommend`, `update`, `log`, `sync`, `search`, `close`, `add`
 - 하이브리드 명령어 구조 (.md + .yaml)
 
-**📌 /tracker - 프로젝트 & 이슈 트래커 (신규)**
+**📌 /tracker - 프로젝트 & 이슈 트래커**
 - Projects 데이터베이스 연동
 - 5개 액션: `add`, `list`, `update`, `assign`, `close`
 - Tag 기반 관리: Issue, Bug, Feature, Refactoring
 
-**⚠️ Breaking Changes**
-```bash
-# 레거시 명령어 → 새 명령어
-/notion-start → /docu start
-/notion-list → /docu list
-/notion-switch → /docu switch
-/notion-recommend → /docu recommend
-/notion-add → /docu add
-/notion-sync-commits → /docu sync
-```
-
-**🔧 Phase 1-2 개선사항**
-- Session Manager: 워크플로우 세션 상태 관리
-- Document Gate 검증 로직 개선
-- /commit, /pr 명령어 안정성 강화
-- Notion 통합 보안 패치
-
 ### v3.3.2 - Slash Command UX Improvement
 
 **🎯 실행 흐름 강제화**
-- **CRITICAL INSTRUCTIONS**: 13개 모든 슬래시 커맨드에 실행 순서 가이드 추가
-- **타입 시스템**: Workflow/Utility/Hybrid 명령어 자동 분류
-- **명령어 추천**: 완료 후 다음 단계 자동 추천 시스템
-
-**🛠️ 새로운 유틸리티 도구**
-- **AskUserQuestion 어댑터**: YAML/Shell 메뉴를 AskUserQuestion JSON으로 자동 변환
-- **컨텍스트 관리자**: 명령어 실행 상태 관리 및 Lock 메커니즘
-- **명령어 추천 시스템**: YAML 기반 조건부 다음 단계 추천
-- **타입 검증**: 명령어 타입별 필수 요소 자동 검증
-
-**📚 문서 구조 개선**
-- **명령어 예제 재구성**: .claude/docs/command-examples/ 디렉토리로 분리
-- **타입 분석 문서**: command-type-analysis.md 추가 (345줄)
-- **링크 검증**: 자동화된 문서 링크 무결성 체크
-
-**🔒 보안 강화**
-- **eval 보안**: command-recommender.sh의 조건 검사 보안 강화
-- **안전한 조건만 허용**: test/[ 명령어만 실행, 위험한 명령어 차단
+- CRITICAL INSTRUCTIONS: 모든 슬래시 커맨드에 실행 순서 가이드 추가
+- 타입 시스템: Workflow/Utility/Hybrid 명령어 자동 분류
+- 명령어 추천: 완료 후 다음 단계 자동 추천 시스템
 
 **🧹 코드 정리**
-- **12,765줄 삭제**: 사용하지 않는 테스트 파일 및 deprecated 모듈 제거
-- **코드베이스 40% 감소**: 유지보수성 및 성능 향상
-- **체계적 관리**: .claude/deprecated/ 디렉토리로 이전
-
-### v3.3.1 - Architecture Templates & Database Tools
-
-**🏗️ Architecture Templates (32개 템플릿)**
-- **Backend**: Clean, DDD, Hexagonal, Layered, Serverless
-- **Frontend**: Atomic, FSD, MVC, Micro-Frontend
-- **Fullstack**: JAMStack, Microservices, Monorepo
-- **Mobile**: Clean Architecture, MVVM
-
-**🗄️ Database Tools**
-- **DB 동기화**: `/db-sync` - .env DB → .env.docker DB 자동 동기화
-- **Prisma 마이그레이션**: `/prisma-migrate` - 스키마 변경 자동 마이그레이션
-- **안전 보장**: 자동 백업, 롤백, 데이터 검증
-- **지능형 네이밍**: Git diff 분석 기반 마이그레이션 이름 자동 생성
-- **멀티 플랫폼**: macOS (Intel/ARM), Linux 자동 감지
+- 12,765줄 삭제: 사용하지 않는 테스트 파일 및 deprecated 모듈 제거
+- 코드베이스 40% 감소: 유지보수성 및 성능 향상
 
 ## 🚀 Quick Start
 
@@ -365,4 +336,4 @@ MIT License - 자유롭게 사용, 수정, 배포 가능
 
 ---
 
-**v3.5.0** | [GitHub](https://github.com/Liamns/claude-workflows) | Made with ❤️ for Claude Code
+**v4.0.0** | [GitHub](https://github.com/Liamns/claude-workflows) | Made with ❤️ for Claude Code

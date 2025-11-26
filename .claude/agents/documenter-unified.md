@@ -222,3 +222,12 @@ documenter:
 - 커밋 시: `/commit`
 - 릴리즈 시: 자동 실행
 - 일일 정리: 크론 또는 수동
+
+## 참조 Skill
+
+필요 시 아래 Skill 파일을 읽어서 전문 지식을 활용합니다:
+
+| Skill | 경로 | 활용 시점 |
+|-------|------|-----------|
+| notion-database-sync | `.claude/skills/notion-database-sync/SKILL.md` | Notion 페이지 생성, 데이터베이스 동기화 |
+| daily-changelog-notion | `.claude/skills/daily-changelog-notion/SKILL.md` | 일일 변경사항 Notion 문서화 |

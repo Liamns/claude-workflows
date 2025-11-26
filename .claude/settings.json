@@ -1,0 +1,138 @@
+{
+  "hooks": {
+    "matchers": [
+      {
+        "tool": "SlashCommand",
+        "pattern": "implement",
+        "events": [
+          {
+            "event": "PreToolUse",
+            "hooks": [
+              {
+                "type": "command",
+                "script": ".claude/hooks/implement-smart-selector.sh"
+              }
+            ]
+          },
+          {
+            "event": "PostToolUse",
+            "hooks": [
+              {
+                "type": "command",
+                "script": ".claude/hooks/implement-task-updater.sh"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tool": "SlashCommand",
+        "pattern": "plan-major",
+        "events": [
+          {
+            "event": "PostToolUse",
+            "hooks": [
+              {
+                "type": "command",
+                "script": ".claude/hooks/plan-major-post.sh"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tool": "SlashCommand",
+        "pattern": "plan-minor",
+        "events": [
+          {
+            "event": "PostToolUse",
+            "hooks": [
+              {
+                "type": "command",
+                "script": ".claude/hooks/plan-minor-post.sh"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tool": "SlashCommand",
+        "pattern": "review",
+        "events": [
+          {
+            "event": "PreToolUse",
+            "hooks": [
+              {
+                "type": "command",
+                "script": ".claude/hooks/review-pre.sh"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tool": "SlashCommand",
+        "pattern": "start",
+        "events": [
+          {
+            "event": "PreToolUse",
+            "hooks": [
+              {
+                "type": "command",
+                "script": ".claude/hooks/start-pre.sh"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tool": "SlashCommand",
+        "pattern": "docu-start",
+        "events": [
+          {
+            "event": "PreToolUse",
+            "hooks": [
+              {
+                "type": "command",
+                "script": ".claude/hooks/docu-start-pre.sh"
+              }
+            ]
+          },
+          {
+            "event": "PostToolUse",
+            "hooks": [
+              {
+                "type": "command",
+                "script": ".claude/hooks/docu-start-post.sh"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tool": "SlashCommand",
+        "pattern": "docu-close",
+        "events": [
+          {
+            "event": "PreToolUse",
+            "hooks": [
+              {
+                "type": "command",
+                "script": ".claude/hooks/docu-close-pre.sh"
+              }
+            ]
+          },
+          {
+            "event": "PostToolUse",
+            "hooks": [
+              {
+                "type": "command",
+                "script": ".claude/hooks/docu-close-post.sh"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

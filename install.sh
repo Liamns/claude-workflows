@@ -872,11 +872,10 @@ install_workflows() {
     if [ "$DRY_RUN" = true ]; then
         print_info "[DRY RUN] Installation verification skipped"
     else
-        # Update .gitignore with installer patterns
+        # Update .gitignore with .claude/ and .specify/ directories
         local gitignore_file="$TARGET_DIR/.gitignore"
         local patterns_to_add=(
-            ".claude/cache/"
-            ".claude/.backup/"
+            ".claude/"
             ".specify/"
         )
 
@@ -889,7 +888,7 @@ install_workflows() {
                 echo "$pattern" >> "$gitignore_file"
             fi
         done
-        log_to_file ".gitignore updated"
+        log_to_file ".gitignore updated with .claude/ and .specify/"
 
         # Try checksum-based verification first, fallback to basic verification
         local verification_passed=false

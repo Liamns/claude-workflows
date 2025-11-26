@@ -12,17 +12,10 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Version Configuration - Read from .claude/.version if available
+# Version Configuration (hardcoded)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-if [ -f "$SCRIPT_DIR/.claude/.version" ]; then
-    VERSION_FROM_FILE=$(cat "$SCRIPT_DIR/.claude/.version" | tr -d '[:space:]')
-    INSTALLER_VERSION="$VERSION_FROM_FILE"
-    TARGET_VERSION="$VERSION_FROM_FILE"
-else
-    # Fallback to hardcoded version
-    INSTALLER_VERSION="4.1.0"
-    TARGET_VERSION="4.1.0"
-fi
+INSTALLER_VERSION="4.1.0"
+TARGET_VERSION="4.1.0"
 
 # Repository Configuration
 REPO_URL="https://github.com/Liamns/claude-workflows"
@@ -151,66 +144,44 @@ health_check() {
 cleanup_deprecated_files() {
     echo ""
     print_info "Cleaning up deprecated files..."
-    echo ""
 
-    local cleaned=0
+    local cmd_cleaned=0
+    local agent_cleaned=0
+    local dir_cleaned=0
 
-    # v1.0 commands
-    local old_commands=(
-        "major-specify.md"
-        "major-clarify.md"
-        "major-plan.md"
-        "major-tasks.md"
-        "major-implement.md"
-    )
-
+    # v1.0 commands (silent removal)
+    local old_commands=("major-specify.md" "major-clarify.md" "major-plan.md" "major-tasks.md" "major-implement.md")
     for file in "${old_commands[@]}"; do
         if [ -f "$TARGET_DIR/.claude/commands/$file" ]; then
             rm -f "$TARGET_DIR/.claude/commands/$file"
-            print_success "Removed: commands/$file"
-            ((cleaned++))
+            ((cmd_cleaned++))
         fi
     done
 
-    # v1.0 agents
-    local old_agents=(
-        "architect.md"
-        "fsd-architect.md"
-        "code-reviewer.md"
-        "security-scanner.md"
-        "impact-analyzer.md"
-        "quick-fixer.md"
-        "test-guardian.md"
-        "smart-committer.md"
-        "changelog-writer.md"
-    )
-
+    # v1.0 agents (silent removal)
+    local old_agents=("architect.md" "fsd-architect.md" "code-reviewer.md" "security-scanner.md" "impact-analyzer.md" "quick-fixer.md" "test-guardian.md" "smart-committer.md" "changelog-writer.md")
     for agent in "${old_agents[@]}"; do
         if [ -f "$TARGET_DIR/.claude/agents/$agent" ]; then
             rm -f "$TARGET_DIR/.claude/agents/$agent"
-            print_success "Removed: agents/$agent"
-            ((cleaned++))
+            ((agent_cleaned++))
         fi
     done
 
-    # _backup and _deprecated directories
+    # _backup and _deprecated directories (silent removal)
     if [ -d "$TARGET_DIR/.claude/commands/_backup" ]; then
         rm -rf "$TARGET_DIR/.claude/commands/_backup"
-        print_success "Removed: commands/_backup/"
-        ((cleaned++))
+        ((dir_cleaned++))
     fi
-
     if [ -d "$TARGET_DIR/.claude/agents/_deprecated" ]; then
         rm -rf "$TARGET_DIR/.claude/agents/_deprecated"
-        print_success "Removed: agents/_deprecated/"
-        ((cleaned++))
+        ((dir_cleaned++))
     fi
 
-    echo ""
-    if [ $cleaned -eq 0 ]; then
+    local total=$((cmd_cleaned + agent_cleaned + dir_cleaned))
+    if [ $total -eq 0 ]; then
         print_info "No deprecated files found"
     else
-        print_success "Cleanup complete: $cleaned item(s) removed"
+        print_success "Deprecated 파일 정리: ${total}개 (commands: ${cmd_cleaned}, agents: ${agent_cleaned}, dirs: ${dir_cleaned})"
     fi
     echo ""
 }
@@ -347,26 +318,22 @@ cleanup_before_migration() {
 
     # Only cleanup if upgrading from v1.0 or if old files exist
     if [[ "$version" =~ ^1\. ]] || [ -f "$TARGET_DIR/.claude/commands/major-specify.md" ]; then
-        print_info "Cleaning up v1.0 deprecated files before migration..."
-
-        # Remove v1.0 commands (5 files)
+        # Silent removal - v1.0 commands (5 files)
         rm -f "$TARGET_DIR/.claude/commands/major-specify.md" 2>/dev/null || true
         rm -f "$TARGET_DIR/.claude/commands/major-clarify.md" 2>/dev/null || true
         rm -f "$TARGET_DIR/.claude/commands/major-plan.md" 2>/dev/null || true
         rm -f "$TARGET_DIR/.claude/commands/major-tasks.md" 2>/dev/null || true
         rm -f "$TARGET_DIR/.claude/commands/major-implement.md" 2>/dev/null || true
 
-        # Remove v1.0 agents (9 files)
+        # Silent removal - v1.0 agents (9 files)
         local old_agents=("architect.md" "fsd-architect.md" "code-reviewer.md" "security-scanner.md" "impact-analyzer.md" "quick-fixer.md" "test-guardian.md" "smart-committer.md" "changelog-writer.md")
         for agent in "${old_agents[@]}"; do
             rm -f "$TARGET_DIR/.claude/agents/$agent" 2>/dev/null || true
         done
 
-        # Remove _backup and _deprecated directories
+        # Silent removal - _backup and _deprecated directories
         rm -rf "$TARGET_DIR/.claude/commands/_backup" 2>/dev/null || true
         rm -rf "$TARGET_DIR/.claude/agents/_deprecated" 2>/dev/null || true
-
-        print_success "Deprecated files cleaned up before migration"
     fi
 }
 
@@ -452,11 +419,10 @@ rollback_from_backup() {
 # Verify installation
 verify_installation() {
     local errors=0
+    local file_errors=0
+    local dir_errors=0
 
-    print_info "Verifying installation..."
-    echo ""
-
-    # Check critical files
+    # Check critical files (silent check)
     local critical_files=(
         ".claude/workflow-gates.json"
         ".claude/commands/major.md"
@@ -470,17 +436,13 @@ verify_installation() {
     )
 
     for file in "${critical_files[@]}"; do
-        if [ -f "$TARGET_DIR/$file" ]; then
-            print_success "✓ $file"
-        else
-            print_error "✗ $file (MISSING)"
+        if [ ! -f "$TARGET_DIR/$file" ]; then
+            ((file_errors++))
             ((errors++))
         fi
     done
 
-    echo ""
-
-    # Check directories
+    # Check directories (silent check)
     local critical_dirs=(
         ".claude/commands"
         ".claude/agents"
@@ -490,23 +452,18 @@ verify_installation() {
     )
 
     for dir in "${critical_dirs[@]}"; do
-        if [ -d "$TARGET_DIR/$dir" ]; then
-            local file_count=$(find "$TARGET_DIR/$dir" -type f 2>/dev/null | wc -l | tr -d ' ')
-            print_success "✓ $dir/ ($file_count files)"
-        else
-            print_error "✗ $dir/ (MISSING)"
+        if [ ! -d "$TARGET_DIR/$dir" ]; then
+            ((dir_errors++))
             ((errors++))
         fi
     done
 
-    echo ""
-
     if [ $errors -eq 0 ]; then
-        print_success "Installation verification passed!"
+        print_success "검증 완료: ${#critical_files[@]} 파일, ${#critical_dirs[@]} 디렉토리 확인"
         log_to_file "Installation verification: PASSED"
         return 0
     else
-        print_error "Installation verification failed with $errors errors"
+        print_error "검증 실패: 파일 ${file_errors}개, 디렉토리 ${dir_errors}개 누락"
         log_to_file "Installation verification: FAILED ($errors errors)"
         return 1
     fi
@@ -731,154 +688,101 @@ install_workflows() {
 
     # Copy slash commands (excluding deprecated and backup)
     if [ -d "$TEMP_DIR/.claude/commands" ]; then
-        print_info "Installing Slash Commands (15개)..."
         if [ "$DRY_RUN" = false ]; then
             # Backup existing pr.md if present (user might have customized it)
             if [ -f "$TARGET_DIR/.claude/commands/pr.md" ]; then
                 mkdir -p "$TARGET_DIR/.claude/.backup/command-backups"
                 cp "$TARGET_DIR/.claude/commands/pr.md" "$TARGET_DIR/.claude/.backup/command-backups/pr-$(date +%Y%m%d-%H%M%S).md"
-                print_info "Existing pr.md backed up to .claude/.backup/command-backups/"
             fi
 
             # Copy files, excluding deprecated and backup directories
             find "$TEMP_DIR/.claude/commands" -maxdepth 1 -type f -name "*.md" -exec cp {} "$TARGET_DIR/.claude/commands/" \;
         fi
-        print_success "Slash Commands installed (15개: start, triage, major, minor, micro, commit, pr, pr-review, review, dashboard, docu, tracker, epic, db-sync, prisma-migrate)"
-    else
-        print_warning ".claude/commands/ directory not found in repository"
     fi
 
     # Copy templates (excluding deprecated and backup)
     if [ -d "$TEMP_DIR/.claude/templates" ]; then
-        print_info "Installing Templates..."
         if [ "$DRY_RUN" = false ]; then
-            # Copy all files and subdirectories
             cp -r "$TEMP_DIR/.claude/templates/"* "$TARGET_DIR/.claude/templates/" 2>/dev/null || true
-            # Remove deprecated and backup directories if they exist
             rm -rf "$TARGET_DIR/.claude/templates/deprecated" "$TARGET_DIR/.claude/templates/.backup" 2>/dev/null || true
         fi
-        print_success "Templates installed"
-    else
-        print_warning ".claude/templates/ directory not found in repository"
     fi
 
     # Copy workflow-gates.json
     if [ -f "$TEMP_DIR/.claude/workflow-gates.json" ]; then
-        print_info "Installing workflow-gates.json..."
         if [ "$DRY_RUN" = false ]; then
             cp "$TEMP_DIR/.claude/workflow-gates.json" "$TARGET_DIR/.claude/"
         fi
-        print_success "workflow-gates.json installed (with model optimization)"
     else
         print_warning "workflow-gates.json not found in repository"
     fi
 
     # Copy agents (excluding deprecated and backup)
     if [ -d "$TEMP_DIR/.claude/agents" ]; then
-        print_info "Installing Unified Agents (6개)..."
         if [ "$DRY_RUN" = false ]; then
             cp -r "$TEMP_DIR/.claude/agents" "$TARGET_DIR/.claude/"
-            # Remove deprecated and backup directories if they exist
             rm -rf "$TARGET_DIR/.claude/agents/deprecated" "$TARGET_DIR/.claude/agents/.backup" 2>/dev/null || true
         fi
-        print_success "Unified agents installed (architect-unified, reviewer-unified, implementer-unified, documenter-unified 등)"
-    else
-        print_warning "agents/ directory not found in repository"
     fi
 
     # Copy skills (excluding deprecated and backup)
     if [ -d "$TEMP_DIR/.claude/skills" ]; then
-        print_info "Installing Skills (15개)..."
         if [ "$DRY_RUN" = false ]; then
             cp -r "$TEMP_DIR/.claude/skills" "$TARGET_DIR/.claude/"
-            # Remove deprecated and backup directories if they exist
             rm -rf "$TARGET_DIR/.claude/skills/deprecated" "$TARGET_DIR/.claude/skills/.backup" 2>/dev/null || true
         fi
-        print_success "Skills installed (bug-fix-pattern, api-integration, form-validation, platform-detection 등)"
-    else
-        print_warning "skills/ directory not found in repository"
     fi
 
     # Copy lib (helper scripts, excluding deprecated and backup)
     if [ -d "$TEMP_DIR/.claude/lib" ]; then
-        print_info "Installing Library Scripts..."
         if [ "$DRY_RUN" = false ]; then
             cp -r "$TEMP_DIR/.claude/lib" "$TARGET_DIR/.claude/"
-            # Remove deprecated and backup directories if they exist
             rm -rf "$TARGET_DIR/.claude/lib/deprecated" "$TARGET_DIR/.claude/lib/.backup" 2>/dev/null || true
             chmod +x "$TARGET_DIR/.claude/lib/"*.sh 2>/dev/null || true
         fi
-        print_success "Library scripts installed (cache-helper, metrics-collector, dashboard-generator, git-stats-helper)"
-    else
-        print_warning "lib/ directory not found in repository"
     fi
 
     # Copy documentation (excluding deprecated and backup)
     if [ -d "$TEMP_DIR/.claude/docs" ]; then
-        print_info "Installing Documentation..."
         if [ "$DRY_RUN" = false ]; then
             cp -r "$TEMP_DIR/.claude/docs" "$TARGET_DIR/.claude/"
-            # Remove deprecated and backup directories if they exist
             rm -rf "$TARGET_DIR/.claude/docs/deprecated" "$TARGET_DIR/.claude/docs/.backup" 2>/dev/null || true
         fi
-        print_success "Documentation installed (PROJECT-CONTEXT, SUB-AGENTS-GUIDE, SKILLS-GUIDE, REUSABILITY-GUIDE, MODEL-OPTIMIZATION-GUIDE, ARCHITECTURE-GUIDE)"
-    else
-        print_warning ".claude/docs/ directory not found in repository"
     fi
 
     # Copy architectures system (v2.2.0, excluding deprecated and backup)
     if [ -d "$TEMP_DIR/architectures" ]; then
-        print_info "Installing Multi-Architecture Support System..."
         if [ "$DRY_RUN" = false ]; then
             cp -r "$TEMP_DIR/architectures" "$TARGET_DIR/.claude/"
-            # Remove deprecated and backup directories if they exist
             rm -rf "$TARGET_DIR/.claude/architectures/deprecated" "$TARGET_DIR/.claude/architectures/.backup" 2>/dev/null || true
         fi
-        print_success "Architecture system installed (FSD, Atomic, Clean, Hexagonal, DDD 등)"
-    else
-        print_warning ".claude/architectures/ directory not found in repository"
     fi
 
     # Copy model optimization configs (v2.2.0, excluding deprecated and backup)
     if [ -d "$TEMP_DIR/.claude/config" ]; then
-        print_info "Installing Model Optimization Configs..."
         if [ "$DRY_RUN" = false ]; then
-            # Copy all files and subdirectories
             cp -r "$TEMP_DIR/.claude/config/"* "$TARGET_DIR/.claude/config/" 2>/dev/null || true
-            # Remove deprecated and backup directories if they exist
             rm -rf "$TARGET_DIR/.claude/config/deprecated" "$TARGET_DIR/.claude/config/.backup" 2>/dev/null || true
         fi
-        print_success "Model configs installed (model-router.yaml, user-preferences.yaml)"
-    else
-        print_warning ".claude/config/ directory not found in repository"
     fi
 
     # Copy command configuration files (v3.3.1)
     if [ -d "$TEMP_DIR/.claude/commands-config" ]; then
-        print_info "Installing Command Configurations..."
         if [ "$DRY_RUN" = false ]; then
             mkdir -p "$TARGET_DIR/.claude/commands-config"
             cp -r "$TEMP_DIR/.claude/commands-config/"* "$TARGET_DIR/.claude/commands-config/" 2>/dev/null || true
         fi
-        print_success "Command configs installed (14 YAML files)"
-    else
-        print_warning ".claude/commands-config/ directory not found in repository"
     fi
 
     # Copy registry files (v3.3.1)
     if [ -d "$TEMP_DIR/.claude/registry" ]; then
-        print_info "Installing Registry..."
         if [ "$DRY_RUN" = false ]; then
             mkdir -p "$TARGET_DIR/.claude/registry"
             cp -r "$TEMP_DIR/.claude/registry/"* "$TARGET_DIR/.claude/registry/" 2>/dev/null || true
         fi
-        print_success "Registry installed (command-resource mapping)"
-    else
-        print_warning ".claude/registry/ directory not found in repository"
     fi
 
     # Create .specify directory structure (optional, created by /start command)
-    print_info "Creating .specify directory structure..."
     if [ "$DRY_RUN" = false ]; then
         mkdir -p "$TARGET_DIR/.specify/memory"
         mkdir -p "$TARGET_DIR/.specify/templates"
@@ -889,24 +793,18 @@ install_workflows() {
 
     # Copy .specify templates (excluding deprecated and backup)
     if [ -d "$TEMP_DIR/.specify/templates" ]; then
-        print_info "Installing .specify templates..."
         if [ "$DRY_RUN" = false ]; then
             cp -r "$TEMP_DIR/.specify/templates/"* "$TARGET_DIR/.specify/templates/" 2>/dev/null || true
-            # Remove deprecated and backup directories if they exist
             rm -rf "$TARGET_DIR/.specify/templates/deprecated" "$TARGET_DIR/.specify/templates/.backup" 2>/dev/null || true
         fi
-        print_success ".specify templates installed"
     fi
 
     # Copy .specify scripts (Epic automation scripts)
     if [ -d "$TEMP_DIR/.specify/scripts/bash" ]; then
-        print_info "Installing .specify scripts..."
         if [ "$DRY_RUN" = false ]; then
             cp -r "$TEMP_DIR/.specify/scripts/bash/"* "$TARGET_DIR/.specify/scripts/bash/" 2>/dev/null || true
-            # Make scripts executable
             chmod +x "$TARGET_DIR/.specify/scripts/bash/"*.sh 2>/dev/null || true
         fi
-        print_success ".specify scripts installed"
     fi
 
     # Copy constitution template
@@ -914,8 +812,10 @@ install_workflows() {
         if [ "$DRY_RUN" = false ]; then
             cp "$TEMP_DIR/.specify/memory/constitution.md" "$TARGET_DIR/.specify/memory/"
         fi
-        print_success "Constitution template installed"
     fi
+
+    # Print installation summary (one line)
+    print_success "설치 완료: Commands (15), Agents (6), Skills (15), Lib, Docs, Config, Architectures"
 
     # Final cleanup: Remove any deprecated or backup directories from root levels
     print_info "Cleaning up deprecated and backup directories..."
@@ -1113,106 +1013,51 @@ install_workflows() {
 
     fi
 
-    # Print summary
+    # Print summary (simplified)
     echo ""
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${GREEN}Installed Components (v$TARGET_VERSION):${NC}"
+    echo -e "${GREEN}Claude Workflows v$TARGET_VERSION 설치 완료${NC}"
     echo ""
-    echo "📁 $TARGET_DIR/.claude/"
-    echo "   ├── commands/        (15 Slash Commands)"
-    echo "   ├── templates/       (문서 템플릿)"
-    echo "   ├── agents/          (6 Unified Agents - 통합 최적화)"
-    echo "   ├── skills/          (15 Skills - 자동 활성화)"
-    echo "   ├── lib/             (Helper Scripts)"
-    echo "   │   ├── cache-helper.sh"
-    echo "   │   ├── metrics-collector.sh"
-    echo "   │   ├── dashboard-generator.sh"
-    echo "   │   ├── git-stats-helper.sh"
-    echo "   │   ├── migrate-v1-to-v2.sh"
-    echo "   │   └── migrate-v2-to-v25.sh"
-    echo "   ├── cache/           (Metrics & Cache Data)"
-    echo "   │   ├── metrics/"
-    echo "   │   └── workflow-history/"
-    echo "   ├── docs/            (PROJECT-CONTEXT, 가이드 문서)"
-    echo "   ├── .claude/architectures/   (Multi-Architecture Support)"
-    echo "   │   ├── frontend/    (FSD, Atomic Design)"
-    echo "   │   ├── backend/     (Clean, Hexagonal, DDD)"
-    echo "   │   └── fullstack/   (Monorepo, JAMstack)"
-    echo "   ├── config/          (Model & User Preferences)"
-    echo "   │   ├── model-router.yaml"
-    echo "   │   ├── user-preferences.yaml"
-    echo "   │   ├── cache-config.yaml"
-    echo "   │   └── parallel-config.yaml"
-    echo "   └── workflow-gates.json (Model Optimization 포함)"
-    echo ""
-    echo "📁 $TARGET_DIR/.specify/"
-    echo "   ├── memory/          (constitution.md)"
-    echo "   ├── templates/       (spec, plan, tasks)"
-    echo "   ├── scripts/bash/"
-    echo "   ├── steering/"
-    echo "   └── specs/"
+    echo "📁 설치 위치: $TARGET_DIR/.claude/"
+    echo "   Commands (15), Agents (6), Skills (15), Lib, Docs, Config, Architectures"
     echo ""
 
     # Show verification statistics if checksum verification was used
     if [ "$checksum_available" = true ] && [ "$DRY_RUN" = false ]; then
-        echo -e "${GREEN}Installation Verification:${NC}"
-        echo "   ✅ SHA256 checksum-based integrity verification"
-        echo "   ✅ Automatic file recovery on mismatch"
-        echo "   ✅ .gitignore updated with installer patterns"
+        echo -e "${GREEN}✅ SHA256 체크섬 검증 완료${NC}"
         echo ""
     fi
 
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
 
-    # Print next steps
-    echo -e "${GREEN}Next Steps:${NC}"
+    # Print next steps (v4.1.0 updated)
+    echo -e "${GREEN}Quick Start:${NC}"
     echo ""
-    echo "1. 프로젝트 초기 설정 (🆕 아키텍처 선택 포함):"
-    echo "   /start              # Architecture 선택 및 Constitution 생성"
+    echo "1. 프로젝트 초기화:"
+    echo "   /start                    # 아키텍처 선택 + Constitution 생성"
     echo ""
-    echo "2. 자동 워크플로 선택:"
-    echo "   /triage [작업 설명]         # 최적 워크플로 + 모델 자동 선택"
+    echo "2. 워크플로우 선택 (AI 자동 분석):"
+    echo "   /triage [작업 설명]       # 최적 워크플로우 자동 추천"
     echo ""
-    echo "3. 코드 리뷰:"
-    echo "   /review [target]             # 종합 코드 리뷰"
-    echo "   /review --staged             # 스테이징 변경사항 리뷰"
-    echo "   /review --diff HEAD~1        # Git diff 리뷰"
-    echo "   /review [target] --adv       # 심층 분석 모드"
+    echo "3. 주요 명령어:"
+    echo "   /major                    # 신규 기능 개발"
+    echo "   /minor                    # 버그 수정, 개선"
+    echo "   /micro                    # 간단한 수정"
+    echo "   /commit                   # 스마트 커밋"
+    echo "   /pr                       # PR 자동 생성"
+    echo "   /review --staged          # 코드 리뷰"
+    echo "   /dashboard                # 메트릭스 대시보드"
     echo ""
-    echo "4. 워크플로 명령어 (🆕 통합 Major):"
-    echo "   /major                       # 통합 Major 워크플로 (2개 질문만)"
-    echo "   /minor [feature-or-issue]    # 버그 수정 워크플로"
-    echo "   /micro [description]         # 간단한 변경"
+    echo "4. Notion 통합 (v4.1.0):"
+    echo "   /docu start               # 기능 명세서 작업 시작"
+    echo "   /docu list                # 진행 중인 작업 목록"
+    echo "   /docu-update --today      # Git 커밋 → 작업 로그 자동화"
+    echo "   /tracker add              # 이슈/프로젝트 추가"
+    echo "   /tracker --today          # Git 커밋 → 이슈 자동 생성"
     echo ""
-    echo "5. Git 자동화:"
-    echo "   /commit             # Conventional Commits 자동 생성"
-    echo "   /pr                 # PR 자동 생성"
-    echo "   /pr-review [PR#]    # GitHub PR 자동 리뷰"
-    echo ""
-    echo "6. 📊 실시간 메트릭스 대시보드 (🆕 v2.5):"
-    echo "   /dashboard          # 현재 세션 메트릭"
-    echo "   /dashboard --today  # 오늘의 통계"
-    echo "   /dashboard --summary # 전체 누적 통계"
-    echo ""
-    echo "7. 모델 옵션:"
-    echo "   --model=opus        # 특정 모델 강제 사용"
-    echo "   --use-context7      # Context7 강제 활성화"
-    echo "   --optimize-cost     # 비용 최적화 우선"
-    echo ""
-    echo "8. 아키텍처 관련:"
-    echo "   /architecture-info  # 현재 아키텍처 정보"
-    echo "   /architecture-switch # 아키텍처 변경"
-    echo ""
-    echo "9. Agents 및 Skills:"
-    echo "   - 6개 통합 에이전트 자동 활성화"
-    echo "   - 15개 스킬 자동 적용"
-    echo "   - 워크플로우별 최적화 적용"
-    echo ""
-    echo "10. 자세한 사용법:"
+    echo "5. 자세한 사용법:"
     echo "   ${REPO_URL}#readme"
-    echo "   .claude/docs/MODEL-OPTIMIZATION-GUIDE.md"
-    echo "   .claude/docs/ARCHITECTURE-GUIDE.md"
     echo ""
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 }

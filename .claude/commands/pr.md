@@ -1,4 +1,12 @@
+---
+name: pr
+hooks:
+  pre: .claude/hooks/pr-pre.sh
+---
+
 # /pr - Pull Request 자동 생성
+
+> **참고**: 이 명령어는 `.claude/CLAUDE.md`의 규칙을 준수합니다.
 
 **Claude를 위한 필수 지시사항:**
 

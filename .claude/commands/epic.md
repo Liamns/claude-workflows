@@ -1,5 +1,7 @@
 # /epic - Large Initiative Workflow
 
+> **참고**: 이 명령어는 `.claude/CLAUDE.md`의 규칙을 준수합니다.
+
 **Claude를 위한 필수 지시사항:**
 
 이 명령어가 실행될 때 반드시 다음 단계를 **순서대로** 따라야 합니다:
@@ -39,8 +41,8 @@ Epic 계획 완료 후, **첫 번째 Major 기능을 시작할지** 물어볼 �
 ### 사용자 선택 후 자동 실행
 
 ```javascript
-{"0": "예, /major 실행"}  → SlashCommand("/major")
-{"0": "나중에"}            → 실행 안 함
+{"0": "예, /plan-major 실행"}  → SlashCommand("/plan-major")
+{"0": "나중에"}                 → 실행 안 함
 ```
 
 ---
@@ -383,7 +385,7 @@ Epic 워크플로우(workflow)는 다음을 사용합니다:
    - dependencies.json: Graph data
 
 5. **Feature Implementation**
-   - Use `/major` for each feature
+   - Use `/plan-major` for each feature
    - Update progress.md automatically
    - Track completion percentage
 
@@ -403,7 +405,7 @@ Epic 워크플로우(workflow)는 다음을 사용합니다:
 - Team collaboration needed
 - Requires architectural changes
 
-### When to Use /major
+### When to Use /plan-major
 
 - Complexity score 5-9
 - Single feature scope
@@ -415,10 +417,10 @@ Epic 워크플로우(workflow)는 다음을 사용합니다:
 
 ```
 Epic: Microservices Migration (.specify/epics/011-microservices-migration/)
-├── Feature 1: API Gateway → /major "API Gateway"
-├── Feature 2: Auth Service → /major "Auth Service"
-├── Feature 3: User Service → /major "User Service"
-└── Feature 4: Deployment → /major "Deployment Pipeline"
+├── Feature 1: API Gateway → /plan-major "API Gateway"
+├── Feature 2: Auth Service → /plan-major "Auth Service"
+├── Feature 3: User Service → /plan-major "User Service"
+└── Feature 4: Deployment → /plan-major "Deployment Pipeline"
 
 All features work in the same Epic branch: 011-microservices-migration
 ```
@@ -534,8 +536,8 @@ Progress is automatically updated when:
 /epic "initiative description"
 
 # Implement features in dependency order
-/major "Feature 001"  # No deps, start first
-/major "Feature 002"  # Depends on 001
+/plan-major "Feature 001"  # No deps, start first
+/plan-major "Feature 002"  # Depends on 001
 
 # Check progress anytime
 cat .specify/epics/<epic-id>/progress.md
@@ -553,7 +555,7 @@ cat .specify/epics/<epic-id>/progress.md
 
 ## Related Commands
 
-- `/major` - Implement individual features
+- `/plan-major` - Plan individual features
 - `/triage` - Determine if task is Epic-worthy
 - `/review` - Review feature implementations
 - `/pr` - Create PRs for completed features

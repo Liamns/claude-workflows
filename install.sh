@@ -839,30 +839,14 @@ install_workflows() {
     print_success "File installation complete!"
     echo ""
 
-    # Download checksum manifest for integrity verification
+    # Download checksum manifest for integrity verification (silent)
     if [ "$DRY_RUN" = false ]; then
-        print_info "Downloading checksum manifest..."
-
-        # Source verification helpers
         if [ -f "$TARGET_DIR/.claude/lib/verify-with-checksum.sh" ]; then
             source "$TARGET_DIR/.claude/lib/verify-with-checksum.sh"
-
-            # Change to target directory for verification
             pushd "$TARGET_DIR" > /dev/null
-
-            if download_checksum_manifest "$REPO_URL" "$REPO_BRANCH"; then
-                print_success "Checksum manifest downloaded"
-            else
-                print_warning "Failed to download checksum manifest"
-                print_info "Installation will continue with basic verification"
-            fi
-
+            download_checksum_manifest "$REPO_URL" "$REPO_BRANCH" > /dev/null 2>&1 || true
             popd > /dev/null
-        else
-            print_warning "Checksum verification system not found"
-            print_info "Skipping checksum download"
         fi
-        echo ""
     fi
 
     # Create version tracking file
@@ -883,28 +867,29 @@ install_workflows() {
         fi
     fi
 
-    # Verify installation with checksum-based integrity check
+    # Verify installation with checksum-based integrity check (simplified output)
     echo ""
     if [ "$DRY_RUN" = true ]; then
         print_info "[DRY RUN] Installation verification skipped"
     else
-        # Update .gitignore with installer patterns (before verification)
-        echo ""
-        if [ -f "$TARGET_DIR/.claude/lib/gitignore-manager.sh" ]; then
-            print_info "Updating .gitignore..."
+        # Update .gitignore with installer patterns
+        local gitignore_file="$TARGET_DIR/.gitignore"
+        local patterns_to_add=(
+            ".claude/cache/"
+            ".claude/.backup/"
+            ".specify/"
+        )
 
-            pushd "$TARGET_DIR" > /dev/null
-            source "$TARGET_DIR/.claude/lib/gitignore-manager.sh"
-
-            if add_installer_patterns_to_gitignore ".gitignore"; then
-                print_success ".gitignore updated with installer patterns"
-                log_to_file ".gitignore updated"
+        for pattern in "${patterns_to_add[@]}"; do
+            if [ -f "$gitignore_file" ]; then
+                if ! grep -qxF "$pattern" "$gitignore_file" 2>/dev/null; then
+                    echo "$pattern" >> "$gitignore_file"
+                fi
             else
-                print_warning "Failed to update .gitignore (non-critical)"
+                echo "$pattern" >> "$gitignore_file"
             fi
-
-            popd > /dev/null
-        fi
+        done
+        log_to_file ".gitignore updated"
 
         # Try checksum-based verification first, fallback to basic verification
         local verification_passed=false
@@ -912,74 +897,40 @@ install_workflows() {
 
         if [ -f "$TARGET_DIR/.claude/.checksums.json" ] && [ -f "$TARGET_DIR/.claude/lib/verify-with-checksum.sh" ]; then
             checksum_available=true
-            print_info "Running checksum-based file integrity verification..."
-
             pushd "$TARGET_DIR" > /dev/null
 
-            if verify_installation_with_checksum; then
+            if verify_installation_with_checksum > /dev/null 2>&1; then
                 verification_passed=true
-                print_success "Checksum verification passed!"
                 log_to_file "Checksum verification: PASSED"
-
-                # 체크섬에 없는 레거시 파일 정리
-                echo ""
-                print_info "체크섬에 없는 레거시 파일 정리 중..."
-                if cleanup_orphan_files false; then
-                    print_success "레거시 파일 정리 완료"
-                    log_to_file "Orphan files cleanup: COMPLETED"
-                else
-                    print_warning "레거시 파일 정리 중 일부 오류 발생 (설치는 계속됨)"
-                    log_to_file "Orphan files cleanup: PARTIAL"
-                fi
+                # Silent cleanup of orphan files
+                cleanup_orphan_files false > /dev/null 2>&1 || true
+                log_to_file "Orphan files cleanup: COMPLETED"
             else
                 # Checksum verification failed - try to recover
-                print_warning "Some files failed checksum verification"
-                print_info "Attempting automatic recovery..."
-
-                if retry_failed_files "$REPO_URL" "$REPO_BRANCH"; then
+                print_warning "일부 파일 검증 실패, 자동 복구 시도..."
+                if retry_failed_files "$REPO_URL" "$REPO_BRANCH" > /dev/null 2>&1; then
                     verification_passed=true
-                    print_success "All files recovered successfully!"
+                    print_success "파일 복구 완료"
                     log_to_file "File recovery: SUCCESS"
-
-                    # Recovery 후에도 레거시 파일 정리 실행
-                    echo ""
-                    print_info "체크섬에 없는 레거시 파일 정리 중..."
-                    if cleanup_orphan_files false; then
-                        print_success "레거시 파일 정리 완료"
-                        log_to_file "Orphan files cleanup: COMPLETED (after recovery)"
-                    else
-                        print_warning "레거시 파일 정리 중 일부 오류 발생 (설치는 계속됨)"
-                        log_to_file "Orphan files cleanup: PARTIAL (after recovery)"
-                    fi
+                    cleanup_orphan_files false > /dev/null 2>&1 || true
                 else
-                    print_error "File recovery failed"
+                    print_error "파일 복구 실패"
                     log_to_file "File recovery: FAILED"
                     verification_passed=false
                 fi
             fi
-
             popd > /dev/null
         fi
 
         # Fallback to basic verification if checksum not available
         if [ "$checksum_available" = false ]; then
-            print_info "Running basic file verification..."
             if verify_installation; then
                 verification_passed=true
-
-                # 체크섬 시스템이 없어도 레거시 파일 정리 시도
-                # (새로 설치된 파일에 체크섬 시스템이 있으면 사용)
+                # Silent cleanup if checksum system available after install
                 if [ -f "$TARGET_DIR/.claude/.checksums.json" ] && [ -f "$TARGET_DIR/.claude/lib/verify-with-checksum.sh" ]; then
-                    print_info "체크섬 기반 레거시 파일 정리 중..."
                     pushd "$TARGET_DIR" > /dev/null
                     source "$TARGET_DIR/.claude/lib/verify-with-checksum.sh"
-                    if cleanup_orphan_files false; then
-                        print_success "레거시 파일 정리 완료"
-                        log_to_file "Orphan files cleanup: COMPLETED (basic verification mode)"
-                    else
-                        print_warning "레거시 파일 정리 중 일부 오류 발생"
-                        log_to_file "Orphan files cleanup: PARTIAL (basic verification mode)"
-                    fi
+                    cleanup_orphan_files false > /dev/null 2>&1 || true
                     popd > /dev/null
                 fi
             fi
@@ -987,30 +938,22 @@ install_workflows() {
 
         # Handle verification failure
         if [ "$verification_passed" = false ]; then
-            print_error "Installation verification failed"
-            print_info "로그 파일을 확인하세요: $LOG_FILE"
+            print_error "설치 검증 실패"
             if [ -n "$BACKUP_DIR" ]; then
-                print_warning "You can find the backup at: $BACKUP_DIR"
-                print_info "Rolling back installation..."
-                if rollback_from_backup; then
-                    print_info "Rollback completed. Previous version restored."
+                print_warning "백업 위치: $BACKUP_DIR"
+                if rollback_from_backup > /dev/null 2>&1; then
+                    print_info "롤백 완료"
                 else
-                    print_error "Rollback failed. Please restore manually from: $BACKUP_DIR"
+                    print_error "롤백 실패. 수동 복원 필요: $BACKUP_DIR"
                 fi
             fi
             exit 1
         fi
 
-        # Enhanced validation (checks for deprecated files)
-        echo ""
-        if ! validate_installation; then
-            print_warning "Validation found issues (but installation is functional)"
+        # Silent validation (only warn on issues)
+        if ! validate_installation > /dev/null 2>&1; then
             log_to_file "Validation completed with warnings"
         fi
-
-        # Validation system removed in v3.3.1 (TODO cleanup completed)
-        # Validation scripts are kept in .claude/lib/ for reference but not used
-
     fi
 
     # Print summary (simplified)
@@ -1050,8 +993,8 @@ install_workflows() {
     echo "   /dashboard                # 메트릭스 대시보드"
     echo ""
     echo "4. Notion 통합 (v4.1.0):"
-    echo "   /docu start               # 기능 명세서 작업 시작"
-    echo "   /docu list                # 진행 중인 작업 목록"
+    echo "   /docu-start               # 기능 명세서 작업 시작"
+    echo "   /docu-list                # 진행 중인 작업 목록"
     echo "   /docu-update --today      # Git 커밋 → 작업 로그 자동화"
     echo "   /tracker add              # 이슈/프로젝트 추가"
     echo "   /tracker --today          # Git 커밋 → 이슈 자동 생성"

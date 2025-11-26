@@ -37,6 +37,7 @@ ACTIVE_TASKS=".claude/cache/active-tasks.json"
 /docu-update --log              # 작업 로그 조회
 /docu-update --log --days 7     # 최근 7일 로그
 /docu-update --today            # 오늘 커밋 기반 작업 로그 자동 업데이트
+/docu-update --author-홍길동     # 참여자 추가/변경
 ```
 
 ### 옵션 설명
@@ -47,10 +48,32 @@ ACTIVE_TASKS=".claude/cache/active-tasks.json"
 | `--admin` | 어드민 채널 작업만 대상으로 지정 |
 | `--today` | 오늘 Git 커밋을 분석하여 해당 기능의 '작업 로그'에 자동 기록 |
 | `--log` | 작업 로그 조회 |
+| `--author-{name}` | 참여자 추가/변경. {name}으로 Notion 사용자 검색 후 매칭 |
 
 ---
 
 ## Workflow: 상태 업데이트
+
+### Step 0: --author-xxx 옵션 처리 (옵션 있을 경우)
+
+```bash
+# 사용자 검색
+mcp__notion-company__notion-get-users --query "$author_name"
+```
+
+**매칭 결과 처리**:
+- **1명 매칭**: 자동으로 해당 사용자 선택 (user_id 저장)
+- **다수 매칭**: AskUserQuestion으로 선택
+  ```
+  AskUserQuestion:
+  - question: "'{author_name}'에 해당하는 사용자가 여러 명입니다. 선택하세요."
+  - header: "참여자"
+  - options: [매칭된 사용자 목록]
+  ```
+- **0명 매칭**: 경고 출력 후 참여자 없이 진행
+  ```
+  ⚠️ '{author_name}'에 해당하는 사용자를 찾을 수 없습니다. 참여자 업데이트를 건너뜁니다.
+  ```
 
 ### Step 1: 현재 작업 확인
 
@@ -111,6 +134,19 @@ mcp__notion-company__notion-update-page
 - properties: {"진행현황": "{new_status}"}
 ```
 
+**--author-xxx로 user_id 확보된 경우 참여자도 함께 업데이트:**
+```bash
+mcp__notion-company__notion-update-page \
+  --data '{
+    "page_id": "'"$current_id"'",
+    "command": "update_properties",
+    "properties": {
+      "진행현황": "'"$new_status"'",
+      "참여자": "[\"'"$user_id"'\"]"
+    }
+  }'
+```
+
 ### Step 5: 로컬 캐시 동기화
 
 ```bash
@@ -118,7 +154,7 @@ mcp__notion-company__notion-update-page
 add_active_task "$current_id" "$title" "$priority" "$new_status" "$channel" "$feature_group"
 ```
 
-### Step 6: 결과 출력
+### Step 6: 결과 출력 및 완료 제안
 
 ```
 ✅ 상태 업데이트 완료!
@@ -130,13 +166,56 @@ add_active_task "$current_id" "$title" "$priority" "$new_status" "$channel" "$fe
 💡 Notion 페이지도 업데이트되었습니다.
 ```
 
+**완료 키워드 감지 시 (작업 로그, 커밋 메시지, 상태 등에서):**
+
+```bash
+# 완료 키워드 패턴
+COMPLETE_PATTERNS="완료|Done|마무리|close|fix|resolve|finished"
+
+# 상태가 '완료', '테스트중'이거나 로그에 완료 키워드가 있으면 제안
+if [[ "$new_status" =~ (완료|테스트중) ]] || [[ "$log_content" =~ $COMPLETE_PATTERNS ]]; then
+  should_ask_completion=true
+fi
+```
+
+**AskUserQuestion으로 완료 처리 확인:**
+```
+AskUserQuestion 도구 호출:
+- question: "이 작업이 완료된 것으로 보입니다. 완료 처리하시겠습니까?"
+- header: "완료 확인"
+- options:
+  - label: "예, 완료 처리"
+    description: "/docu-close 실행 (진행현황을 '완료'로 변경)"
+  - label: "아니오, 계속 진행"
+    description: "현재 상태 유지"
+  - label: "나중에 결정"
+    description: "이번에는 건너뛰기"
+```
+
+**"예, 완료 처리" 선택 시:**
+- `/docu-close` 명령어로 자동 연결
+- 또는 직접 완료 처리:
+```bash
+end_date=$(TZ=Asia/Seoul date +%Y-%m-%d)
+
+mcp__notion-company__notion-update-page \
+  --data '{
+    "page_id": "'"$current_id"'",
+    "command": "update_properties",
+    "properties": {
+      "진행현황": "완료",
+      "date:종료일:start": "'"$end_date"'"
+    }
+  }'
+```
+
 ### Step 6.5: 작업 로그 서브페이지 확인/생성
 
 상태 업데이트 후 '작업 로그' 서브페이지를 확인하고 없으면 생성합니다.
 
 ```bash
 # 1. 페이지 내용 조회
-mcp__notion-personal__notion-fetch id="$current_id"
+mcp__notion-company__notion-fetch id="$current_id"
 
 # 2. '작업 로그' 서브페이지 존재 여부 확인
 #    → fetch 결과에서 <page>작업 로그</page> 검색
@@ -146,7 +225,7 @@ mcp__notion-personal__notion-fetch id="$current_id"
 
 **서브페이지 생성 (미존재 시):**
 ```
-mcp__notion-personal__notion-update-page
+mcp__notion-company__notion-update-page
 - page_id: {current_id}
 - command: insert_content_after
 - selection_with_ellipsis: "(페이지 마지막 콘텐츠)..."
@@ -406,7 +485,7 @@ git log --since="today 00:00" --author="$author" --format="%h|%s|%ad" --date=sho
 
 3. **표에 행 추가**
    ```
-   mcp__notion-personal__notion-update-page
+   mcp__notion-company__notion-update-page
    - page_id: {작업로그_page_id}
    - command: replace_content_range
    - selection_with_ellipsis: "|--------|...----------|"

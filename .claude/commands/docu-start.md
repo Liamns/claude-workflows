@@ -39,7 +39,18 @@ ACTIVE_TASKS=".claude/cache/active-tasks.json"
 /docu-start --admin [keyword]      # 어드민 데이터베이스에서 검색
 /docu-start --add [name]           # 새 기능정의서 추가
 /docu-start --search [query]       # 검색만 (작업 시작 안 함)
+/docu-start --author-홍길동 "로그인"  # 참여자 자동 설정 후 작업 시작
 ```
+
+### 옵션
+
+| 옵션 | 설명 |
+|------|------|
+| `--web` | 화주 앱 기능 명세서 데이터베이스 사용 |
+| `--admin` | 어드민 WEB 기능정의서 데이터베이스 사용 |
+| `--add` | 새 기능정의서 추가 |
+| `--search` | 검색만 (작업 시작 안 함) |
+| `--author-{name}` | 참여자 자동 설정. {name}으로 Notion 사용자 검색 후 매칭 |
 
 ### 채널 옵션
 
@@ -51,7 +62,28 @@ ACTIVE_TASKS=".claude/cache/active-tasks.json"
 
 ## Workflow: 기본 모드
 
-### Step 0: 채널 선택 (옵션 미입력 시)
+### Step 0-A: --author-xxx 옵션 처리 (옵션 있을 경우)
+
+```bash
+# 사용자 검색
+mcp__notion-company__notion-get-users --query "$author_name"
+```
+
+**매칭 결과 처리**:
+- **1명 매칭**: 자동으로 해당 사용자 선택 (user_id 저장)
+- **다수 매칭**: AskUserQuestion으로 선택
+  ```
+  AskUserQuestion:
+  - question: "'{author_name}'에 해당하는 사용자가 여러 명입니다. 선택하세요."
+  - header: "참여자"
+  - options: [매칭된 사용자 목록]
+  ```
+- **0명 매칭**: 경고 출력 후 참여자 없이 진행
+  ```
+  ⚠️ '{author_name}'에 해당하는 사용자를 찾을 수 없습니다. 참여자 없이 진행합니다.
+  ```
+
+### Step 0-B: 채널 선택 (옵션 미입력 시)
 
 `--web` 또는 `--admin` 옵션이 없으면 AskUserQuestion으로 채널 선택:
 
@@ -125,6 +157,21 @@ AskUserQuestion 도구 호출:
 업데이트 시:
 - 시작일: KST 오늘 날짜
 - 진행현황: "개발중"
+- 참여자: user_id (--author-xxx로 확보된 경우)
+
+```bash
+# --author-xxx로 user_id 확보된 경우 참여자도 함께 업데이트
+mcp__notion-company__notion-update-page \
+  --data '{
+    "page_id": "'"$page_id"'",
+    "command": "update_properties",
+    "properties": {
+      "진행현황": "개발중",
+      "date:시작일:start": "'"$start_date"'",
+      "참여자": "[\"'"$user_id"'\"]"
+    }
+  }'
+```
 
 ### Step 5: Active Tasks 저장
 

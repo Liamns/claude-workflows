@@ -76,11 +76,39 @@ PROP_TAG="Tag"
 ```bash
 /tracker add [제목]
 /tracker add "로그인 버그 수정"
+/tracker add --author-홍길동 "버그 수정"    # 담당자 자동 설정
+/tracker add --author-kim "새 기능"          # 이름 일부로 검색
 ```
+
+### Options
+
+| 옵션 | 설명 |
+|------|------|
+| `--author-{name}` | Assignee를 자동 설정. {name}으로 Notion 사용자 검색 후 매칭 |
 
 ### Workflow
 
-1. **정보 수집 (AskUserQuestion)**:
+1. **--author-xxx 옵션 처리** (옵션 있을 경우):
+   ```bash
+   # 사용자 검색
+   mcp__notion-company__notion-get-users --query "$author_name"
+   ```
+
+   **매칭 결과 처리**:
+   - **1명 매칭**: 자동으로 해당 사용자 선택
+   - **다수 매칭**: AskUserQuestion으로 선택
+     ```
+     AskUserQuestion:
+     - question: "'{author_name}'에 해당하는 사용자가 여러 명입니다. 선택하세요."
+     - header: "담당자"
+     - options: [매칭된 사용자 목록]
+     ```
+   - **0명 매칭**: 경고 출력 후 담당자 없이 진행
+     ```
+     ⚠️ '{author_name}'에 해당하는 사용자를 찾을 수 없습니다. 담당자 없이 생성합니다.
+     ```
+
+2. **정보 수집 (AskUserQuestion)**:
 
    **Tag 선택**:
    - question: "유형을 선택하세요"
@@ -90,14 +118,29 @@ PROP_TAG="Tag"
    - question: "우선순위를 선택하세요"
    - options: ["High", "Medium", "Low"]
 
-2. **Notion 페이지 생성**:
+3. **Notion 페이지 생성**:
    ```bash
    source .claude/lib/notion-utils.sh
 
    # KST 날짜
    start_date=$(TZ=Asia/Seoul date +%Y-%m-%d)
 
-   # 페이지 생성
+   # 페이지 생성 (Assignee 포함 여부에 따라 properties 구성)
+   # --author-xxx로 user_id가 확보된 경우:
+   mcp__notion-company__notion-create-pages \
+     --parent '{"data_source_id": "2ad47c08-6985-8016-b033-000bdcffaec7"}' \
+     --pages '[{
+       "properties": {
+         "Project name": "'"$title"'",
+         "Status": "Not started",
+         "Priority": "'"$priority"'",
+         "Tag": "[\"'"$tag"'\"]",
+         "Assignee": "[\"'"$user_id"'\"]",
+         "date:Start date:start": "'"$start_date"'"
+       }
+     }]'
+
+   # --author-xxx 없거나 매칭 실패 시:
    mcp__notion-company__notion-create-pages \
      --parent '{"data_source_id": "2ad47c08-6985-8016-b033-000bdcffaec7"}' \
      --pages '[{
@@ -111,7 +154,7 @@ PROP_TAG="Tag"
      }]'
    ```
 
-3. **결과 반환**: 생성된 페이지 URL
+4. **결과 반환**: 생성된 페이지 URL
 
 ---
 
@@ -187,6 +230,41 @@ PROP_TAG="Tag"
      --data '{"page_id": "'"$page_id"'", "command": "update_properties", "properties": {"Status": "'"$status"'"}}'
    ```
 3. **결과 출력**: 업데이트 완료 메시지
+4. **완료 제안** (상태가 `Done`이 아닌 경우에도 완료 키워드 감지 시):
+
+   ```bash
+   # 완료 키워드 패턴
+   COMPLETE_PATTERNS="완료|Done|마무리|close|fix|resolve|finished"
+   ```
+
+   **완료 키워드 감지 시 AskUserQuestion:**
+   ```
+   AskUserQuestion 도구 호출:
+   - question: "이 이슈가 완료된 것으로 보입니다. 완료 처리하시겠습니까?"
+   - header: "완료 확인"
+   - options:
+     - label: "예, 완료 처리"
+       description: "Status를 Done으로 변경하고 종료일 설정"
+     - label: "아니오, 계속 진행"
+       description: "현재 상태 유지"
+     - label: "나중에 결정"
+       description: "이번에는 건너뛰기"
+   ```
+
+   **"예, 완료 처리" 선택 시:**
+   ```bash
+   end_date=$(TZ=Asia/Seoul date +%Y-%m-%d)
+
+   mcp__notion-company__notion-update-page \
+     --data '{
+       "page_id": "'"$page_id"'",
+       "command": "update_properties",
+       "properties": {
+         "Status": "Done",
+         "date:End date:start": "'"$end_date"'"
+       }
+     }'
+   ```
 
 ---
 
@@ -317,7 +395,7 @@ start_date=$(TZ=Asia/Seoul date +%Y-%m-%d)
 title=$(echo "$commit_msg" | sed 's/^[^:]*: //')
 
 # Notion 페이지 생성
-mcp__notion-personal__notion-create-pages \
+mcp__notion-company__notion-create-pages \
   --parent '{"data_source_id": "2ad47c08-6985-8016-b033-000bdcffaec7"}' \
   --pages '[{
     "properties": {
@@ -347,6 +425,51 @@ mcp__notion-personal__notion-create-pages \
 💡 '/tracker list'로 전체 목록을 확인하세요.
 ```
 
+#### Step 7: 완료 커밋 감지 및 자동 완료 제안
+
+커밋 메시지에 완료 키워드가 포함된 경우 해당 이슈의 완료 처리를 제안:
+
+```bash
+# 완료 키워드 패턴
+COMPLETE_PATTERNS="완료|Done|마무리|close|fix|resolve|finished"
+
+# 커밋 메시지 분석
+for commit in $commits; do
+  if [[ "$commit_msg" =~ $COMPLETE_PATTERNS ]]; then
+    completed_issues+=("$commit_msg")
+  fi
+done
+```
+
+**완료 키워드가 감지된 커밋이 있는 경우:**
+```
+AskUserQuestion 도구 호출:
+- question: "완료로 보이는 작업이 있습니다. 해당 이슈를 Done으로 처리하시겠습니까?"
+- header: "완료 확인"
+- options:
+  - label: "예, 완료 처리"
+    description: "완료 키워드가 포함된 이슈를 Done으로 변경"
+  - label: "선택적 처리"
+    description: "각 이슈별로 완료 여부 확인"
+  - label: "아니오"
+    description: "모두 Not started 상태 유지"
+```
+
+**"예, 완료 처리" 또는 "선택적 처리" 선택 시:**
+```bash
+end_date=$(TZ=Asia/Seoul date +%Y-%m-%d)
+
+mcp__notion-company__notion-update-page \
+  --data '{
+    "page_id": "'"$created_page_id"'",
+    "command": "update_properties",
+    "properties": {
+      "Status": "Done",
+      "date:End date:start": "'"$end_date"'"
+    }
+  }'
+```
+
 ---
 
 ## Views
@@ -366,5 +489,7 @@ mcp__notion-personal__notion-create-pages \
 
 ---
 
-**문서 버전**: 1.0.0
-**최종 수정**: 2025-11-21
+**문서 버전**: 1.1.0
+**최종 수정**: 2025-11-26
+**업데이트**:
+- 1.1.0: --author-xxx 옵션 추가, 이슈 완료 자동 제안 기능 추가

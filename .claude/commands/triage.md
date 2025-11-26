@@ -1,5 +1,7 @@
 # 🎯 Triage - 스마트 워크플로우 선택기
 
+> **참고**: 이 명령어는 `.claude/CLAUDE.md`의 규칙을 준수합니다.
+
 ⚠️ **CRITICAL: 이 지시사항을 절대 건너뛰지 마세요**
 
 **Claude를 위한 필수 실행 순서 (예외 없음):**
@@ -64,10 +66,10 @@ source .claude/lib/session-manager.sh && restore_from_compact
 **사용자가 워크플로우를 선택하면 즉시 해당 명령어를 실행하세요:**
 
 ```javascript
-{"0": "Major 워크플로우"}  → SlashCommand("/major")
-{"0": "Minor"}              → SlashCommand("/minor")
+{"0": "Major 워크플로우"}  → SlashCommand("/plan-major")
+{"0": "Minor"}              → SlashCommand("/plan-minor")
 {"0": "Epic"}               → SlashCommand("/epic")
-{"0": "Micro"}              → SlashCommand("/micro")
+{"0": "Micro"}              → SlashCommand("/plan-micro")
 {"0": "직접 선택"}          → 실행 안 함, 안내만
 ```
 
@@ -102,7 +104,7 @@ AI 기반 워크플로우(workflow) 선택기로, 작업(task)을 자동으로 �
 4. **자동 실행**: 추천된 워크플로우를 선택적으로 즉시 시작
 
 **주요 기능:**
-- 지능형 복잡도 점수 산정 (0-15 척도)
+- 지능형 복잡도 점수 산정 (0-20 척도)
 - 기준 기반 자동 워크플로우 선택
 - Major 작업을 위한 Plan Mode 가이드 (복잡도 5+)
 - 과거 결정으로부터 학습
@@ -127,6 +129,7 @@ AI 기반 워크플로우(workflow) 선택기로, 작업(task)을 자동으로 �
 | 0-3   | **Micro** | < 30분 | 오타, 설정, 로그, 주석 |
 | 4-7   | **Minor** | < 1일 | 버그 수정, 개선, 리팩토링 |
 | 8-15  | **Major** | 2일 이상 | 신규 기능, 아키텍처 변경 |
+| 16+   | **Epic** | 1주 이상 | 대규모 프로젝트, 다중 Feature |
 
 ## Examples
 
@@ -386,6 +389,7 @@ complexity_score =
 - **0-3점**: Micro (간단한 수정)
 - **4-7점**: Minor (버그 수정, 개선)
 - **8-15점**: Major (신규 기능)
+- **16+점**: Epic (대규모 프로젝트, 다중 Feature)
 
 ### 4. 실행 가이드 제공
 

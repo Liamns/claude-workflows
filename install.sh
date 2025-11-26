@@ -898,7 +898,9 @@ install_workflows() {
             checksum_available=true
             pushd "$TARGET_DIR" > /dev/null
 
+            echo -n "파일 무결성 검증 중..."
             if verify_installation_with_checksum > /dev/null 2>&1; then
+                echo " 완료"
                 verification_passed=true
                 log_to_file "Checksum verification: PASSED"
                 # Silent cleanup of orphan files
@@ -906,6 +908,7 @@ install_workflows() {
                 log_to_file "Orphan files cleanup: COMPLETED"
             else
                 # Checksum verification failed - try to recover
+                echo ""
                 print_warning "일부 파일 검증 실패, 자동 복구 시도..."
                 if retry_failed_files "$REPO_URL" "$REPO_BRANCH" > /dev/null 2>&1; then
                     verification_passed=true

@@ -46,16 +46,64 @@
 - options: ["Major 워크플로우", "Minor 워크플로우", "직접 선택"]
 ```
 
-### 사용자 선택 후 자동 실행
+### ⛔ CRITICAL: 사용자 선택 후 필수 행동
 
-**사용자가 워크플로우를 선택하면 즉시 해당 명령어를 실행하세요:**
+**사용자가 워크플로우를 선택하면 반드시 다음을 수행하세요:**
 
+#### 유일하게 허용된 행동
+SlashCommand 도구로 해당 명령어 실행:
 ```javascript
 {"0": "Major 워크플로우"}  → SlashCommand("/plan-major")
 {"0": "Minor"}              → SlashCommand("/plan-minor")
 {"0": "Epic"}               → SlashCommand("/epic")
-{"0": "Micro"}              → SlashCommand("/plan-micro")
+{"0": "Micro"}              → SlashCommand("/micro")
 {"0": "직접 선택"}          → 실행 안 함, 안내만
+```
+
+#### 절대 금지 행동 (워크플로우 선택 직후)
+❌ Write 도구로 구현 파일 생성
+❌ Edit 도구로 소스 코드 수정
+❌ "구현을 시작하겠습니다" 발언
+❌ 코드 블록에 구현 코드 작성
+❌ SlashCommand 없이 다음 단계 진행
+
+#### 구현 코드 파일 확장자 (생성/수정 금지)
+`.ts`, `.tsx`, `.js`, `.jsx`, `.py`, `.go`, `.rs`, `.java`, `.css`, `.scss`, `.html`, `.vue`, `.svelte`
+
+#### 허용된 파일
+- `.md` 파일 (문서)
+- `.json` 파일 (설정/상태)
+
+---
+
+### 🛑 STOP AND VERIFY
+
+워크플로우 선택 응답을 받은 직후, 다음을 확인하세요:
+
+**지금 하려는 행동이 무엇인가요?**
+- [ ] SlashCommand 실행 → ✅ 계속 진행
+- [ ] Write/Edit 도구 사용 → ⛔ 중단! 잘못된 행동입니다
+- [ ] 구현 코드 작성 → ⛔ 중단! 잘못된 행동입니다
+
+**자기 검증 질문:**
+"지금 SlashCommand를 호출하려고 하는가, 아니면 다른 것을 하려고 하는가?"
+→ SlashCommand가 아니면 **즉시 중단**하고 SlashCommand 실행
+
+---
+
+### ❌ 잘못된 예시 (절대 하지 마세요)
+
+```
+사용자: "Major 워크플로우" 선택
+Claude: "좋습니다. 바로 구현을 시작하겠습니다."
+        [Write 도구로 src/feature.ts 생성] ← ❌ 금지!
+```
+
+### ✅ 올바른 예시 (반드시 이렇게)
+
+```
+사용자: "Major 워크플로우" 선택
+Claude: [SlashCommand("/plan-major") 호출] ← ✅ 유일하게 허용된 행동
 ```
 
 ---

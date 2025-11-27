@@ -129,6 +129,33 @@ PostHook이 있는 명령어는 다음을 준수합니다.
 | Critical Rules 섹션 | 건너뛰기 |
 | PostHook 있는 명령어 | 미완성 문서로 종료 |
 | Compact 발생 후 | History 확인 없이 새 작업 시작 |
+| 워크플로우 선택 직후 | SlashCommand 없이 구현/다음 단계 진행 |
+
+---
+
+## 7. 워크플로우 선택 후 행동 규칙
+
+### AskUserQuestion으로 워크플로우 선택 받은 직후
+
+| 사용자 선택 | 유일하게 허용된 다음 행동 |
+|------------|-------------------------|
+| Major 워크플로우 | `SlashCommand("/plan-major")` |
+| Minor 워크플로우 | `SlashCommand("/plan-minor")` |
+| Micro 워크플로우 | `SlashCommand("/micro")` |
+| Epic 워크플로우 | `SlashCommand("/epic")` |
+| 직접 선택 | 안내 메시지만 출력 |
+
+### 워크플로우 선택 직후 금지 행동
+- ❌ Write/Edit 도구 사용
+- ❌ 구현 코드 작성
+- ❌ "~를 구현하겠습니다" 발언
+- ❌ SlashCommand 없이 다음 단계로 진행
+
+### 위반 감지 시 행동
+워크플로우 선택 후 SlashCommand가 아닌 다른 행동을 하려고 하면:
+1. 즉시 중단
+2. "워크플로우 명령어를 먼저 실행합니다" 안내
+3. 해당 SlashCommand 실행
 
 ---
 

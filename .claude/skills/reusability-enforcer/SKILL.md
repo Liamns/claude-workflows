@@ -498,6 +498,116 @@ User: "카메라로 사진을 찍는 기능을 추가해줘"
    - No new implementation needed
 ```
 
+### 시나리오 7: 테스트 파일 작성 (TDD 연동)
+```bash
+User: "OrderForm에 대한 테스트를 작성해줘"
+
+[자동 실행]
+1. 대상 파일 분석...
+   $ target: src/features/order/ui/OrderForm.tsx
+
+2. 관련 DTO/Type 검색...
+   $ bash .claude/lib/reusability/reusability-checker.sh -e frontend -t dto Order
+   $ bash .claude/lib/reusability/reusability-checker.sh -e frontend -t type Order
+
+3. Found DTOs/Types:
+   ✓ CreateOrderDTO: src/entities/order/model/dto.ts
+   ✓ OrderResponseDTO: src/entities/order/model/dto.ts
+   ✓ OrderFormProps: src/features/order/ui/types.ts
+   ✓ OrderStatus: src/entities/order/model/types.ts
+
+4. 기존 Mock 검색...
+   $ bash .claude/lib/reusability/reusability-checker.sh -t mock Order
+   ✓ orderApiMock: src/entities/order/__mocks__/orderApi.ts
+   ✓ mockOrderData: src/entities/order/__mocks__/mockData.ts
+
+5. 테스트 패턴 분석...
+   - Framework: vitest
+   - Mock Pattern: vi.mock()
+   - Structure: AAA (Arrange-Act-Assert)
+
+6. Recommendation:
+   테스트 파일 생성: src/features/order/ui/__tests__/OrderForm.test.tsx
+
+   Import 대상:
+   ```tsx
+   // 기존 DTO/Type 재사용
+   import { CreateOrderDTO, OrderResponseDTO } from '@/entities/order/model/dto';
+   import type { OrderFormProps } from '../types';
+
+   // 기존 Mock 재사용
+   import { mockOrderData } from '@/entities/order/__mocks__/mockData';
+   import { orderApiMock } from '@/entities/order/__mocks__/orderApi';
+
+   // 테스트 유틸리티
+   import { render, screen, fireEvent } from '@testing-library/react';
+   import { describe, it, expect, vi, beforeEach } from 'vitest';
+   ```
+
+7. Action:
+   - 기존 DTO/Type 100% 재사용
+   - 기존 Mock 100% 재사용
+   - 새 타입 정의 금지
+```
+
+### 시나리오 7-1: 테스트 작성 시 DTO 재사용 (상세)
+```bash
+User: "주문 생성 API 테스트가 필요해"
+
+[자동 실행]
+1. API 대상 파일 분석...
+   $ target: src/features/order/api/createOrder.ts
+
+2. 관련 DTO 우선 검색 (테스트 대상과 같은 도메인 먼저)...
+   $ bash .claude/lib/reusability/reusability-checker.sh -e backend -t dto Order
+
+3. DTO 검색 결과 (우선순위순):
+   1️⃣ [도메인 일치] src/entities/order/model/dto.ts
+      - CreateOrderDTO ✓
+      - UpdateOrderDTO ✓
+      - OrderResponseDTO ✓
+
+   2️⃣ [도메인 연관] src/entities/product/model/dto.ts
+      - ProductInOrderDTO ✓
+
+4. Mock/Stub 검색...
+   $ bash .claude/lib/reusability/reusability-checker.sh -t mock Order
+   $ bash .claude/lib/reusability/reusability-checker.sh -t stub Order
+
+5. Mock/Stub 검색 결과:
+   ✓ __mocks__/orderService.ts (기존 Mock)
+   ✓ fixtures/order.fixture.ts (기존 Stub 데이터)
+
+6. Recommendation:
+   ```typescript
+   // ✅ 올바른 방법: 기존 DTO 재사용
+   import { CreateOrderDTO } from '@/entities/order/model/dto';
+   import { mockOrderService } from '@/__mocks__/orderService';
+   import { orderFixture } from '@/fixtures/order.fixture';
+
+   describe('createOrder', () => {
+     it('should create order with valid DTO', async () => {
+       // Arrange - 기존 fixture 사용
+       const input: CreateOrderDTO = orderFixture.createInput;
+
+       // Act
+       const result = await createOrder(input);
+
+       // Assert - 기존 DTO 타입으로 검증
+       expect(result).toMatchObject<OrderResponseDTO>({...});
+     });
+   });
+   ```
+
+   ```typescript
+   // ❌ 잘못된 방법: 새 타입 정의
+   interface MyOrderInput {  // 금지!
+     productId: string;
+     quantity: number;
+   }
+   ```
+```
+
 ## 메트릭 수집
 
 추적할 지표:

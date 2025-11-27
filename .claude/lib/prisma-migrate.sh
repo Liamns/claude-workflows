@@ -140,10 +140,42 @@ check_schema_changes() {
 # Step 2: Select Environment
 # ============================================================================
 
+# 환경별 .env 파일 감지
+detect_env_files() {
+    local env_files=()
+
+    # 프로젝트 루트의 .env* 파일 검색
+    shopt -s nullglob
+    for env_file in .env .env.local .env.development .env.dev .env.staging .env.production .env.prod; do
+        if [ -f "$env_file" ]; then
+            env_files+=("$env_file")
+        fi
+    done
+    shopt -u nullglob
+
+    # 결과 출력 (newline-separated)
+    printf '%s\n' "${env_files[@]}"
+}
+
 select_environment() {
     echo ""
     log_info "=== Step 2: Select Environment ==="
     echo ""
+
+    # .env 파일 감지
+    local env_files
+    env_files=$(detect_env_files)
+
+    if [ -n "$env_files" ]; then
+        log_info "감지된 환경 파일:"
+        echo "$env_files" | while read -r file; do
+            [ -n "$file" ] && log_info "  - $file"
+        done
+        echo ""
+
+        # 감지된 파일 목록을 stdout으로 출력 (Claude가 파싱)
+        echo "ENV_FILES_DETECTED:$(echo "$env_files" | tr '\n' ',')"
+    fi
 
     echo "Please select the environment:"
     echo "  1) Development (create migration file + apply)"

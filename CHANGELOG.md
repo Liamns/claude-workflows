@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.1.1] - 2025-11-27
+
+### Added
+- **`/docu` 게이트웨이 명령어**
+  - 기존 6개 `docu-*` 명령어를 단일 게이트웨이로 통합
+  - 자연어 입력으로 모든 작업 처리 (Claude Code가 직접 파싱)
+  - 채널 선택 (화주/어드민) 후 자동 라우팅
+  - `/docu-start`, `/docu-list`, `/docu-switch`, `/docu-update`, `/docu-close` deprecated 처리
+
+### Fixed
+- **tracker.md Notion 스키마 수정**
+  - 영어 속성명을 실제 한글 속성명으로 변경
+  - `Project name` → `작업 설명`
+  - `Status` → `진행 상황`
+  - `Priority` → `우선순위`
+  - `Tag` → `작업 분류`
+  - `Assignee` → `참여자`
+  - `Start date` → `시작일`
+  - `End date` → `종료일`
+
+### Compatibility
+- 기존 `docu-*` 명령어는 deprecated 되었지만 계속 사용 가능
+- `/docu` 명령어로 전환 권장
+
 ## [4.1.0] - 2025-11-26
 
 ### Added

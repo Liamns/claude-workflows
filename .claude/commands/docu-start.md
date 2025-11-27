@@ -5,6 +5,8 @@ hooks:
   post: .claude/hooks/docu-start-post.sh
 ---
 
+> **DEPRECATED**: 이 명령어는 `/docu`로 통합되었습니다. `/docu {키워드} 시작` 형태로 사용하세요.
+
 # Docu:Start - Notion 기능 명세서 기반 작업 시작
 
 > **참고**: 이 명령어는 `.claude/CLAUDE.md`의 규칙을 준수합니다.

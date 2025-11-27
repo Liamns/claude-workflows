@@ -2,6 +2,8 @@
 name: docu-list
 ---
 
+> **DEPRECATED**: 이 명령어는 `/docu`로 통합되었습니다. `/docu 목록` 형태로 사용하세요.
+
 # Docu:List - 진행 중인 작업 목록 및 추천
 
 > **참고**: 이 명령어는 `.claude/CLAUDE.md`의 규칙을 준수합니다.

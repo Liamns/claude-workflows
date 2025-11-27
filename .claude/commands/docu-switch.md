@@ -2,6 +2,8 @@
 name: docu-switch
 ---
 
+> **DEPRECATED**: 이 명령어는 `/docu`로 통합되었습니다. `/docu {기능명} 전환` 형태로 사용하세요.
+
 # Docu:Switch - 작업 컨텍스트 전환
 
 > **참고**: 이 명령어는 `.claude/CLAUDE.md`의 규칙을 준수합니다.

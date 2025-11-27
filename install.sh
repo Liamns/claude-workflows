@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Claude Code Workflows Installer
-# Version: 4.1.1 - /docu 게이트웨이 통합 및 tracker.md 스키마 수정
+# Version: 4.1.2 - 명령어 참조 일관성 수정
 
 set -e
 
@@ -14,8 +14,8 @@ NC='\033[0m' # No Color
 
 # Version Configuration (hardcoded)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-INSTALLER_VERSION="4.1.1"
-TARGET_VERSION="4.1.1"
+INSTALLER_VERSION="4.1.2"
+TARGET_VERSION="4.1.2"
 
 # Repository Configuration
 REPO_URL="https://github.com/Liamns/claude-workflows"

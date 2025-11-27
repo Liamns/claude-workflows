@@ -109,6 +109,10 @@ cd .specify/fixes/042-null-pointer
 # → fix-analysis.md 생성
 ```
 
+## Output Language
+
+모든 출력은 **한글**로 작성합니다.
+
 ## 참고
 
 - 복잡도 분석은 `/triage`에서 수행됩니다

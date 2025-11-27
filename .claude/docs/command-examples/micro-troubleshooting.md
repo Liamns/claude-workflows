@@ -13,11 +13,11 @@
 
 ## 자동 전환 문제
 
-### 1. "자꾸 /minor로 전환돼요"
+### 1. "자꾸 /plan-minor로 전환돼요"
 
 **증상:**
 ```
-⚠️ Auto-upgrading to /minor
+⚠️ Auto-upgrading to /plan-minor
 Reason: Complexity too high (4/15)
 ```
 
@@ -36,7 +36,7 @@ Reason: Complexity too high (4/15)
 - 여러 파일 수정 (5개+)
 - 테스트 필요
 
-→ /minor 사용하기
+→ /plan-minor 사용 후 /implement 실행
 ```
 
 **방법 2: 변경 범위 축소**
@@ -57,7 +57,7 @@ Reason: Complexity too high (4/15)
 ```bash
 # ❌ Micro 부적합
 "로그인 검증 개선"
-→ 로직 변경이므로 /minor
+→ 로직 변경이므로 /plan-minor
 
 # ✅ Micro 적합
 "로그인 폼 버튼 색상 변경"
@@ -792,28 +792,28 @@ Micro → Major:
 
 ### 일반적인 에러와 해결
 
-**"Auto-upgrading to /minor"**
+**"Auto-upgrading to /plan-minor"**
 ```
 → 변경이 생각보다 복잡함
-→ /minor 사용하거나 범위 축소
+→ /plan-minor 사용하거나 범위 축소
 ```
 
 **"Breaking change detected"**
 ```
 → API/인터페이스 변경 시도
-→ /major 사용 또는 변경 취소
+→ /plan-major 사용 또는 변경 취소
 ```
 
 **"문서가 생성 안 됨"**
 ```
 → Micro는 문서 생성 안 함 (정상)
-→ 문서 필요하면 /minor 사용
+→ 문서 필요하면 /plan-minor 사용
 ```
 
 **"테스트가 실행 안 됨"**
 ```
 → Micro는 테스트 안 함 (정상)
-→ 테스트 필요하면 /minor 사용
+→ 테스트 필요하면 /plan-minor 사용
 ```
 
 ---

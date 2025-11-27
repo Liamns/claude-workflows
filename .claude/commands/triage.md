@@ -262,11 +262,11 @@ Complexity Score: 6/15
 
 [사용자가 "Minor 워크플로우 (추천)" 선택]
 
-🚀 Next Steps (사용자 선택 후):
-1. Run: /minor "Fix null pointer error in user login"
-2. Implement fix with minimal changes
-3. Update related tests
-4. Run: /commit && /pr
+🚀 다음 단계 (사용자 선택 후):
+1. 실행: /plan-minor "Fix null pointer error in user login"
+2. 계획 문서 검토 후 /implement 실행
+3. 관련 테스트 업데이트
+4. 실행: /commit && /pr
 
 Expected Tokens: ~15,000 (vs 60,000 without triage)
 ```

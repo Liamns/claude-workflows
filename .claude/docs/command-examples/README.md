@@ -10,9 +10,10 @@
 
 ## 참조하는 명령어
 
-- [major.md](../../commands/major.md)
-- [minor.md](../../commands/minor.md)
-- [micro.md](../../commands/micro.md)
+- [plan-major.md](../../commands/plan-major.md) - Major 계획 수립
+- [plan-minor.md](../../commands/plan-minor.md) - Minor 계획 수립
+- [implement.md](../../commands/implement.md) - 구현 단계
+- [micro.md](../../commands/micro.md) - Micro 워크플로우
 
 ## 포함된 파일
 
@@ -36,4 +37,12 @@
 
 ```markdown
 자세한 사용 예시는 [major-examples.md](../docs/command-examples/major-examples.md)를 참고하세요.
+```
+
+## 워크플로우 구조
+
+```
+Major: /plan-major → /implement (2단계)
+Minor: /plan-minor → /implement (2단계)
+Micro: /micro (단일 단계)
 ```

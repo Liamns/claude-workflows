@@ -363,7 +363,9 @@ API 변경, 인터페이스 수정 등을 자동 감지하여:
 
 ### Major/Minor/Micro 워크플로우와 함께
 ```bash
-/minor "fix: login error"
+/plan-minor "fix: login error"
+# ... 계획 문서 검토 후
+/implement
 # ... 구현 완료 후
 /commit  # 자동으로 적절한 메시지 생성
 /pr      # PR 자동 생성

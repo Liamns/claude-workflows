@@ -35,7 +35,7 @@ Epic 계획 완료 후, **첫 번째 Major 기능을 시작할지** 물어볼 �
 [AskUserQuestion 호출]
 - question: "첫 번째 기능을 시작하시겠습니까?"
 - header: "다음 단계"
-- options: ["예, /major 실행", "나중에"]
+- options: ["예, /plan-major 실행", "나중에"]
 ```
 
 ### 사용자 선택 후 자동 실행
@@ -93,7 +93,7 @@ Epic 계획 완료 후, **첫 번째 Major 기능을 시작할지** 물어볼 �
 - 복잡도(complexity) 10+ 프로젝트 자동 구조화
 - 의존성(dependency) 그래프가 순환 의존성(circular dependency) 방지
 - epic.md, progress.md, roadmap.md 자동 생성
-- 기능(feature) 구현을 위한 /major와 통합
+- 기능(feature) 구현을 위한 /plan-major와 통합
 - 성공 기준 추적
 
 ## Usage

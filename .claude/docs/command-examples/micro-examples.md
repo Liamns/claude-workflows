@@ -194,12 +194,12 @@ Validation logic changes affect behavior and require:
 💡 Recommendation
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Use /minor instead:
+Use /plan-minor instead:
 - Proper issue analysis
 - Related tests validation
 - Documentation
 
-Auto-upgrading to /minor workflow...
+Auto-upgrading to /plan-minor workflow...
 ```
 
 ---
@@ -598,7 +598,7 @@ npm run dev
 
 # 결과
 ⚠️ Complexity too high (5/15)
-→ Auto-upgrading to /minor
+→ Auto-upgrading to /plan-minor
 
 # 이유: 로직 변경은 테스트 필요
 ```
@@ -610,7 +610,7 @@ npm run dev
 # 결과
 ⚠️ Logic change detected
 → Requires testing
-→ Auto-upgrading to /minor
+→ Auto-upgrading to /plan-minor
 
 # 이유: 버그 수정은 테스트 커버리지 필요
 ```
@@ -622,7 +622,7 @@ npm run dev
 # 결과
 ⚠️ Multiple files affected (8 files)
 → Needs analysis
-→ Auto-upgrading to /minor
+→ Auto-upgrading to /plan-minor
 
 # 이유: 5개 이상 파일은 Minor 권장
 ```
@@ -637,7 +637,7 @@ npm run dev
 
 # 결과
 ⚠️ New feature detected
-→ Auto-upgrading to /major
+→ Auto-upgrading to /plan-major
 
 # 이유: 새 기능은 Major 필수
 ```
@@ -649,7 +649,7 @@ npm run dev
 # 결과
 ⚠️ Complexity too high (10/15)
 → Requires planning
-→ Auto-upgrading to /major
+→ Auto-upgrading to /plan-major
 
 # 이유: 대규모 리팩토링은 Major
 ```
@@ -676,13 +676,13 @@ npm run dev
 ### Micro 사용 불가한 작업
 
 ```
-❌ 로직 변경 → /minor
-❌ 버그 수정 → /minor
-❌ 리팩토링 → /minor
-❌ 함수 추가 → /minor
-❌ 새 기능 → /major
-❌ API 변경 → /major
-❌ 아키텍처 수정 → /major
+❌ 로직 변경 → /plan-minor
+❌ 버그 수정 → /plan-minor
+❌ 리팩토링 → /plan-minor
+❌ 함수 추가 → /plan-minor
+❌ 새 기능 → /plan-major
+❌ API 변경 → /plan-major
+❌ 아키텍처 수정 → /plan-major
 ```
 
 ### 토큰 사용량 예상

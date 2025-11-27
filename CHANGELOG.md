@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.1.2] - 2025-11-27
+
+### Fixed
+- **명령어 참조 일관성 수정**
+  - 모든 문서에서 `/minor` → `/plan-minor`, `/major` → `/plan-major`로 수정
+  - 2단계 워크플로우 구조 (`/plan-*` → `/implement`) 명확화
+  - 수정된 파일: `triage.md`, `commit.md`, `epic.md`, `micro.md`, `plan-major.md`, `plan-minor.md`, `implement.md`, `dashboard.md`, `pr-review.md`, `review.md`, `start.md`
+  - 예시 문서 수정: `major-examples.md`, `minor-examples.md`, `micro-examples.md`
+  - 트러블슈팅 문서 수정: `major-troubleshooting.md`, `minor-troubleshooting.md`, `micro-troubleshooting.md`
+
+### Documentation
+- 워크플로우 구조 명확화: `Major: /plan-major → /implement`, `Minor: /plan-minor → /implement`, `Micro: /micro (단일 단계)`
+
 ## [4.1.1] - 2025-11-27
 
 ### Added

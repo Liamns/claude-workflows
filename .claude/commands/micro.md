@@ -84,7 +84,7 @@
 - 테스트 요구사항 없음
 - 30분 이내 실행
 - 오타, 로그, 주석, 설정 변경에 완벽
-- 범위가 너무 크면 자동으로 /minor로 전환
+- 범위가 너무 크면 자동으로 /plan-minor로 전환
 
 ## Usage
 
@@ -282,9 +282,9 @@ Micro 워크플로우(workflow)는 최소한의 에이전트(agent) 개입을 �
 **예시:**
 ```bash
 /micro
-> "Fix typo in API documentation"
-> "Update broken link in README"
-> "Fix markdown formatting"
+> "API 문서 오타 수정"
+> "README 깨진 링크 수정"
+> "마크다운 형식 정리"
 ```
 
 ### 2. 로그/주석 제거
@@ -298,9 +298,9 @@ Micro 워크플로우(workflow)는 최소한의 에이전트(agent) 개입을 �
 **예시:**
 ```bash
 /micro
-> "Remove console.log from production code"
-> "Remove commented-out code"
-> "Clean up debug statements"
+> "프로덕션 코드에서 console.log 제거"
+> "주석 처리된 코드 제거"
+> "디버그 코드 정리"
 ```
 
 ### 3. 설정 변경
@@ -314,9 +314,9 @@ Micro 워크플로우(workflow)는 최소한의 에이전트(agent) 개입을 �
 **예시:**
 ```bash
 /micro
-> "Change API timeout to 10s"
-> "Update port from 3000 to 8080"
-> "Enable feature flag"
+> "API 타임아웃을 10초로 변경"
+> "포트를 3000에서 8080으로 변경"
+> "기능 플래그 활성화"
 ```
 
 ### 4. 스타일링 (코스메틱)
@@ -330,9 +330,9 @@ Micro 워크플로우(workflow)는 최소한의 에이전트(agent) 개입을 �
 **예시:**
 ```bash
 /micro
-> "Change button color to blue"
-> "Increase padding by 4px"
-> "Update font size to 16px"
+> "버튼 색상을 파란색으로 변경"
+> "패딩 4px 증가"
+> "폰트 크기 16px로 업데이트"
 ```
 
 ### 5. Import 정리

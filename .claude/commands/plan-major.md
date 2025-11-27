@@ -96,6 +96,10 @@ cd .specify/epics/006-token-optimization/features/001-caching
 # → 006-epic-token-optimization 브랜치 유지
 ```
 
+## Output Language
+
+모든 출력은 **한글**로 작성합니다.
+
 ## 참고
 
 - 복잡도 분석은 `/triage`에서 수행됩니다

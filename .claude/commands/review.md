@@ -149,112 +149,112 @@
 
 ## Examples
 
-### Example 1: Basic Review
+### 예시 1: 기본 리뷰
 
 ```bash
 /review src/auth/login.ts
 ```
 
-**Output:**
+**출력:**
 ```
 ╔═══════════════════════════════════════╗
-║     Code Review Report                ║
+║     코드 리뷰 리포트                    ║
 ╚═══════════════════════════════════════╝
 
-📁 File: src/auth/login.ts
-📊 Quality Score: 85/100
+📁 파일: src/auth/login.ts
+📊 품질 점수: 85/100
 
-✅ Strengths:
-  - Clear function separation
-  - Proper error handling
-  - Type safety with TypeScript
+✅ 강점:
+  - 명확한 함수 분리
+  - 적절한 에러 처리
+  - TypeScript로 타입 안전성 확보
 
-⚠️  Issues Found:
+⚠️  발견된 문제:
 
-1. [MEDIUM] Missing input validation
+1. [MEDIUM] 입력 검증 누락
    Line 45: user.password
-   → Add validation before processing user input
+   → 사용자 입력 처리 전 검증 추가 필요
 
-2. [LOW] Inconsistent naming
+2. [LOW] 일관성 없는 네이밍
    Line 23: getUserData vs get_user_session
-   → Use consistent camelCase naming
+   → 일관된 camelCase 네이밍 사용 권장
 
-💡 Suggestions:
-  - Consider using existing auth/validator.ts
-  - Add unit tests for edge cases
+💡 제안 사항:
+  - 기존 auth/validator.ts 활용 고려
+  - 엣지 케이스에 대한 유닛 테스트 추가
 ```
 
-### Example 2: Advanced Security Review
+### 예시 2: 심층 보안/성능 리뷰
 
 ```bash
 /review --adv src/api/
 ```
 
-**Output:**
+**출력:**
 ```
 ╔═══════════════════════════════════════╗
-║  Advanced Security & Performance      ║
+║  심층 보안 & 성능 분석                  ║
 ╚═══════════════════════════════════════╝
 
-🔒 Security Scan (OWASP Top 10)
+🔒 보안 스캔 (OWASP Top 10)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-❌ [HIGH] SQL Injection Risk
-   File: api/users.ts:67
-   Issue: Direct string concatenation in query
-   Fix: Use parameterized queries
+❌ [HIGH] SQL Injection 위험
+   파일: api/users.ts:67
+   문제: 쿼리에 직접 문자열 연결 사용
+   해결: 파라미터화된 쿼리 사용
 
-⚠️  [MEDIUM] XSS Vulnerability
-   File: api/comments.ts:34
-   Issue: Unsanitized user input in response
-   Fix: Use DOMPurify or similar sanitizer
+⚠️  [MEDIUM] XSS 취약점
+   파일: api/comments.ts:34
+   문제: 응답에 미정제된 사용자 입력
+   해결: DOMPurify 또는 유사 sanitizer 사용
 
-⚡ Performance Analysis
+⚡ 성능 분석
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-⚠️  [MEDIUM] N+1 Query Problem
-   File: api/posts.ts:89
-   Impact: 50+ DB queries for single request
-   Fix: Use JOIN or eager loading
+⚠️  [MEDIUM] N+1 쿼리 문제
+   파일: api/posts.ts:89
+   영향: 단일 요청에 50개 이상의 DB 쿼리
+   해결: JOIN 또는 eager loading 사용
 
-📊 Summary
+📊 요약
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Security Issues:   2 high, 1 medium
-Performance:       1 medium, 3 low
-Overall Score:     68/100
+보안 이슈:    2 high, 1 medium
+성능:         1 medium, 3 low
+종합 점수:    68/100
 ```
 
-### Example 3: Architecture Compliance
+### 예시 3: 아키텍처 준수 검사
 
 ```bash
 /review --arch
 ```
 
-**Output:**
+**출력:**
 ```
 ╔═══════════════════════════════════════╗
-║  Architecture Compliance Check        ║
+║  아키텍처 준수 검사                     ║
 ╚═══════════════════════════════════════╝
 
-🏗  Detected: Feature-Sliced Design (FSD)
+🏗  감지됨: Feature-Sliced Design (FSD)
 
-✅ Compliant:
-  - features/auth follows FSD structure
-  - Proper layer separation (ui → model → api)
-  - No forbidden cross-slice imports
+✅ 준수 항목:
+  - features/auth가 FSD 구조를 따름
+  - 적절한 레이어 분리 (ui → model → api)
+  - 금지된 cross-slice import 없음
 
-❌ Violations:
+❌ 위반 사항:
 
 1. features/posts/ui → features/user/model
-   → Shared logic should move to entities/
+   → 공유 로직을 entities/로 이동해야 함
 
 2. widgets/header → features/auth/api
-   → Widgets shouldn't import feature internals
+   → Widgets는 feature 내부를 import하면 안 됨
 
-📋 Recommendations:
-  - Extract shared user logic to entities/user
-  - Use public API from features/auth/index.ts
+📋 권장 사항:
+  - 공유 user 로직을 entities/user로 추출
+  - features/auth/index.ts의 공개 API 사용
 ```
 
 ## Implementation

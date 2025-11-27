@@ -1,6 +1,6 @@
 # 🤖 Claude Workflows
 
-[![Version](https://img.shields.io/badge/version-4.1.1-blue.svg)](https://github.com/Liamns/claude-workflows)
+[![Version](https://img.shields.io/badge/version-4.1.2-blue.svg)](https://github.com/Liamns/claude-workflows)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-purple.svg)](https://claude.ai/code)
 [![Validation](https://img.shields.io/badge/validation-automated-success.svg)](https://github.com/Liamns/claude-workflows)
@@ -11,6 +11,13 @@
 
 ## 🆕 최신 기능
 
+### v4.1.2 - 명령어 참조 일관성 수정
+
+**🔧 워크플로우 명령어 참조 통일**
+- 모든 문서에서 `/minor` → `/plan-minor`, `/major` → `/plan-major`로 수정
+- 2단계 워크플로우 구조 명확화: `/plan-*` → `/implement`
+- 명령어, 예시, 트러블슈팅 문서 전체 점검 완료
+
 ### v4.1.1 - /docu 게이트웨이 통합 및 스키마 수정
 
 **🔗 /docu 게이트웨이 명령어**
@@ -20,7 +27,6 @@
 
 **🔧 tracker.md 스키마 수정**
 - Notion 실제 속성명으로 업데이트 (영어 → 한글)
-- 작업 설명, 진행 상황, 우선순위, 작업 분류, 참여자, 시작일, 종료일
 
 ### v4.1.0 - /docu-* 명령어 시스템 업그레이드
 
@@ -31,18 +37,6 @@
 **📝 작업 로그 자동 생성**
 - `/docu-update` 실행 시 '작업 로그' 서브페이지 자동 생성
 - 커밋ID, 핵심작업내용, 작업날짜 표 구조
-
-### v4.0.0 - Legacy Cleanup & Streamlined Architecture
-
-**🧹 대규모 레거시 정리**
-- deprecated 레거시 명령어 및 설정 파일 완전 제거
-- 사용하지 않는 Shell 스크립트 40+ 개 정리
-- 코드베이스 경량화 및 유지보수성 향상
-
-**🛡️ Epic 007 - md+Hook+CLAUDE.md 3중 방어 구조**
-- 명령어 md 파일 자체 규칙 강화
-- PostHook 검증 시스템 연동
-- CLAUDE.md 프로젝트 레벨 규칙 통합
 
 ## 🚀 Quick Start
 

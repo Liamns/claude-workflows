@@ -35,7 +35,7 @@ git init
 git remote add origin <repository-url>
 
 # 다시 실행
-/major
+/plan-major
 ```
 
 ---
@@ -63,7 +63,7 @@ git remote add origin <repository-url>
 # - Hexagonal (Backend)
 
 # 설정 후 다시 실행
-/major
+/plan-major
 ```
 
 ---
@@ -173,14 +173,14 @@ git branch -D 010-auth-system
 rm -rf .specify/features/010-auth-system/
 
 # Major 재실행
-/major
+/plan-major
 ```
 
 **해결 방법 3: 새 번호로 시작**
 ```bash
 # 다음 번호로 새 spec 생성
-# Major가 자동으로 011번 할당
-/major
+# /plan-major가 자동으로 011번 할당
+/plan-major
 ```
 
 ---
@@ -207,7 +207,7 @@ git checkout -b 010-auth-system  # 브랜치 재생성
 
 # 내용을 버리려면
 rm -rf .specify/features/010-auth-system/
-/major  # 재실행
+/plan-major  # 재실행
 ```
 
 ---
@@ -681,7 +681,7 @@ export async function login(email: string, password: string) {
 ```
 
 **원인:**
-- Epic 외부에서 `/major` 실행
+- Epic 외부에서 `/plan-major` 실행
 - Epic 브랜치로 체크아웃하지 않음
 
 **해결:**
@@ -693,9 +693,11 @@ git checkout 009-ecommerce-platform
 git branch --show-current
 # 출력: 009-ecommerce-platform
 
-# 3. Major 실행
-/major "사용자 인증"
+# 3. Major 계획 및 구현
+/plan-major "사용자 인증"
 # → .specify/features/009-ecommerce-platform/features/001-auth/ 생성
+# 문서 검토 후
+/implement
 ```
 
 ---
@@ -766,13 +768,17 @@ git checkout -b 009-ecommerce-platform-payment
 git checkout 009-ecommerce-platform
 
 # Feature 1 작업
-/major "인증 시스템"
+/plan-major "인증 시스템"
+# 문서 검토 후
+/implement
 # ... 구현 ...
 git add .
 git commit -m "feat(auth): implement authentication"
 
 # Feature 2 작업 (같은 브랜치에서)
-/major "결제 통합"
+/plan-major "결제 통합"
+# 문서 검토 후
+/implement
 # ... 구현 ...
 git add .
 git commit -m "feat(payment): integrate payment gateway"
@@ -807,8 +813,8 @@ git checkout HEAD -- .claude/templates/
 # 3. 또는 최신 버전으로 업데이트
 git pull origin main
 
-# 4. Major 재실행
-/major
+# 4. Major 계획 재실행
+/plan-major
 ```
 
 ---
@@ -1021,15 +1027,13 @@ cat .claude/cache/stats.json
 ```bash
 # 전체를 한 번에 하지 말고 Phase별로 나눔
 
-# Phase 1만 먼저
-/major
-# → spec.md, plan.md만 생성
+# Phase 1: 계획 단계
+/plan-major
+# → spec.md, plan.md, tasks.md 생성
 
-# Phase 2
-# → tasks.md 생성
-
-# Phase 3
-# → research.md, data-model.md 생성
+# Phase 2: 구현 단계
+/implement
+# → tasks.md 기반으로 코드 구현
 ```
 
 ---
@@ -1052,12 +1056,12 @@ tail -n 100 .claude/logs/major-*.log | grep "ERROR"
 ### 상세 모드 실행
 
 ```bash
-# 디버그 모드로 Major 실행
-DEBUG=true /major
+# 디버그 모드로 Major 계획 실행
+DEBUG=true /plan-major
 
 # 또는 환경 변수 설정
 export CLAUDE_DEBUG=1
-/major
+/plan-major
 ```
 
 ### Git 상태 확인
@@ -1094,7 +1098,8 @@ cat .claude/workflow-gates.json | jq '.major'
 
 ### 관련 문서
 
-- [major.md](../major.md) - Major 워크플로우 메인 문서
+- [plan-major.md](../../commands/plan-major.md) - Major 계획 단계
+- [implement.md](../../commands/implement.md) - 구현 단계
 - [major-examples.md](major-examples.md) - 사용 예시
 - [major-document-templates.md](major-document-templates.md) - 문서 템플릿
 

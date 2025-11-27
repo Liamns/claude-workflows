@@ -155,27 +155,27 @@
 
 ## Examples
 
-### Example 1: New React Project (FSD)
+### 예시 1: React 프로젝트 (FSD)
 
 ```bash
 /start
 ```
 
-**Output:**
+**출력:**
 ```
-🚀 Claude Workflows - Project Initialization
+🚀 Claude Workflows - 프로젝트 초기화
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-📊 Analyzing project structure...
+📊 프로젝트 구조 분석 중...
 
-✓ Found: package.json
-✓ Found: src/ directory
-✓ Detected: React application
+✓ 발견: package.json
+✓ 발견: src/ 디렉토리
+✓ 감지: React 애플리케이션
 
-🔍 Architecture Detection:
+🔍 아키텍처 감지:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Analyzing directories...
+디렉토리 분석 중...
 ✓ src/app/
 ✓ src/pages/
 ✓ src/widgets/
@@ -183,124 +183,124 @@ Analyzing directories...
 ✓ src/entities/
 ✓ src/shared/
 
-🎯 Detected Architecture: Feature-Sliced Design (FSD)
-Confidence: 95%
+🎯 감지된 아키텍처: Feature-Sliced Design (FSD)
+신뢰도: 95%
 
-📝 Configuration:
+📝 설정:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Creating .specify/memory/constitution.md
-- FSD layer rules
-- Import constraints
-- Naming conventions
+.specify/memory/constitution.md 생성 중
+- FSD 레이어 규칙
+- Import 제약 조건
+- 네이밍 규칙
 
-Creating .specify/config/architecture.json
-- Architecture: "fsd"
-- Layers: [app, pages, widgets, features, entities, shared]
-- Validation: enabled
+.specify/config/architecture.json 생성 중
+- 아키텍처: "fsd"
+- 레이어: [app, pages, widgets, features, entities, shared]
+- 검증: 활성화
 
-Creating workflow-gates.json
-- Major workflow gates
-- Minor workflow gates
-- Reusability checks
+workflow-gates.json 생성 중
+- Major 워크플로우 게이트
+- Minor 워크플로우 게이트
+- 재사용성 검사
 
-✅ Setup Complete!
+✅ 설정 완료!
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Next Steps:
-1. Review .specify/memory/constitution.md
-2. Run: /triage "your first task"
-3. Start development with /major, /minor, or /micro
+다음 단계:
+1. .specify/memory/constitution.md 검토
+2. 실행: /triage "첫 번째 작업"
+3. /plan-major, /plan-minor, 또는 /micro로 개발 시작
 
-Architecture: Feature-Sliced Design (FSD)
-Templates: 15 components ready
-Agents: 6 unified agents configured
+아키텍처: Feature-Sliced Design (FSD)
+템플릿: 15개 컴포넌트 준비됨
+에이전트: 6개 통합 에이전트 설정됨
 ```
 
-### Example 2: Backend API (Clean Architecture)
+### 예시 2: 백엔드 API (Clean Architecture)
 
 ```bash
 /start
 ```
 
-**Output:**
+**출력:**
 ```
-🚀 Claude Workflows - Project Initialization
+🚀 Claude Workflows - 프로젝트 초기화
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-📊 Analyzing project structure...
+📊 프로젝트 구조 분석 중...
 
-✓ Found: package.json
-✓ Found: src/ directory
-✓ Detected: Node.js backend
+✓ 발견: package.json
+✓ 발견: src/ 디렉토리
+✓ 감지: Node.js 백엔드
 
-🔍 Architecture Detection:
+🔍 아키텍처 감지:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Analyzing directories...
+디렉토리 분석 중...
 ✓ src/domain/
 ✓ src/application/
 ✓ src/infrastructure/
 ✓ src/presentation/
 
-🎯 Detected Architecture: Clean Architecture
-Confidence: 92%
+🎯 감지된 아키텍처: Clean Architecture
+신뢰도: 92%
 
-📝 Configuration:
+📝 설정:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Creating .specify/memory/constitution.md
-- Dependency rules (inward only)
-- Entity independence
-- Use case patterns
+.specify/memory/constitution.md 생성 중
+- 의존성 규칙 (내부 방향만)
+- 엔티티 독립성
+- Use case 패턴
 
-Creating .specify/config/architecture.json
-- Architecture: "clean"
-- Layers: [domain, application, infrastructure, presentation]
-- Dependency direction: inward
+.specify/config/architecture.json 생성 중
+- 아키텍처: "clean"
+- 레이어: [domain, application, infrastructure, presentation]
+- 의존성 방향: 내부
 
-✅ Setup Complete!
+✅ 설정 완료!
 
-Next Steps:
-1. Review architectural constraints
-2. Run: /triage "Add new use case"
-3. Implement with strict layer separation
+다음 단계:
+1. 아키텍처 제약 조건 검토
+2. 실행: /triage "새 use case 추가"
+3. 엄격한 레이어 분리로 구현
 ```
 
-### Example 3: Fullstack (Manual Selection)
+### 예시 3: 풀스택 (수동 선택)
 
 ```bash
 /start
 ```
 
-**Prompt:**
+**프롬프트:**
 ```
-🔍 Multiple architectures detected:
-- Frontend: React in src/client/
-- Backend: Node.js in src/server/
+🔍 다중 아키텍처 감지:
+- 프론트엔드: src/client/ 의 React
+- 백엔드: src/server/ 의 Node.js
 
-Please specify architectures:
+아키텍처를 선택하세요:
 ```
 
-**User selects:**
-- Frontend: FSD
-- Backend: Clean Architecture
+**사용자 선택:**
+- 프론트엔드: FSD
+- 백엔드: Clean Architecture
 
-**Output:**
+**출력:**
 ```
-📝 Multi-Architecture Configuration:
+📝 다중 아키텍처 설정:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Frontend (src/client/):
-- Architecture: FSD
-- Layers: [app, pages, widgets, features, entities, shared]
+프론트엔드 (src/client/):
+- 아키텍처: FSD
+- 레이어: [app, pages, widgets, features, entities, shared]
 
-Backend (src/server/):
-- Architecture: Clean Architecture
-- Layers: [domain, application, infrastructure, presentation]
+백엔드 (src/server/):
+- 아키텍처: Clean Architecture
+- 레이어: [domain, application, infrastructure, presentation]
 
-Creating unified constitution...
-✅ Multi-architecture setup complete!
+통합 constitution 생성 중...
+✅ 다중 아키텍처 설정 완료!
 ```
 
 ## Implementation

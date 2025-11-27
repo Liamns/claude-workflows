@@ -138,103 +138,103 @@ PR 리뷰 완료 후, **수정이 필요한 사항이 있을 때** 커밋 여부
 
 ## Examples
 
-### Example 1: Basic PR Review
+### 예시 1: 기본 PR 리뷰
 
 ```bash
 /pr-review 42
 ```
 
-**Output:**
+**출력:**
 ```
 ╔═══════════════════════════════════════╗
-║   PR #42 Review                       ║
+║   PR #42 리뷰                         ║
 ╚═══════════════════════════════════════╝
 
-📋 PR Info
+📋 PR 정보
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Title: feat: Add user authentication
-Author: @username
-Files: 12 changed
-+1,245 -89 lines
+제목: feat: 사용자 인증 추가
+작성자: @username
+파일: 12개 변경
++1,245 -89 라인
 
-✅ Strengths
+✅ 강점
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-1. Well-structured authentication flow
-2. Comprehensive test coverage (92%)
-3. Follows existing patterns in auth/
+1. 잘 구조화된 인증 흐름
+2. 높은 테스트 커버리지 (92%)
+3. auth/ 내 기존 패턴 준수
 
-⚠️  Issues Found
+⚠️  발견된 문제
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-[MEDIUM] Missing rate limiting
-  File: src/api/login.ts:45
-  → Add rate limiting to prevent brute force
+[MEDIUM] Rate limiting 누락
+  파일: src/api/login.ts:45
+  → 무차별 대입 공격 방지를 위한 rate limiting 추가 필요
 
-[LOW] Inconsistent error messages
-  Files: src/auth/*.ts
-  → Use centralized error messages
+[LOW] 일관성 없는 에러 메시지
+  파일: src/auth/*.ts
+  → 중앙화된 에러 메시지 사용 권장
 
-💡 Suggestions
+💡 제안 사항
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-- Consider using existing src/utils/validator.ts
-- Add integration tests for token refresh flow
+- 기존 src/utils/validator.ts 활용 고려
+- 토큰 갱신 플로우에 대한 통합 테스트 추가
 
-📊 Overall Assessment
+📊 종합 평가
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Score: 85/100
-Recommendation: ✅ APPROVE with minor changes
+점수: 85/100
+권장: ✅ APPROVE (사소한 수정 필요)
 ```
 
-### Example 2: Security-Focused Review
+### 예시 2: 보안 중심 리뷰
 
 ```bash
 /pr-review 42 --security
 ```
 
-**Output:**
+**출력:**
 ```
 ╔═══════════════════════════════════════╗
-║   Security Review - PR #42            ║
+║   보안 리뷰 - PR #42                   ║
 ╚═══════════════════════════════════════╝
 
-🔒 OWASP Top 10 Analysis
+🔒 OWASP Top 10 분석
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-❌ [CRITICAL] Password Stored in Plain Text
-   File: src/models/user.ts:67
-   Issue: Passwords not hashed
-   Fix: Use bcrypt with salt rounds >= 12
+❌ [CRITICAL] 비밀번호 평문 저장
+   파일: src/models/user.ts:67
+   문제: 비밀번호 해싱 안 됨
+   해결: bcrypt 사용 (salt rounds >= 12)
 
-⚠️  [HIGH] SQL Injection Risk
-   File: src/api/users.ts:123
-   Issue: String concatenation in query
-   Fix: Use parameterized queries
+⚠️  [HIGH] SQL Injection 위험
+   파일: src/api/users.ts:123
+   문제: 쿼리에 문자열 연결 사용
+   해결: 파라미터화된 쿼리 사용
 
-✅ [PASS] XSS Prevention
-   All user inputs properly sanitized
+✅ [통과] XSS 방지
+   모든 사용자 입력이 적절히 sanitize됨
 
-✅ [PASS] CSRF Protection
-   Tokens implemented correctly
+✅ [통과] CSRF 보호
+   토큰이 올바르게 구현됨
 
-🛡️  Additional Checks
+🛡️  추가 검사
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-⚠️  Dependencies: 2 vulnerabilities found
-   - jsonwebtoken: Upgrade to 9.0.0+
-   - express: Upgrade to 4.18.2+
+⚠️  의존성: 2개의 취약점 발견
+   - jsonwebtoken: 9.0.0+ 으로 업그레이드 필요
+   - express: 4.18.2+ 으로 업그레이드 필요
 
-📊 Security Score: 45/100
+📊 보안 점수: 45/100
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Recommendation: ❌ REQUEST CHANGES
-Critical issues must be fixed before merge
+권장: ❌ REQUEST CHANGES
+병합 전 치명적 문제 수정 필요
 ```
 
-### Example 3: Full Detailed Review
+### 예시 3: 상세 리뷰
 
 ```bash
 /pr-review 42 --full

@@ -21,7 +21,7 @@
 ```
 ❌ Error: Scope too large for Minor workflow
 Complexity: 9/15 (Major threshold: 8+)
-Recommendation: Use /major instead
+Recommendation: Use /plan-major instead
 ```
 
 **원인:**
@@ -33,7 +33,9 @@ Recommendation: Use /major instead
 
 **방법 1: Major 워크플로우 사용**
 ```bash
-/major
+/plan-major
+# 문서 생성 후
+/implement
 ```
 더 큰 범위의 작업에 적합한 Major 워크플로우로 전환
 
@@ -77,7 +79,7 @@ Please provide:
 
 **좋은 이슈 설명 작성:**
 ```bash
-/minor
+/plan-minor
 ```
 
 **대화 과정:**
@@ -160,7 +162,7 @@ TypeError: Cannot read property 'toLowerCase' of null
 ```
 ⚠️ Warning: 12 files will be affected
 Minor workflow is optimized for 1-4 files
-Consider using /major for better organization
+Consider using /plan-major for better organization
 ```
 
 **원인:**
@@ -188,20 +190,25 @@ Consider using /major for better organization
 
 **방법 2: Major 워크플로우로 전환**
 ```bash
-/major
-# 여러 파일에 걸친 체계적인 리팩토링
+/plan-major
+# 여러 파일에 걸친 체계적인 리팩토링 계획
+/implement
+# 계획에 따라 구현
 ```
 
 **방법 3: 여러 Minor 작업으로 분할**
 ```bash
 # 작업 1: 로그인 폼
-/minor "로그인 폼 검증 개선"
+/plan-minor "로그인 폼 검증 개선"
+/implement
 
 # 작업 2: 회원가입 폼
-/minor "회원가입 폼 검증 개선"
+/plan-minor "회원가입 폼 검증 개선"
+/implement
 
 # 작업 3: 공통 유틸리티
-/minor "폼 검증 유틸리티 추출"
+/plan-minor "폼 검증 유틸리티 추출"
+/implement
 ```
 
 ---

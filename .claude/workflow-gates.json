@@ -67,6 +67,28 @@
               "에러 응답 형식",
               "MSW 핸들러"
             ]
+          },
+          "dto-type-search": {
+            "enabled": true,
+            "required": true,
+            "description": "기존 DTO/Type 검색 필수화",
+            "skill": "reusability-enforcer",
+            "criteria": [
+              "관련 DTO 검색 완료",
+              "관련 Type 정의 검색",
+              "기존 타입 우선 재사용"
+            ]
+          },
+          "test-prerequisite": {
+            "enabled": true,
+            "required": true,
+            "description": "테스트 파일 사전 검사 (TDD 강제)",
+            "hook": "implement-smart-selector.sh",
+            "criteria": [
+              "대상 파일에 대한 테스트 파일 존재 확인",
+              "테스트 미존재 시 AskUserQuestion으로 TDD 선택",
+              "/test 명령어로 테스트 우선 작성 유도"
+            ]
           }
         },
         "during-implementation": {

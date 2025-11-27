@@ -20,6 +20,42 @@ usage: "/prisma-migrate"
 
 ---
 
+## 📋 환경 파일 선택 규칙 (AskUserQuestion 필수)
+
+### ENV_FILES_DETECTED 파싱
+
+스크립트가 `ENV_FILES_DETECTED:` 출력을 반환하면, 반드시 AskUserQuestion으로 환경 선택을 유도합니다.
+
+**스크립트 출력 예시:**
+```
+ENV_FILES_DETECTED:.env,.env.development,.env.production,
+```
+
+**AskUserQuestion 호출 예시:**
+```
+[AskUserQuestion 호출]
+- question: "여러 환경 파일이 감지되었습니다. 어떤 환경에서 마이그레이션을 실행하시겠습니까?"
+- header: "환경 선택"
+- options:
+  - ".env (기본)"
+  - ".env.development"
+  - ".env.production"
+```
+
+### 선택 후 처리
+
+사용자가 선택한 환경 파일에 따라:
+1. 해당 `.env` 파일의 `DATABASE_URL`을 사용
+2. 환경에 맞는 Prisma 명령어 실행
+   - `.env.development` → `prisma migrate dev`
+   - `.env.production` → `prisma migrate deploy`
+
+### 단일 환경 파일인 경우
+
+`.env` 파일이 하나만 존재하면 AskUserQuestion 없이 해당 환경 사용.
+
+---
+
 ## 📋 다음 단계 추천 시 필수 규칙
 
 ### 마이그레이션 완료 후 DB 동기화 제안 시 AskUserQuestion 사용

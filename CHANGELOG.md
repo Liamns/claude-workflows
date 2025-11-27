@@ -7,6 +7,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.2.0] - 2025-11-28
+
+### Added
+- **`/test` 명령어 신규 추가** - 테스트 작성 전용 명령어
+  - git diff 기반 대상 파일 자동 감지
+  - `--coverage` 옵션: 커버리지 분석 및 미커버 영역 보완
+  - `--fix` 옵션: 테스트 파일 타입 에러 자동 수정
+  - PreHook으로 관련 DTO/Type/Mock 자동 검색
+  - AAA (Arrange-Act-Assert) 패턴 자동 적용
+
+- **TDD 강제 메커니즘** (`/implement` Major 모드)
+  - 테스트 파일 존재 여부 사전 검사
+  - `TEST_REQUIRED` 플래그 기반 분기
+  - AskUserQuestion으로 TDD 선택 제공:
+    - 테스트 먼저 작성 → `/test` 연계
+    - 테스트 없이 진행 (경고)
+    - 취소
+
+- **workflow-gates.json 새 게이트**
+  - `dto-type-search`: 기존 DTO/Type 검색 필수화
+  - `test-prerequisite`: TDD 사전 검사 (Major 모드)
+
+### Enhanced
+- **reusability-enforcer 스킬 강화**
+  - 시나리오 7: 테스트 작성 시 DTO/Type/Mock 재사용
+  - 시나리오 7-1: API 테스트 작성 시 DTO 우선 재사용
+  - 기존 Mock/Stub 자동 검색 및 재사용 유도
+
+- **implement-smart-selector.sh 훅 개선**
+  - TDD 검사 로직 통합
+  - 테스트 미존재 파일 목록 출력
+  - `/test` 명령어 연계 지원
+
+### Changed
+- `/implement` 명령어 문서 확장 (TDD 섹션 추가)
+- `/prisma-migrate` 명령어 개선
+
 ## [4.1.2] - 2025-11-27
 
 ### Fixed

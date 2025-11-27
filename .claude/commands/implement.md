@@ -47,20 +47,73 @@ hooks:
 - **여러 개 발견**: stderr로 목록 출력, 명령어가 AskUserQuestion 생성
 - **0개 발견**: 차단 (exit code 2) - "완료되지 않은 작업이 없습니다"
 
+## TDD 강제 메커니즘 (Major 모드)
+
+PreHook이 `TEST_REQUIRED:true`를 출력한 경우, 테스트가 없는 상태입니다.
+
+### PreHook 결과 처리
+
+PreHook stderr 출력에서 다음 패턴을 확인:
+- `TEST_REQUIRED:true` → 테스트 미존재, AskUserQuestion 분기
+- `TEST_REQUIRED:false` → 테스트 존재, 정상 진행
+
+### TDD 선택 분기
+
+**TEST_REQUIRED:true 감지 시**, 반드시 AskUserQuestion 호출:
+
+```
+question: "테스트가 없습니다. 어떻게 진행하시겠습니까?"
+header: "TDD 선택"
+options:
+  - label: "테스트 먼저 작성"
+    description: "/test 명령어 실행하여 테스트 먼저 생성"
+  - label: "테스트 없이 진행"
+    description: "권장하지 않음 - 나중에 테스트 추가 필요"
+  - label: "취소"
+    description: "구현을 중단하고 계획 재검토"
+```
+
+### 선택에 따른 처리
+
+| 선택 | 처리 |
+|------|------|
+| 테스트 먼저 작성 | `SlashCommand("/test")` 실행 |
+| 테스트 없이 진행 | 경고 메시지 출력 후 구현 계속 |
+| 취소 | 구현 종료, 계획 검토 안내 |
+
+### TDD 경고 메시지 (테스트 없이 진행 선택 시)
+
+```
+⚠️  경고: 테스트 없이 진행합니다
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+테스트 작성을 건너뛰면:
+- 리팩토링 시 회귀 버그 위험 증가
+- 코드 품질 검증 어려움
+- PR 리뷰 시 지적 가능성
+
+구현 완료 후 반드시 /test 실행을 권장합니다.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
 ## 구현 프로세스
 
 1. **문서 로드**
    - `tasks.md` 또는 `fix-analysis.md` 읽기
    - 미완료 task 목록 확인
 
-2. **순차 구현**
+2. **TDD 검사** (Major 모드)
+   - PreHook에서 `TEST_REQUIRED` 플래그 확인
+   - 테스트 없으면 AskUserQuestion 분기
+   - 사용자 선택에 따라 진행
+
+3. **순차 구현**
    - 체크리스트 순서대로 구현
    - 각 task마다:
      - 필요한 파일 탐색
      - 코드 작성/수정
      - 테스트 확인
 
-3. **품질 검증**
+4. **품질 검증**
    - 타입 체크 (`yarn type-check`)
    - 테스트 실행 (해당 시)
    - 코드 스타일 확인
@@ -126,7 +179,7 @@ git diff --name-only
 
 ## 스마트 선택 동작 예시
 
-### 예시 1: 1개 발견 (자동 선택)
+### 예시 1: 1개 발견 (자동 선택, 테스트 존재)
 
 ```bash
 $ /implement
@@ -137,7 +190,40 @@ $ /implement
    - 3개 미완료 task
 
 📍 자동 선택되었습니다
+📋 워크플로우 모드: major
+
+🧪 TDD 검사 실행 중...
+✅ TDD 검사 통과 (테스트 파일 존재 확인)
+TEST_REQUIRED:false
+
 → 구현 시작...
+```
+
+### 예시 1-1: Major 모드, 테스트 미존재 (TDD 분기)
+
+```bash
+$ /implement
+
+# PreHook 실행:
+🔍 미완료 작업 탐색 중...
+✅ 발견: .specify/features/009-new-feature
+   - 5개 미완료 task
+
+📍 자동 선택되었습니다
+📋 워크플로우 모드: major
+
+🧪 TDD 검사 실행 중...
+⚠️  테스트가 없는 소스 파일 발견:
+   - src/features/order/ui/OrderForm.tsx
+   - src/features/order/api/orderApi.ts
+
+TEST_REQUIRED:true
+
+# 명령어가 AskUserQuestion 생성:
+[TDD 선택]
+- 테스트 먼저 작성 → /test 실행
+- 테스트 없이 진행 → 경고 후 계속
+- 취소 → 종료
 ```
 
 ### 예시 2: 여러 개 발견 (선택 필요)

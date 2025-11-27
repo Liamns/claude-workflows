@@ -1,6 +1,6 @@
 # 🤖 Claude Workflows
 
-[![Version](https://img.shields.io/badge/version-4.1.2-blue.svg)](https://github.com/Liamns/claude-workflows)
+[![Version](https://img.shields.io/badge/version-4.2.0-blue.svg)](https://github.com/Liamns/claude-workflows)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-purple.svg)](https://claude.ai/code)
 [![Validation](https://img.shields.io/badge/validation-automated-success.svg)](https://github.com/Liamns/claude-workflows)
@@ -11,32 +11,32 @@
 
 ## 🆕 최신 기능
 
+### v4.2.0 - TDD 강화 및 /test 명령어
+
+**🧪 `/test` 명령어 신규**
+- 테스트 작성 전용 명령어
+- git diff 기반 대상 파일 자동 감지
+- `--coverage`: 커버리지 분석 및 미커버 영역 보완
+- `--fix`: 테스트 파일 타입 에러 자동 수정
+
+**🔒 TDD 강제 메커니즘**
+- `/implement` Major 모드에서 테스트 존재 여부 검사
+- 테스트 없으면 AskUserQuestion으로 분기:
+  - 테스트 먼저 작성 → `/test` 연계
+  - 테스트 없이 진행 (경고)
+  - 취소
+
 ### v4.1.2 - 명령어 참조 일관성 수정
 
 **🔧 워크플로우 명령어 참조 통일**
 - 모든 문서에서 `/minor` → `/plan-minor`, `/major` → `/plan-major`로 수정
 - 2단계 워크플로우 구조 명확화: `/plan-*` → `/implement`
-- 명령어, 예시, 트러블슈팅 문서 전체 점검 완료
 
 ### v4.1.1 - /docu 게이트웨이 통합 및 스키마 수정
 
 **🔗 /docu 게이트웨이 명령어**
 - 기존 6개 `docu-*` 명령어를 단일 `/docu` 게이트웨이로 통합
 - 자연어 입력으로 모든 작업 처리 (Claude Code가 직접 파싱)
-- 채널 선택 (화주/어드민) 후 자동 라우팅
-
-**🔧 tracker.md 스키마 수정**
-- Notion 실제 속성명으로 업데이트 (영어 → 한글)
-
-### v4.1.0 - /docu-* 명령어 시스템 업그레이드
-
-**🎯 채널 선택 옵션** (`--web`/`--admin`)
-- 모든 `/docu-*` 명령어에서 데이터베이스 직접 선택 가능
-- 옵션 미입력 시 AskUserQuestion으로 안내
-
-**📝 작업 로그 자동 생성**
-- `/docu-update` 실행 시 '작업 로그' 서브페이지 자동 생성
-- 커밋ID, 핵심작업내용, 작업날짜 표 구조
 
 ## 🚀 Quick Start
 
@@ -136,6 +136,7 @@ bash .claude/lib/generate-checksums.sh -o .claude/.checksums.json --verbose
 /review --staged    # 코드 리뷰
 /commit            # 스마트 커밋
 /pr                # PR 자동 생성
+/test              # 🧪 테스트 작성 (TDD 연계)
 /dashboard         # 📊 실시간 메트릭스 대시보드
 
 # 📝 Notion Integration (v3.5.0)
@@ -321,4 +322,4 @@ MIT License - 자유롭게 사용, 수정, 배포 가능
 
 ---
 
-**v4.1.1** | [GitHub](https://github.com/Liamns/claude-workflows) | Made with ❤️ for Claude Code
+**v4.2.0** | [GitHub](https://github.com/Liamns/claude-workflows) | Made with ❤️ for Claude Code

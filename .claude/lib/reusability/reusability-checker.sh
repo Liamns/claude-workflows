@@ -43,6 +43,10 @@ Options:
                         - utils: 유틸리티 함수
                         - state: 상태 관리 (Zustand, Redux)
                         - form: 폼 관련 코드
+                        - dto: DTO 클래스/인터페이스
+                        - type: TypeScript 타입 정의
+                        - mock: Mock 파일 (__mocks__/, *.mock.ts)
+                        - stub: Stub/Fixture 파일
                         (default: all)
 
   -o, --output <FORMAT> Output format: text|json|markdown
@@ -143,12 +147,12 @@ main() {
 
   # 타입 검증
   case "$type" in
-    all|api|component|hook|service|controller|prisma|utils|state|form)
+    all|api|component|hook|service|controller|prisma|utils|state|form|dto|type|mock|stub)
       # Valid
       ;;
     *)
       log_error "Invalid type: $type"
-      log_error "Must be one of: all, api, component, hook, service, controller, prisma, utils, state, form"
+      log_error "Must be one of: all, api, component, hook, service, controller, prisma, utils, state, form, dto, type, mock, stub"
       exit 1
       ;;
   esac
@@ -221,31 +225,75 @@ main() {
 
   local search_results=""
 
-  case "$env" in
-    frontend)
-      if [[ "$verbose" == "true" ]]; then
-        log_info "Searching frontend patterns..."
-      fi
-      search_results=$("${SCRIPT_DIR}/search-react.sh" "$query" "$type" 2>/dev/null || echo "")
+  # Mock/Stub/DTO/Type 전용 검색 함수
+  search_mock_files() {
+    local q="$1"
+    echo "# Mock Files (__mocks__/, *.mock.ts)"
+    find . -type f \( -path "*/__mocks__/*" -o -name "*.mock.ts" -o -name "*.mock.tsx" \) -not -path "./node_modules/*" 2>/dev/null | grep -i "$q" || echo "  No mocks found"
+  }
+
+  search_stub_files() {
+    local q="$1"
+    echo "# Stub/Fixture Files"
+    find . -type f \( -name "*.stub.ts" -o -name "*.fixture.ts" -o -path "*/fixtures/*" \) -not -path "./node_modules/*" 2>/dev/null | grep -i "$q" || echo "  No stubs found"
+  }
+
+  search_dto_files() {
+    local q="$1"
+    echo "# DTO Files"
+    find . -type f -name "*.dto.ts" -not -path "./node_modules/*" 2>/dev/null | xargs grep -l "$q" 2>/dev/null || true
+    find . -type f \( -name "dto.ts" -o -name "dtos.ts" \) -not -path "./node_modules/*" 2>/dev/null | xargs grep -l "$q" 2>/dev/null || true
+    grep -r "interface.*${q}.*DTO\|class.*${q}.*DTO\|type.*${q}.*DTO" --include="*.ts" . 2>/dev/null | grep -v node_modules | head -10 || echo "  No DTOs found"
+  }
+
+  search_type_files() {
+    local q="$1"
+    echo "# Type Definitions"
+    find . -type f \( -name "types.ts" -o -name "*.types.ts" -o -name "*.d.ts" \) -not -path "./node_modules/*" 2>/dev/null | xargs grep -l "$q" 2>/dev/null || true
+    grep -r "interface.*${q}\|type.*${q}\s*=" --include="*.ts" --include="*.tsx" . 2>/dev/null | grep -v node_modules | grep -v "\.dto\." | head -10 || echo "  No types found"
+  }
+
+  # 특수 타입 검색 (mock, stub, dto, type)
+  case "$type" in
+    mock)
+      search_results=$(search_mock_files "$query")
       ;;
-
-    backend)
-      if [[ "$verbose" == "true" ]]; then
-        log_info "Searching backend patterns..."
-      fi
-      search_results=$("${SCRIPT_DIR}/search-nestjs.sh" "$query" "$type" 2>/dev/null || echo "")
+    stub)
+      search_results=$(search_stub_files "$query")
       ;;
+    dto)
+      search_results=$(search_dto_files "$query")
+      ;;
+    type)
+      search_results=$(search_type_files "$query")
+      ;;
+    *)
+      # 기존 환경별 검색 로직
+      case "$env" in
+        frontend)
+          if [[ "$verbose" == "true" ]]; then
+            log_info "Searching frontend patterns..."
+          fi
+          search_results=$("${SCRIPT_DIR}/search-react.sh" "$query" "$type" 2>/dev/null || echo "")
+          ;;
 
-    fullstack)
-      if [[ "$verbose" == "true" ]]; then
-        log_info "Searching fullstack patterns..."
-      fi
+        backend)
+          if [[ "$verbose" == "true" ]]; then
+            log_info "Searching backend patterns..."
+          fi
+          search_results=$("${SCRIPT_DIR}/search-nestjs.sh" "$query" "$type" 2>/dev/null || echo "")
+          ;;
 
-      local frontend_results=$("${SCRIPT_DIR}/search-react.sh" "$query" "$type" 2>/dev/null || echo "")
-      local backend_results=$("${SCRIPT_DIR}/search-nestjs.sh" "$query" "$type" 2>/dev/null || echo "")
+        fullstack)
+          if [[ "$verbose" == "true" ]]; then
+            log_info "Searching fullstack patterns..."
+          fi
 
-      # 결과 결합
-      search_results=$(cat <<EOF
+          local frontend_results=$("${SCRIPT_DIR}/search-react.sh" "$query" "$type" 2>/dev/null || echo "")
+          local backend_results=$("${SCRIPT_DIR}/search-nestjs.sh" "$query" "$type" 2>/dev/null || echo "")
+
+          # 결과 결합
+          search_results=$(cat <<EOF
 # ========================================
 # Frontend Results
 # ========================================
@@ -257,6 +305,8 @@ ${frontend_results}
 ${backend_results}
 EOF
 )
+          ;;
+      esac
       ;;
   esac
 

@@ -5,6 +5,8 @@ hooks:
   post: .claude/hooks/docu-close-post.sh
 ---
 
+> **DEPRECATED**: 이 명령어는 `/docu`로 통합되었습니다. `/docu 완료` 형태로 사용하세요.
+
 # Docu:Close - 작업 완료 처리 및 커밋 동기화
 
 > **참고**: 이 명령어는 `.claude/CLAUDE.md`의 규칙을 준수합니다.

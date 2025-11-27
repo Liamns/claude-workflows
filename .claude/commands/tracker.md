@@ -27,11 +27,14 @@ load_config "tracker"
 TRACKER_DS="2ad47c08-6985-8016-b033-000bdcffaec7"
 TRACKER_DS_URL="collection://2ad47c08-6985-8016-b033-000bdcffaec7"
 
-# 속성명
-PROP_TITLE="Project name"
-PROP_STATUS="Status"
-PROP_PRIORITY="Priority"
-PROP_TAG="Tag"
+# 속성명 (실제 Notion 스키마)
+PROP_TITLE="작업 설명"
+PROP_STATUS="진행 상황"
+PROP_PRIORITY="우선순위"
+PROP_TAG="작업 분류"
+PROP_ASSIGNEE="참여자"
+PROP_START_DATE="시작일"
+PROP_END_DATE="종료일"
 ```
 
 ## Usage
@@ -57,13 +60,13 @@ PROP_TAG="Tag"
 
 | 필드 | 타입 | 값 |
 |------|------|-----|
-| Project name | title | 프로젝트/이슈 제목 |
-| Status | status | `Not started`, `In progress`, `Done` |
-| Priority | select | `High`, `Medium`, `Low` |
-| Tag | multi_select | `Issue`, `Bug`, `Feature`, `Refatoring` |
-| Assignee | person | 담당자 |
-| Start date | date | 시작일 |
-| End date | date | 종료일 |
+| 작업 설명 | title | 프로젝트/이슈 제목 |
+| 진행 상황 | status | `Not started`, `In progress`, `Done` |
+| 우선순위 | select | `High`, `Medium`, `Low` |
+| 작업 분류 | multi_select | `Issue`, `Bug`, `Feature`, `Refatoring` |
+| 참여자 | person | 담당자 |
+| 시작일 | date | 시작일 |
+| 종료일 | date | 종료일 |
 | Team | multi_select | 팀 |
 | Progress | formula | 진행률 (자동 계산) |
 
@@ -131,12 +134,12 @@ PROP_TAG="Tag"
      --parent '{"data_source_id": "2ad47c08-6985-8016-b033-000bdcffaec7"}' \
      --pages '[{
        "properties": {
-         "Project name": "'"$title"'",
-         "Status": "Not started",
-         "Priority": "'"$priority"'",
-         "Tag": "[\"'"$tag"'\"]",
-         "Assignee": "[\"'"$user_id"'\"]",
-         "date:Start date:start": "'"$start_date"'"
+         "작업 설명": "'"$title"'",
+         "진행 상황": "Not started",
+         "우선순위": "'"$priority"'",
+         "작업 분류": "[\"'"$tag"'\"]",
+         "참여자": "[\"'"$user_id"'\"]",
+         "date:시작일:start": "'"$start_date"'"
        }
      }]'
 
@@ -145,11 +148,11 @@ PROP_TAG="Tag"
      --parent '{"data_source_id": "2ad47c08-6985-8016-b033-000bdcffaec7"}' \
      --pages '[{
        "properties": {
-         "Project name": "'"$title"'",
-         "Status": "Not started",
-         "Priority": "'"$priority"'",
-         "Tag": "[\"'"$tag"'\"]",
-         "date:Start date:start": "'"$start_date"'"
+         "작업 설명": "'"$title"'",
+         "진행 상황": "Not started",
+         "우선순위": "'"$priority"'",
+         "작업 분류": "[\"'"$tag"'\"]",
+         "date:시작일:start": "'"$start_date"'"
        }
      }]'
    ```
@@ -227,7 +230,7 @@ PROP_TAG="Tag"
 2. **상태 업데이트**:
    ```bash
    mcp__notion-company__notion-update-page \
-     --data '{"page_id": "'"$page_id"'", "command": "update_properties", "properties": {"Status": "'"$status"'"}}'
+     --data '{"page_id": "'"$page_id"'", "command": "update_properties", "properties": {"진행 상황": "'"$status"'"}}'
    ```
 3. **결과 출력**: 업데이트 완료 메시지
 4. **완료 제안** (상태가 `Done`이 아닌 경우에도 완료 키워드 감지 시):
@@ -260,8 +263,8 @@ PROP_TAG="Tag"
        "page_id": "'"$page_id"'",
        "command": "update_properties",
        "properties": {
-         "Status": "Done",
-         "date:End date:start": "'"$end_date"'"
+         "진행 상황": "Done",
+         "date:종료일:start": "'"$end_date"'"
        }
      }'
    ```
@@ -290,7 +293,7 @@ PROP_TAG="Tag"
 3. **Assignee 업데이트**:
    ```bash
    mcp__notion-company__notion-update-page \
-     --data '{"page_id": "'"$page_id"'", "command": "update_properties", "properties": {"Assignee": "[\"'"$user_id"'\"]"}}'
+     --data '{"page_id": "'"$page_id"'", "command": "update_properties", "properties": {"참여자": "[\"'"$user_id"'\"]"}}'
    ```
 
 ---
@@ -311,7 +314,7 @@ PROP_TAG="Tag"
    end_date=$(TZ=Asia/Seoul date +%Y-%m-%d)
 
    mcp__notion-company__notion-update-page \
-     --data '{"page_id": "'"$page_id"'", "command": "update_properties", "properties": {"Status": "Done", "date:End date:start": "'"$end_date"'"}}'
+     --data '{"page_id": "'"$page_id"'", "command": "update_properties", "properties": {"진행 상황": "Done", "date:종료일:start": "'"$end_date"'"}}'
    ```
 3. **결과 출력**: 완료 메시지
 
@@ -399,11 +402,11 @@ mcp__notion-company__notion-create-pages \
   --parent '{"data_source_id": "2ad47c08-6985-8016-b033-000bdcffaec7"}' \
   --pages '[{
     "properties": {
-      "Project name": "'"$title"'",
-      "Status": "Not started",
-      "Priority": "Medium",
-      "Tag": "[\"'"$tag"'\"]",
-      "date:Start date:start": "'"$start_date"'"
+      "작업 설명": "'"$title"'",
+      "진행 상황": "Not started",
+      "우선순위": "Medium",
+      "작업 분류": "[\"'"$tag"'\"]",
+      "date:시작일:start": "'"$start_date"'"
     }
   }]'
 ```
@@ -464,8 +467,8 @@ mcp__notion-company__notion-update-page \
     "page_id": "'"$created_page_id"'",
     "command": "update_properties",
     "properties": {
-      "Status": "Done",
-      "date:End date:start": "'"$end_date"'"
+      "진행 상황": "Done",
+      "date:종료일:start": "'"$end_date"'"
     }
   }'
 ```
@@ -489,7 +492,8 @@ mcp__notion-company__notion-update-page \
 
 ---
 
-**문서 버전**: 1.1.0
-**최종 수정**: 2025-11-26
+**문서 버전**: 1.2.0
+**최종 수정**: 2025-11-27
 **업데이트**:
+- 1.2.0: Notion 스키마 속성명을 실제 한글 이름으로 수정
 - 1.1.0: --author-xxx 옵션 추가, 이슈 완료 자동 제안 기능 추가

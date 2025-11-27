@@ -1,6 +1,6 @@
 # 🤖 Claude Workflows
 
-[![Version](https://img.shields.io/badge/version-4.1.0-blue.svg)](https://github.com/Liamns/claude-workflows)
+[![Version](https://img.shields.io/badge/version-4.1.1-blue.svg)](https://github.com/Liamns/claude-workflows)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-purple.svg)](https://claude.ai/code)
 [![Validation](https://img.shields.io/badge/validation-automated-success.svg)](https://github.com/Liamns/claude-workflows)
@@ -10,6 +10,17 @@
 **📖 새로운 Claude 세션?** → [프로젝트 컨텍스트 문서](.claude/docs/PROJECT-CONTEXT.md) (5분이면 전체 파악)
 
 ## 🆕 최신 기능
+
+### v4.1.1 - /docu 게이트웨이 통합 및 스키마 수정
+
+**🔗 /docu 게이트웨이 명령어**
+- 기존 6개 `docu-*` 명령어를 단일 `/docu` 게이트웨이로 통합
+- 자연어 입력으로 모든 작업 처리 (Claude Code가 직접 파싱)
+- 채널 선택 (화주/어드민) 후 자동 라우팅
+
+**🔧 tracker.md 스키마 수정**
+- Notion 실제 속성명으로 업데이트 (영어 → 한글)
+- 작업 설명, 진행 상황, 우선순위, 작업 분류, 참여자, 시작일, 종료일
 
 ### v4.1.0 - /docu-* 명령어 시스템 업그레이드
 
@@ -21,36 +32,17 @@
 - `/docu-update` 실행 시 '작업 로그' 서브페이지 자동 생성
 - 커밋ID, 핵심작업내용, 작업날짜 표 구조
 
-**⚡ `--today` 옵션**
-- `/docu-update --today`: Git 커밋 분석 → 작업 로그 자동 업데이트
-- `/tracker --today`: Git 커밋 분석 → 이슈 자동 생성
-- 다중 작업자 감지 시 선택 UI 제공
-
 ### v4.0.0 - Legacy Cleanup & Streamlined Architecture
 
 **🧹 대규모 레거시 정리**
 - deprecated 레거시 명령어 및 설정 파일 완전 제거
 - 사용하지 않는 Shell 스크립트 40+ 개 정리
-- commands-config/*.yaml 레거시 파일 삭제
 - 코드베이스 경량화 및 유지보수성 향상
 
 **🛡️ Epic 007 - md+Hook+CLAUDE.md 3중 방어 구조**
 - 명령어 md 파일 자체 규칙 강화
 - PostHook 검증 시스템 연동
 - CLAUDE.md 프로젝트 레벨 규칙 통합
-- 문서 완성도 자동 검증
-
-### v3.5.0 - 통합 명령어 시스템
-
-**📝 /docu - Notion 문서 통합 관리**
-- 기존 notion-* 명령어 6개를 단일 명령어로 통합
-- 10개 액션: `start`, `list`, `switch`, `recommend`, `update`, `log`, `sync`, `search`, `close`, `add`
-- 하이브리드 명령어 구조 (.md + .yaml)
-
-**📌 /tracker - 프로젝트 & 이슈 트래커**
-- Projects 데이터베이스 연동
-- 5개 액션: `add`, `list`, `update`, `assign`, `close`
-- Tag 기반 관리: Issue, Bug, Feature, Refactoring
 
 ## 🚀 Quick Start
 
@@ -335,4 +327,4 @@ MIT License - 자유롭게 사용, 수정, 배포 가능
 
 ---
 
-**v4.1.0** | [GitHub](https://github.com/Liamns/claude-workflows) | Made with ❤️ for Claude Code
+**v4.1.1** | [GitHub](https://github.com/Liamns/claude-workflows) | Made with ❤️ for Claude Code

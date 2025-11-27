@@ -2,6 +2,8 @@
 name: docu-update
 ---
 
+> **DEPRECATED**: 이 명령어는 `/docu`로 통합되었습니다. `/docu {상태} 변경` 형태로 사용하세요.
+
 # Docu:Update - 작업 상태 업데이트 및 로그 조회
 
 > **참고**: 이 명령어는 `.claude/CLAUDE.md`의 규칙을 준수합니다.

@@ -1,8 +1,8 @@
 {
   "version": "4.1.2",
-  "generatedAt": "2025-11-27T07:26:03Z",
+  "generatedAt": "2025-11-27T07:32:07Z",
   "files": {
-    ".claude/.checksums.json": "d67cc51f11395e73d3d69d38f58d51f84151852bdf4ffef45b537cf6362f8ffd",
+    ".claude/.checksums.json": "9ff59538b2946ba8d725fd8a9d3d2f3d8e8cbd6b22c6603e46c6e5b3a46ff6c0",
     ".claude/agents/api-designer.md": "4df175254a912463707465f55700d5fd1548e49c12b231b4968b17b119fdef15",
     ".claude/agents/architect-unified.md": "509dd35487a5054f559f7ec6536f33a6015f09bfdcc113916718970d2c43f77f",
     ".claude/agents/documenter-unified.md": "1ca82988445da1867e685f5e12928f0bd41c117f13b013836665d0ee41e2fec1",
@@ -80,6 +80,7 @@
     ".claude/commands/.gitignore": "15d6908b8cca6fd3d6aafedb53ceb0aef9dfdfab66981c8db78199f4c0742f4c",
     ".claude/commands/commit.md": "4688c805055f579fbf61a8feee2a0631b8e2744e5321da85d7e9846ae5610ef6",
     ".claude/commands/dashboard.md": "e9fde9b4f00412702eace389213d08165af6e7d477e28b48416668abac27601a",
+    ".claude/commands/db-sync.md": "7b159192e3d1eccada3cfff46e46d6e2329773b926e0beefdbed5d5684e22a36",
     ".claude/commands/docu.md": "e6e4905537e2535e08416ab96446fc77a972deb961a7513777637163439004bf",
     ".claude/commands/epic.md": "196edea561e128a6447d250cefdee79693539e3df6bd0eef20999e3ee10ad0dc",
     ".claude/commands/implement.md": "183d8270fe3c51fa0ff57b057501e06fc789de3bd31bcacdc78ceadb115dc094",

@@ -28,16 +28,31 @@ description: 브랜치 관리 전용 명령어 (문맥 기반 처리)
    → 존재하면: 브랜치 전환
    → 존재하지 않으면: 브랜치 생성
 
-4. 브랜치 생성 시 이름 분석
-   → fix, bug, hotfix 키워드 포함? → fix-NNN-{name}
-   → 그 외 → NNN-{name}
+4. 브랜치 생성 시 이름 분석 (Git 표준 컨벤션: <type>/<description>)
+   → fix, bug 키워드 포함? → fix/{description}
+   → hotfix 키워드 포함? → hotfix/{description}
+   → refactor 키워드 포함? → refactor/{description}
+   → docs 키워드 포함? → docs/{description}
+   → chore 키워드 포함? → chore/{description}
+   → 그 외 (Feature) → feat/{description}
 ```
 
-### 3. 변경사항 처리
+### 3. 브랜치 타입 (Git 표준 컨벤션)
+
+| Type | 사용 시점 | 예시 |
+|------|----------|------|
+| `feat/` | 새로운 기능 추가 | `feat/user-auth` |
+| `fix/` | 버그 수정 | `fix/login-bug` |
+| `hotfix/` | 긴급 수정 | `hotfix/critical-error` |
+| `refactor/` | 코드 리팩토링 | `refactor/auth-cleanup` |
+| `docs/` | 문서 수정 | `docs/readme-update` |
+| `chore/` | 빌드, 설정 등 | `chore/ci-config` |
+
+### 4. 변경사항 처리
 - 브랜치 전환/생성 전 uncommitted changes 확인
 - 변경사항 있으면 **반드시** AskUserQuestion으로 처리 방법 선택
 
-### 4. AskUserQuestion 필수 사용
+### 5. AskUserQuestion 필수 사용
 - 변경사항 처리 옵션 제시
 - 한글 입력 시 영문 브랜치명 확인
 - 불확실한 상황에서 사용자 확인
@@ -50,8 +65,9 @@ description: 브랜치 관리 전용 명령어 (문맥 기반 처리)
 /branch                        # 현재 상태 표시
 /branch --list                 # 브랜치 목록
 /branch main                   # main으로 전환
-/branch "user-auth"            # Feature 브랜치 생성
-/branch "로그인 버그 수정"      # Fix 브랜치 생성 (키워드 감지)
+/branch "user-auth"            # feat/user-auth 브랜치 생성
+/branch "로그인 버그 수정"      # fix/login-bug 브랜치 생성 (키워드 감지)
+/branch "refactor auth"        # refactor/auth 브랜치 생성
 ```
 
 ---
@@ -124,7 +140,7 @@ git branch -vv --sort=-committerdate | head -10
 `/branch` 실행 시 다음 정보를 표시합니다:
 
 ```
-📍 현재 브랜치: 007-user-auth
+📍 현재 브랜치: feat/user-auth
 📝 변경사항: 3개 파일
 📤 미푸시 커밋: 2개
 🔗 연결된 Epic: 없음
@@ -168,12 +184,12 @@ fi
 ```
 📋 브랜치 목록
 
-* 007-user-auth (현재)
-  006-payment-integration
-  005-order-system
+* feat/user-auth (현재)
+  feat/payment-integration
+  fix/login-bug
   main
 
-최근 작업: 007-user-auth (2시간 전)
+최근 작업: feat/user-auth (2시간 전)
 ```
 
 ### 구현
@@ -245,46 +261,33 @@ options:
 ```bash
 input="$1"
 
-# 1. fix 키워드 감지
-if echo "$input" | grep -qiE '(fix|bug|hotfix|버그|수정|오류)'; then
+# 1. 타입 키워드 감지 (우선순위 순)
+if echo "$input" | grep -qiE '(hotfix|긴급)'; then
+  branch_type="hotfix"
+elif echo "$input" | grep -qiE '(fix|bug|버그|수정|오류)'; then
   branch_type="fix"
+elif echo "$input" | grep -qiE '(refactor|리팩토링|정리)'; then
+  branch_type="refactor"
+elif echo "$input" | grep -qiE '(docs|문서)'; then
+  branch_type="docs"
+elif echo "$input" | grep -qiE '(chore|설정|빌드)'; then
+  branch_type="chore"
 else
-  branch_type="feature"
+  branch_type="feat"
 fi
 
-# 2. kebab-case 변환 (영문만)
+# 2. description 추출 (타입 키워드 제거 후 kebab-case 변환)
 # 한글 입력 시 AskUserQuestion으로 영문명 확인
 if echo "$input" | grep -qP '[가-힣]'; then
   # 한글 포함 → 사용자에게 영문명 확인
   need_confirm=true
 else
-  # 영문만 → 자동 변환
-  branch_name=$(echo "$input" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | sed 's/[^a-z0-9-]//g')
-fi
-```
-
-### 브랜치 번호 할당
-
-```bash
-# 기존 브랜치에서 최대 번호 추출
-if [[ "$branch_type" == "fix" ]]; then
-  max_num=$(git branch | grep -oE '^[[:space:]]*fix-([0-9]+)' | grep -oE '[0-9]+' | sort -n | tail -1)
-  prefix="fix"
-else
-  max_num=$(git branch | grep -oE '^[[:space:]]*([0-9]+)-' | grep -oE '[0-9]+' | sort -n | tail -1)
-  prefix=""
+  # 영문만 → 자동 변환 (타입 키워드 제거)
+  description=$(echo "$input" | sed -E 's/(fix|bug|hotfix|refactor|docs|chore)[:. ]*//gi' | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | sed 's/[^a-z0-9-]//g' | sed 's/^-//' | sed 's/-$//')
 fi
 
-# 다음 번호
-next_num=$((${max_num:-0} + 1))
-next_num_padded=$(printf "%03d" $next_num)
-
-# 브랜치명 생성
-if [[ "$branch_type" == "fix" ]]; then
-  final_branch="fix-${next_num_padded}-${branch_name}"
-else
-  final_branch="${next_num_padded}-${branch_name}"
-fi
+# 3. 최종 브랜치명 생성: <type>/<description>
+final_branch="${branch_type}/${description}"
 ```
 
 ### 한글 입력 처리
@@ -302,11 +305,11 @@ options:
 또는 Claude가 자동 번역하여 확인:
 
 ```
-question: "'로그인 버그 수정' → 'login-bug-fix'로 생성할까요?"
+question: "'로그인 버그 수정' → 'fix/login-bug'로 생성할까요?"
 header: "브랜치명 확인"
 options:
   - label: "확인"
-    description: "fix-042-login-bug-fix 브랜치 생성"
+    description: "fix/login-bug 브랜치 생성"
   - label: "다른 이름"
     description: "다른 이름으로 변경"
   - label: "취소"
@@ -357,24 +360,37 @@ auto_commit "WIP: before branch switch"
 
 ```bash
 /branch "user-auth"
-# → 007-user-auth 브랜치 생성
+# → feat/user-auth 브랜치 생성
 
 /branch "payment integration"
-# → 008-payment-integration 브랜치 생성
+# → feat/payment-integration 브랜치 생성
 ```
 
 ### Fix 브랜치 생성 (키워드 자동 감지)
 
 ```bash
 /branch "login bug"
-# → fix-042-login-bug 브랜치 생성
+# → fix/login-bug 브랜치 생성
 
 /branch "hotfix: payment error"
-# → fix-043-payment-error 브랜치 생성
+# → hotfix/payment-error 브랜치 생성
 
 /branch "로그인 버그 수정"
 # → AskUserQuestion으로 영문명 확인
-# → fix-044-login-bug 브랜치 생성
+# → fix/login-bug 브랜치 생성
+```
+
+### 기타 타입 브랜치 생성
+
+```bash
+/branch "refactor auth module"
+# → refactor/auth-module 브랜치 생성
+
+/branch "docs: update readme"
+# → docs/update-readme 브랜치 생성
+
+/branch "chore: ci config"
+# → chore/ci-config 브랜치 생성
 ```
 
 ### 브랜치 전환
@@ -390,7 +406,7 @@ auto_commit "WIP: before branch switch"
 ```bash
 /branch
 # 출력:
-# 📍 현재 브랜치: 007-user-auth
+# 📍 현재 브랜치: feat/user-auth
 # 📝 변경사항: 3개 파일
 # 📤 미푸시 커밋: 2개
 # 🔗 연결된 Epic: 없음
@@ -403,8 +419,8 @@ auto_commit "WIP: before branch switch"
 ### 브랜치명 충돌
 
 ```
-❌ 오류: '007-user-auth' 브랜치가 이미 존재합니다
-→ 기존 브랜치로 전환하려면: /branch 007-user-auth
+❌ 오류: 'feat/user-auth' 브랜치가 이미 존재합니다
+→ 기존 브랜치로 전환하려면: /branch feat/user-auth
 → 새 브랜치를 만들려면 다른 이름을 사용하세요
 ```
 

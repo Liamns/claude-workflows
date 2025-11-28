@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Claude Code Workflows Installer
-# Version: 4.3.0 - /branch 명령어 추가
+# Version: 4.4.0 - /tracker v2.0.0 및 /branch Git 컨벤션 적용
 
 set -e
 
@@ -14,8 +14,8 @@ NC='\033[0m' # No Color
 
 # Version Configuration (hardcoded)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-INSTALLER_VERSION="4.3.0"
-TARGET_VERSION="4.3.0"
+INSTALLER_VERSION="4.4.0"
+TARGET_VERSION="4.4.0"
 
 # Repository Configuration
 REPO_URL="https://github.com/Liamns/claude-workflows"

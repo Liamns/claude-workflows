@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.4.0] - 2025-11-28
+
+### Added
+- **`/tracker` 명령어 v2.0.0 대규모 업데이트**
+  - 유형(Type) 필드 추가: Request, Task, Epic 구분
+    - Request: 개발팀으로 들어온 개발/수정 요청
+    - Task: 실제 작업 단위 (1 PR = 1 Task)
+    - Epic: 관련 Task를 묶는 상위 항목 (완료 주차 기준)
+  - Epic-Task 계층 구조 지원 (상위/하위 항목 관계)
+  - 완료 주차 필드로 Task 그룹화
+
+- **Global Filter 옵션 추가**
+  - `--author-이름(Github)`: 참여자 필터 (이름으로 검색, 괄호 안 Github 닉네임)
+  - `--week-nn-m`: 완료 주차 필터 (예: --week-11-4 = 11월 4주차)
+  - `--type-value`: 유형 필터 (Epic/Task/Request)
+  - 필터 범위 밖 데이터 접근 금지 규칙 추가
+
+### Changed
+- tracker.md Database Schema 확장 (유형, 완료 주차, 상위 항목, 하위 항목)
+- Action: add 워크플로우에 유형 선택 단계 추가
+- **`/branch` 명령어 Git 표준 컨벤션 적용**
+  - 브랜치명 형식 변경: `NNN-name` → `<type>/<description>`
+  - 지원 타입: `feat/`, `fix/`, `hotfix/`, `refactor/`, `docs/`, `chore/`
+  - 예시: `feat/user-auth`, `fix/login-bug`, `hotfix/critical-error`
+  - 브랜치 번호(NNN) 제거
+
 ## [4.3.0] - 2025-11-28
 
 ### Added

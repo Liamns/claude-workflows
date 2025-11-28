@@ -1,6 +1,6 @@
 # /tracker - 프로젝트 & 이슈 트래커
 
-**버전**: 1.0.0
+**버전**: 2.0.0
 **Database**: Projects
 **Data Source**: `collection://2ad47c08-6985-8016-b033-000bdcffaec7`
 
@@ -29,12 +29,16 @@ TRACKER_DS_URL="collection://2ad47c08-6985-8016-b033-000bdcffaec7"
 
 # 속성명 (실제 Notion 스키마)
 PROP_TITLE="작업 설명"
+PROP_TYPE="유형"
 PROP_STATUS="진행 상황"
 PROP_PRIORITY="우선순위"
 PROP_TAG="작업 분류"
 PROP_ASSIGNEE="참여자"
 PROP_START_DATE="시작일"
 PROP_END_DATE="종료일"
+PROP_COMPLETE_WEEK="완료 주차"
+PROP_PARENT="상위 항목"
+PROP_CHILDREN="하위 항목"
 ```
 
 ## Usage
@@ -54,6 +58,45 @@ PROP_END_DATE="종료일"
 | `close` | 완료 처리 |
 | `--today` | 오늘 Git 커밋 기반 이슈 일괄 생성 |
 
+### Global Filter Options
+
+모든 Action에 적용 가능한 필터 옵션입니다.
+
+| 옵션 | 설명 | 예시 |
+|------|------|------|
+| `--author-이름(Github)` | 참여자 필터. 이름으로 검색, 괄호 안은 Github 닉네임 | `--author-홍길동(hong)` |
+| `--week-nn-m` | 완료 주차 필터. nn월 m주차 | `--week-11-4` (11월 4주차) |
+| `--type-value` | 유형 필터. Epic/Task/Request | `--type-Task` |
+
+**사용 예시:**
+```bash
+# 11월 4주차의 모든 Task 조회
+/tracker list --week-11-4 --type-Task
+
+# 홍길동의 Request 목록
+/tracker list --author-홍길동(hong) --type-Request
+
+# 특정 Epic 하위의 Task 업데이트
+/tracker update <page-id> "Done" --type-Task --week-11-4
+```
+
+### ⚠️ 필터 적용 규칙
+
+> **중요**: 필터가 적용된 명령에서는 **필터 범위 밖의 데이터를 조회하거나 수정하지 마세요**.
+
+| 규칙 | 설명 |
+|------|------|
+| 조회 제한 | 필터 조건에 맞는 항목만 출력 |
+| 수정 제한 | 필터 범위 외 페이지 수정 금지 |
+| 경고 표시 | 범위 외 접근 시도 시 경고 메시지 출력 |
+
+**예시:**
+```bash
+# --type-Task 필터 적용 시
+# ✅ Task 유형만 조회/수정 가능
+# ❌ Epic, Request 유형은 조회/수정 불가
+```
+
 ---
 
 ## Database Schema
@@ -61,14 +104,39 @@ PROP_END_DATE="종료일"
 | 필드 | 타입 | 값 |
 |------|------|-----|
 | 작업 설명 | title | 프로젝트/이슈 제목 |
+| 유형 | select | `Request`, `Task`, `Epic` |
 | 진행 상황 | status | `Not started`, `In progress`, `Done` |
 | 우선순위 | select | `High`, `Medium`, `Low` |
 | 작업 분류 | multi_select | `Issue`, `Bug`, `Feature`, `Refatoring` |
 | 참여자 | person | 담당자 |
 | 시작일 | date | 시작일 |
 | 종료일 | date | 종료일 |
+| 완료 주차 | formula | 종료일 기반 자동 계산 (예: "11월 4주차") |
+| 상위 항목 | relation | Epic 페이지 참조 (Task에서 사용) |
+| 하위 항목 | relation | Task 페이지 목록 (Epic에서 사용) |
 | Team | multi_select | 팀 |
 | Progress | formula | 진행률 (자동 계산) |
+
+### 유형 (Type) 설명
+
+| 유형 | 설명 | 기준 |
+|------|------|------|
+| **Request** | 개발팀으로 들어온 개발/수정 요청, 앞으로 해야 할 일 | 요청 접수 시 생성 |
+| **Task** | 실제 작업 단위 | 1 PR = 1 Task |
+| **Epic** | 관련 Task를 묶는 상위 항목 | 완료 주차 기준으로 Task 그룹화 |
+
+### 페이지 관계 구조
+
+```
+Epic (상위)
+├── Task 1 (하위)
+├── Task 2 (하위)
+└── Task 3 (하위)
+```
+
+- **Epic → Task**: Epic의 '하위 항목'에 관련 Task 연결
+- **Task → Epic**: Task의 '상위 항목'에 소속 Epic 연결
+- **관리 방식**: '완료 주차'가 같은 Task를 관련 Epic 아래에 구성
 
 ---
 
@@ -88,10 +156,16 @@ PROP_END_DATE="종료일"
 | 옵션 | 설명 |
 |------|------|
 | `--author-{name}` | Assignee를 자동 설정. {name}으로 Notion 사용자 검색 후 매칭 |
+| `--type-{value}` | 유형 자동 설정. Request/Task/Epic 중 선택 |
 
 ### Workflow
 
-1. **--author-xxx 옵션 처리** (옵션 있을 경우):
+1. **--type-xxx 옵션 처리** (옵션 있을 경우):
+   - `--type-Request`: 유형을 "Request"로 설정
+   - `--type-Task`: 유형을 "Task"로 설정
+   - `--type-Epic`: 유형을 "Epic"으로 설정
+
+2. **--author-xxx 옵션 처리** (옵션 있을 경우):
    ```bash
    # 사용자 검색
    mcp__notion-company__notion-get-users --query "$author_name"
@@ -111,17 +185,21 @@ PROP_END_DATE="종료일"
      ⚠️ '{author_name}'에 해당하는 사용자를 찾을 수 없습니다. 담당자 없이 생성합니다.
      ```
 
-2. **정보 수집 (AskUserQuestion)**:
+3. **정보 수집 (AskUserQuestion)**:
 
-   **Tag 선택**:
+   **유형 선택** (--type 옵션 없을 경우):
    - question: "유형을 선택하세요"
+   - options: ["Request", "Task", "Epic"]
+
+   **작업 분류 선택**:
+   - question: "작업 분류를 선택하세요"
    - options: ["Issue", "Bug", "Feature", "Refatoring"]
 
    **Priority 선택**:
    - question: "우선순위를 선택하세요"
    - options: ["High", "Medium", "Low"]
 
-3. **Notion 페이지 생성**:
+4. **Notion 페이지 생성**:
    ```bash
    source .claude/lib/notion-utils.sh
 
@@ -135,6 +213,7 @@ PROP_END_DATE="종료일"
      --pages '[{
        "properties": {
          "작업 설명": "'"$title"'",
+         "유형": "'"$type"'",
          "진행 상황": "Not started",
          "우선순위": "'"$priority"'",
          "작업 분류": "[\"'"$tag"'\"]",
@@ -149,6 +228,7 @@ PROP_END_DATE="종료일"
      --pages '[{
        "properties": {
          "작업 설명": "'"$title"'",
+         "유형": "'"$type"'",
          "진행 상황": "Not started",
          "우선순위": "'"$priority"'",
          "작업 분류": "[\"'"$tag"'\"]",
@@ -157,7 +237,7 @@ PROP_END_DATE="종료일"
      }]'
    ```
 
-4. **결과 반환**: 생성된 페이지 URL
+5. **결과 반환**: 생성된 페이지 URL
 
 ---
 
@@ -492,8 +572,9 @@ mcp__notion-company__notion-update-page \
 
 ---
 
-**문서 버전**: 1.2.0
-**최종 수정**: 2025-11-27
+**문서 버전**: 2.0.0
+**최종 수정**: 2025-11-28
 **업데이트**:
+- 2.0.0: 유형(Request/Task/Epic) 필드 추가, 상위/하위 페이지 관계 구조 문서화, 완료 주차 필드 추가, 글로벌 필터 옵션(--author, --week, --type) 추가
 - 1.2.0: Notion 스키마 속성명을 실제 한글 이름으로 수정
 - 1.1.0: --author-xxx 옵션 추가, 이슈 완료 자동 제안 기능 추가

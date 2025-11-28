@@ -1,6 +1,6 @@
 # 🤖 Claude Workflows
 
-[![Version](https://img.shields.io/badge/version-4.3.0-blue.svg)](https://github.com/Liamns/claude-workflows)
+[![Version](https://img.shields.io/badge/version-4.4.0-blue.svg)](https://github.com/Liamns/claude-workflows)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-purple.svg)](https://claude.ai/code)
 [![Validation](https://img.shields.io/badge/validation-automated-success.svg)](https://github.com/Liamns/claude-workflows)
@@ -10,6 +10,18 @@
 **📖 새로운 Claude 세션?** → [프로젝트 컨텍스트 문서](.claude/docs/PROJECT-CONTEXT.md) (5분이면 전체 파악)
 
 ## 🆕 최신 기능
+
+### v4.4.0 - /tracker 명령어 v2.0.0 업데이트
+
+**📋 데이터베이스 스키마 확장**
+- 유형(Type) 필드 추가: Request, Task, Epic 구분
+- Epic-Task 계층 구조 지원 (상위/하위 항목 관계)
+- 완료 주차 필드로 Task 그룹화
+
+**🔍 Global Filter 옵션 추가**
+- `--author-이름(Github)`: 참여자 필터
+- `--week-nn-m`: 완료 주차 필터 (예: --week-11-4)
+- `--type-value`: 유형 필터 (Epic/Task/Request)
 
 ### v4.3.0 - /branch 명령어 추가
 
@@ -39,18 +51,6 @@
   - 테스트 먼저 작성 → `/test` 연계
   - 테스트 없이 진행 (경고)
   - 취소
-
-### v4.1.2 - 명령어 참조 일관성 수정
-
-**🔧 워크플로우 명령어 참조 통일**
-- 모든 문서에서 `/minor` → `/plan-minor`, `/major` → `/plan-major`로 수정
-- 2단계 워크플로우 구조 명확화: `/plan-*` → `/implement`
-
-### v4.1.1 - /docu 게이트웨이 통합 및 스키마 수정
-
-**🔗 /docu 게이트웨이 명령어**
-- 기존 6개 `docu-*` 명령어를 단일 `/docu` 게이트웨이로 통합
-- 자연어 입력으로 모든 작업 처리 (Claude Code가 직접 파싱)
 
 ## 🚀 Quick Start
 
@@ -336,4 +336,4 @@ MIT License - 자유롭게 사용, 수정, 배포 가능
 
 ---
 
-**v4.2.0** | [GitHub](https://github.com/Liamns/claude-workflows) | Made with ❤️ for Claude Code
+**v4.4.0** | [GitHub](https://github.com/Liamns/claude-workflows) | Made with ❤️ for Claude Code

@@ -899,7 +899,9 @@ install_workflows() {
             pushd "$TARGET_DIR" > /dev/null
 
             echo -n "파일 무결성 검증 중..."
-            if verify_installation_with_checksum > /dev/null 2>&1; then
+            local verify_output
+            verify_output=$(mktemp)
+            if verify_installation_with_checksum > "$verify_output" 2>&1; then
                 echo " 완료"
                 verification_passed=true
                 log_to_file "Checksum verification: PASSED"
@@ -907,20 +909,30 @@ install_workflows() {
                 cleanup_orphan_files false > /dev/null 2>&1 || true
                 log_to_file "Orphan files cleanup: COMPLETED"
             else
-                # Checksum verification failed - try to recover
+                # Checksum verification failed - show details
                 echo ""
-                print_warning "일부 파일 검증 실패, 자동 복구 시도..."
-                if retry_failed_files "$REPO_URL" "$REPO_BRANCH" > /dev/null 2>&1; then
+                print_warning "일부 파일 검증 실패:"
+                # Show failed files from output (✗ marks failures)
+                grep -E "(✗|FAIL|MISSING|ERROR|불일치)" "$verify_output" 2>/dev/null | head -20
+                echo ""
+                print_warning "자동 복구 시도..."
+                local recovery_output
+                recovery_output=$(mktemp)
+                if retry_failed_files "$REPO_URL" "$REPO_BRANCH" > "$recovery_output" 2>&1; then
                     verification_passed=true
                     print_success "파일 복구 완료"
                     log_to_file "File recovery: SUCCESS"
                     cleanup_orphan_files false > /dev/null 2>&1 || true
                 else
                     print_error "파일 복구 실패"
+                    # Show recovery details
+                    grep -E "(FAILED|실패|error)" "$recovery_output" 2>/dev/null | head -10
                     log_to_file "File recovery: FAILED"
                     verification_passed=false
                 fi
+                rm -f "$recovery_output"
             fi
+            rm -f "$verify_output"
             popd > /dev/null
         fi
 

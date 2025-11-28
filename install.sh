@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Claude Code Workflows Installer
-# Version: 4.2.0 - TDD 강화 및 /test 명령어
+# Version: 4.3.0 - /branch 명령어 추가
 
 set -e
 
@@ -14,8 +14,8 @@ NC='\033[0m' # No Color
 
 # Version Configuration (hardcoded)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-INSTALLER_VERSION="4.2.0"
-TARGET_VERSION="4.2.0"
+INSTALLER_VERSION="4.3.0"
+TARGET_VERSION="4.3.0"
 
 # Repository Configuration
 REPO_URL="https://github.com/Liamns/claude-workflows"
@@ -94,7 +94,7 @@ health_check() {
     local agents_count=$(find "$TARGET_DIR/.claude/agents" -maxdepth 1 -type f -name '*.md' ! -path '*/_deprecated/*' 2>/dev/null | wc -l | tr -d ' ')
     local skills_count=$(find "$TARGET_DIR/.claude/skills" -maxdepth 1 -type d ! -name 'skills' 2>/dev/null | wc -l | tr -d ' ')
 
-    echo "  Commands: $commands_count (expected: 16)"
+    echo "  Commands: $commands_count (expected: 17)"
     echo "  Agents: $agents_count (expected: 6)"
     echo "  Skills: $skills_count (expected: 15)"
 
@@ -815,7 +815,7 @@ install_workflows() {
     fi
 
     # Print installation summary (one line)
-    print_success "설치 완료: Commands (16), Agents (6), Skills (15), Lib, Docs, Config, Architectures"
+    print_success "설치 완료: Commands (17), Agents (6), Skills (15), Lib, Docs, Config, Architectures"
 
     # Final cleanup: Remove any deprecated or backup directories from root levels
     print_info "Cleaning up deprecated and backup directories..."
@@ -964,7 +964,7 @@ install_workflows() {
     echo -e "${GREEN}Claude Workflows v$TARGET_VERSION 설치 완료${NC}"
     echo ""
     echo "📁 설치 위치: $TARGET_DIR/.claude/"
-    echo "   Commands (16), Agents (6), Skills (15), Lib, Docs, Config, Architectures"
+    echo "   Commands (17), Agents (6), Skills (15), Lib, Docs, Config, Architectures"
     echo ""
 
     # Show verification statistics if checksum verification was used
@@ -976,7 +976,7 @@ install_workflows() {
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
 
-    # Print next steps (v4.1.1 updated)
+    # Print next steps (v4.3.0 updated)
     echo -e "${GREEN}Quick Start:${NC}"
     echo ""
     echo "1. 프로젝트 초기화:"
@@ -989,6 +989,7 @@ install_workflows() {
     echo "   /plan-major → /implement  # 신규 기능 (계획 → 구현)"
     echo "   /plan-minor → /implement  # 버그 수정/개선 (계획 → 구현)"
     echo "   /micro                    # 간단한 수정 (즉시 실행)"
+    echo "   /branch                   # 브랜치 관리 (상태/목록/전환/생성)"
     echo ""
     echo "4. 테스트 & Git:"
     echo "   /test                     # 테스트 작성 (TDD 연계)"

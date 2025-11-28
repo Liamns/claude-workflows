@@ -1,6 +1,6 @@
 # 🤖 Claude Workflows
 
-[![Version](https://img.shields.io/badge/version-4.2.0-blue.svg)](https://github.com/Liamns/claude-workflows)
+[![Version](https://img.shields.io/badge/version-4.3.0-blue.svg)](https://github.com/Liamns/claude-workflows)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-purple.svg)](https://claude.ai/code)
 [![Validation](https://img.shields.io/badge/validation-automated-success.svg)](https://github.com/Liamns/claude-workflows)
@@ -10,6 +10,20 @@
 **📖 새로운 Claude 세션?** → [프로젝트 컨텍스트 문서](.claude/docs/PROJECT-CONTEXT.md) (5분이면 전체 파악)
 
 ## 🆕 최신 기능
+
+### v4.3.0 - /branch 명령어 추가
+
+**🌿 `/branch` 명령어 신규**
+- 브랜치 관리 전용 명령어 (문맥 기반 처리)
+- 인자 없음 → 현재 브랜치 상태 표시
+- `--list` → 브랜치 목록 표시
+- 기존 브랜치명 → 브랜치 전환
+- 새 이름 → 브랜치 생성
+- fix/bug/hotfix 키워드 자동 감지
+
+**♻️ 관심사 분리**
+- `/epic`, `/plan-major`, `/plan-minor`에서 브랜치 로직 제거
+- 브랜치 관리는 `/branch` 명령어로 통합
 
 ### v4.2.0 - TDD 강화 및 /test 명령어
 

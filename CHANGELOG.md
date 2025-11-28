@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.3.0] - 2025-11-28
+
+### Added
+- **`/branch` 명령어 신규 추가** - 브랜치 관리 전용 명령어
+  - 문맥 기반 처리 (서브커맨드 없음)
+  - 인자 없음 → 현재 브랜치 상태 표시
+  - `--list` → 브랜치 목록 표시
+  - 기존 브랜치명 → 브랜치 전환
+  - 새 이름 → 브랜치 생성
+  - fix/bug/hotfix 키워드 자동 감지
+  - 한글 입력 시 영문 브랜치명 확인
+  - 변경사항 있을 때 AskUserQuestion 분기 (커밋/stash/이동/삭제)
+
+### Changed
+- **관심사 분리 (Separation of Concerns) 적용**
+  - `/epic` 명령어에서 브랜치 관리 로직 제거
+  - `/plan-major` 명령어에서 브랜치 생성 로직 제거
+  - `/plan-minor` 명령어에서 브랜치 안내 간소화
+  - 브랜치 관리는 `/branch` 명령어로 통합
+
+### Compatibility
+- 기존 워크플로우 100% 호환
+- `/pr` 명령어의 base 브랜치 선택 기능 유지
+
 ## [4.2.0] - 2025-11-28
 
 ### Added

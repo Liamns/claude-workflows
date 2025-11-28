@@ -104,41 +104,21 @@ Epic 계획 완료 후, **첫 번째 Major 기능을 시작할지** 물어볼 �
 
 이 커맨드는 다음을 수행합니다:
 - `.specify/epics/<epic-id>/` 디렉토리 생성
-- **Epic 브랜치 생성** (`NNN-epic-name`)
-- **병합 대상 브랜치 물어봄** (main, develop 등)
 - 분해 내용이 포함된 epic.md 생성
 - 추적을 위한 progress.md 생성
 - 타임라인이 포함된 roadmap.md 생성
 - 의존성(dependency) 그래프 설정
 
-### Branch Strategy
+### 브랜치 관리
 
-- **Branch Creation**: 자동 생성
-- **Branch Name**: `NNN-epic-name` (예: `009-ecommerce-platform`)
-- **Merge Target**: 실행 시 물어봄 (main, develop 등)
-- **Features**: 모든 하위 features는 동일한 Epic 브랜치에서 작업
+Epic 브랜치가 필요한 경우 `/branch` 명령어를 사용하세요.
 
-### Branch State 처리
+```bash
+/branch "ecommerce-platform Epic"
+# → 011-ecommerce-platform-epic 브랜치 생성
+```
 
-`branch-state-handler.sh` 실행 시:
-
-1. **변경사항 감지 시 중단**
-   - 스크립트가 uncommitted changes를 감지하면 자동으로 중단됩니다
-
-2. **AskUserQuestion으로 5가지 옵션 제공**
-   - 커밋 후 계속 (Commit and continue)
-   - 변경사항과 함께 이동 (Move with changes)
-   - Stash 후 계속 (Stash and continue)
-   - 변경사항 삭제 - ⚠️ 복구 불가 (Discard and continue)
-   - 취소 (Cancel)
-
-3. **사용자 선택을 환경 변수로 전달**
-   ```bash
-   BRANCH_ACTION="commit"  # 또는 move_with_changes, stash, discard, cancel
-   ```
-
-4. **스크립트 재실행하여 선택 처리**
-   - 선택된 동작이 자동으로 수행됩니다
+**참고**: Epic 계획과 브랜치 관리는 분리되어 있습니다. Epic 문서 생성 후 필요에 따라 브랜치를 생성하세요.
 
 ### Prerequisites
 
